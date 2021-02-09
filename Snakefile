@@ -7,8 +7,8 @@ rule cutadapt:
         input_r1 = "data/miseq/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz",
         input_r2 = "data/miseq/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz"
     output:
-        output_r1 = "results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz",
-        output_r2 = "results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz",
+        r1 = "results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz",
+        r2 = "results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz",
         report = "results/cutadapt/20190508_0074/FX003-016-16S-V4-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
@@ -22,4 +22,4 @@ rule cutadapt:
     log:
         "logs/cutadapt/FX003-016-16S-V4_S58.log"
     shell:
-        "cutadapt -a {params.adapter_a} -A {params.adapter_A} -o {output.output_r1} -p {output.output_r2} {input.input_r1} {input.input_r2} 2> {output.report}.txt"
+        "cutadapt -a {params.adapter_a} -A {params.adapter_A} -o {output.r1} -p {output.r2} {input.input_r1} {input.input_r2} 2> {output.report}"
