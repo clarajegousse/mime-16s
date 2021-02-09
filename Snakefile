@@ -28,4 +28,32 @@ rule cutadapt:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
-         -m {params.minimum_length} -o {output.r1} -p {output.r2} {input.input_r1} {input.input_r2} 2> {output.report}"
+         -m {params.minimum_length} \
+         -o {output.r1} -p {output.r2} \
+          {input.input_r1} {input.input_r2} \
+          2> {output.report}"
+
+rule trimmomatic:
+    input:
+        r1 = "results/cutadapt/{run}/{sample}_L001_R1_001.fastq.gz",
+        r2 = "results/cutadapt/{run}/{sample}_L001_R2_001.fastq.gz"
+    output:
+        r1_paired = "results/trimmomatic/{run}/{sample}_paired_L001_R1_001.fastq.gz",
+        r2_paired = "results/trimmomatic/{run}/{sample}_paired_L001_R2_001.fastq.gz",
+        r1_unpaired = "results/trimmomatic/{run}/{sample}_unpaired_L001_R1_001.fastq.gz",
+        r2_unpaired = "results/trimmomatic/{run}/{sample}_unpaired_L001_R2_001.fastq.gz"
+    params:
+        leading = 5,
+        trailing = 5,
+        slidingwindow = "4:15",
+        minlen = 100
+        #illuminaclip = "TruSeq3-PE.fa:2:30:10"
+    log:
+        "logs/trimmomatic/{run}/{sample}.log"
+    shell:
+        "java -jar trimmomatic-0.35.jar PE \
+        -phred33 {input.r1} {input.r2} \
+        {output.r1_paired} {output.r1_unpaired} \
+        {output.r2_paired} {output.r2_unpaired} \
+        LEADING:{params.leading} TRAILING:{params.trailing} \
+        SLIDINGWINDOW:{params.slidingwindow} MINLEN:{params.minlen}"
