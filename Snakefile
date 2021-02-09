@@ -7,11 +7,11 @@ rule cutadapt:
         expand(["data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
         "data/miseq/20190508_0074/{sample}_L001_R2_001.fastq.gz"], sample = SAMPLES)
     output:
-        fastq1 = expand("results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz", sample = SAMPLES),
+        fastq1 = expand("results/cutadapt/20190508_0074/{sample}_L001_R1_001.fastq.gz", sample = SAMPLES),
 
-        fastq2 = expand("results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz", sample = SAMPLES),
+        fastq2 = expand("results/cutadapt/20190508_0074/{sample}_L001_R2_001.fastq.gz", sample = SAMPLES),
 
-        qc = expand("results/cutadapt/20190508_0074/FX003-016-16S-V4_S58.qc.txt", sample = SAMPLES)
+        qc = expand("results/cutadapt/20190508_0074/{sample}.qc.txt", sample = SAMPLES)
 
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
@@ -19,7 +19,7 @@ rule cutadapt:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#
         extra="--minimum-length 1 -q 20"
     log:
-        expand("logs/cutadapt/FX003-016-16S-V4_S58.log", sample = SAMPLES)
+        expand("logs/cutadapt/{sample}.log", sample = SAMPLES)
     threads: 4 # set desired number of threads here
     wrapper:
         "0.70.0/bio/cutadapt/pe"
