@@ -22,4 +22,4 @@ rule cutadapt:
     log:
         "logs/cutadapt/FX003-016-16S-V4_S58.log"
     shell:
-        "cutadapt -a {wilcards.adapter_a} -A {wilcards.adapter_A} -o {wilcards.output_r1} -p {wilcards.output_r2} {wilcards.input_r1} {wilcards.input_r2} 2> {wilcards.report}.txt"
+        "cutadapt -a {params.adapter_a} -A {params.adapter_A} -o {output.output_r1} -p {output.output_r2} {input.input_r1} {input.input_r2} 2> {output.report}.txt"
