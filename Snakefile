@@ -5,7 +5,7 @@
 rule cutadapt:
     input:
         ["data/miseq/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz",
-        "data/miseq/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz"])
+        "data/miseq/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz"]
     output:
         fastq1 ="results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz",
 
