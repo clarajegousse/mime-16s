@@ -1,5 +1,6 @@
 #configfile: "config.yaml"
 RUN = ["20190508_0074"]
+
 SAMPLES = ["FX003-016-16S-V4_S58", "FX003-017-16S-V4_S59"]
 # SAMPLES, = glob_wildcards("data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz")
 
@@ -26,4 +27,5 @@ rule cutadapt:
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
-        "cutadapt -a {params.adapter_a} -A {params.adapter_A} -m {params.minimum_length} -o {output.r1} -p {output.r2} {input.input_r1} {input.input_r2} 2> {output.report}"
+        "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
+         -m {params.minimum_length} -o {output.r1} -p {output.r2} {input.input_r1} {input.input_r2} 2> {output.report}"
