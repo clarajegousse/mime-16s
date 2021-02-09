@@ -1,4 +1,4 @@
-SAMPLES = ["FX003-016-16S-V4", "FX003-017-16S-V4"]
+SAMPLES = ["FX003-016-16S-V4_S58", "FX003-017-16S-V4_S59"]
 
 rule cutadapt:
     input:
