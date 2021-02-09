@@ -51,7 +51,7 @@ rule trimmomatic:
     log:
         "logs/trimmomatic/{run}/{sample}.log"
     shell:
-        "java -jar trimmomatic-0.35.jar PE \
+        "trimmomatic PE \
         -phred33 {input.r1} {input.r2} \
         {output.r1_paired} {output.r1_unpaired} \
         {output.r2_paired} {output.r2_unpaired} \
