@@ -6,14 +6,14 @@ rule cutadapt:
     input:
         expand(["data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
         "data/miseq/20190508_0074/{sample}_L001_R2_001.fastq.gz"],
-        sample = config["SAMPLES"])
+        sample = SAMPLES)
     output:
         fastq1 = expand("results/cutadapt/20190508_0074/{sample}_L001_R1_001.fastq.gz",
-        sample = config["SAMPLES"]),
+        sample = SAMPLES),
         fastq2 = expand("results/cutadapt/20190508_0074/{sample}_L001_R2_001.fastq.gz",
-        sample = config["SAMPLES"]),
+        sample = SAMPLES),
         qc = expand("results/cutadapt/20190508_0074/{sample}.qc.txt",
-        sample = config["SAMPLES"])
+        sample = SAMPLES)
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
         adapters="-a AGAGCACACGTCTGAACTCCAGTCAC -g AGATCGGAAGAGCACACGT -A AGAGCACACGTCTGAACTCCAGTCAC -G AGATCGGAAGAGCACACGT",
@@ -21,7 +21,7 @@ rule cutadapt:
         extra="--minimum-length 1 -q 20"
     log:
         expand("logs/cutadapt/{sample}.log",
-        sample = config["SAMPLES"])
+        sample = SAMPLES)
     threads: 4 # set desired number of threads here
     wrapper:
         "0.70.0/bio/cutadapt/pe"
