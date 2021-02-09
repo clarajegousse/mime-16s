@@ -24,4 +24,4 @@ rule cutadapt:
     log:
         "logs/cutadapt/FX003-016-16S-V4_S58.log"
     shell:
-        "cutadapt -a {adapter_a} -A {adapter_A} -o out.1.fastq -p out.2.fastq {input_r1} {input_r2} 2> {report}.txt"
+        "cutadapt -a {adapter_a} -A {adapter_A} -o {output_r1} -p {output_r2} {input_r1} {input_r2} 2> {report}.txt"
