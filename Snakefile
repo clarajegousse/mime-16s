@@ -24,6 +24,6 @@ rule cutadapt:
         minimum_length = 100
         #quality_cutoff = 20
     log:
-        "logs/cutadapt/{sample}.log"
+        "logs/cutadapt/{run}/{sample}.log"
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} -m {params.minimum_length} -o {output.r1} -p {output.r2} {input.input_r1} {input.input_r2} 2> {output.report}"
