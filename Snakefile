@@ -1,15 +1,15 @@
 #configfile: "config.yaml"
-# SAMPLES = ["FX003-016-16S-V4_S58", "FX003-017-16S-V4_S59"]
+SAMPLES = ["FX003-016-16S-V4_S58", "FX003-017-16S-V4_S59"]
 # SAMPLES, = glob_wildcards("data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz")
 
 rule cutadapt:
     input:
-        input_r1 = "data/miseq/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz",
-        input_r2 = "data/miseq/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz"
+        input_r1 = expand("data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz", sample = SAMPLES),
+        input_r2 = expand("data/miseq/20190508_0074/{sample}_L001_R2_001.fastq.gz", sample = SAMPLES)
     output:
-        r1 = "results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R1_001.fastq.gz",
-        r2 = "results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz",
-        report = "results/cutadapt/20190508_0074/FX003-016-16S-V4-qc-report.txt"
+        r1 = expand("results/cutadapt/20190508_0074/{sample}_L001_R1_001.fastq.gz", sample = SAMPLES),
+        r2 = expand("results/cutadapt/20190508_0074/{sample}_L001_R2_001.fastq.gz", sample = SAMPLES),
+        report = expand("results/cutadapt/20190508_0074/{sample}-qc-report.txt", sample = SAMPLES)
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
         adapter_a = "AGAGCACACGTCTGAACTCCAGTCAC",
@@ -20,6 +20,6 @@ rule cutadapt:
         #minimum_length = 1,
         #quality-cutoff = 20
     log:
-        "logs/cutadapt/FX003-016-16S-V4_S58.log"
+        expand("logs/cutadapt/20190508_0074/{sample}.log", sample = SAMPLES)
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} -o {output.r1} -p {output.r2} {input.input_r1} {input.input_r2} 2> {output.report}"
