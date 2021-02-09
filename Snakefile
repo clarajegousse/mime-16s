@@ -20,6 +20,6 @@ rule cutadapt:
         #minimum_length = 1,
         #quality-cutoff = 20
     log:
-        expand("logs/cutadapt/20190508_0074/{sample}.log", sample = SAMPLES)
+        expand("logs/cutadapt/{sample}.log", sample = SAMPLES)
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} -o {output.r1} -p {output.r2} {input.input_r1} {input.input_r2} 2> {output.report}"
