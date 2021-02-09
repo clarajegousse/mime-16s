@@ -11,11 +11,11 @@ rule cutadapt:
         output_r2="results/cutadapt/20190508_0074/FX003-016-16S-V4_S58_L001_R2_001.fastq.gz",
         report="results/cutadapt/20190508_0074/FX003-016-16S-V4-qc-report.txt"
     params:
-        adapter_a="AGAGCACACGTCTGAACTCCAGTCAC",
-        adapter_g="AGATCGGAAGAGCACACGT",
-        adapter_A="AGAGCACACGTCTGAACTCCAGTCAC",
-        adapter_G="AGATCGGAAGAGCACACGT"
+        adaptera="AGAGCACACGTCTGAACTCCAGTCAC",
+        adapterg="AGATCGGAAGAGCACACGT",
+        adapterA="AGAGCACACGTCTGAACTCCAGTCAC",
+        adapterG="AGATCGGAAGAGCACACGT"
     log:
         "logs/cutadapt/FX003-016-16S-V4_S58.log"
     shell:
-        "cutadapt -a {adapter_a} -A {adapter_A} -o {output_r1} -p {output_r2} {input_r1} {input_r2} 2> {report}.txt"
+        "cutadapt -a {adaptera} -A {adapterA} -o {output_r1} -p {output_r2} {input_r1} {input_r2} 2> {report}.txt"
