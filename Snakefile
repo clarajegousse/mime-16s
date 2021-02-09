@@ -19,8 +19,8 @@ rule cutadapt:
         adapter_G = "AGATCGGAAGAGCACACGT",
 
         # https://cutadapt.readthedocs.io/en/stable/guide.html#
-        minimum_length = 1
-        quality-cutoff = 20
+        #minimum_length = 1,
+        #quality-cutoff = 20
     log:
         "logs/cutadapt/FX003-016-16S-V4_S58.log"
     shell:
