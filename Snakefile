@@ -1,6 +1,6 @@
 #configfile: "config.yaml"
-SAMPLES = ["FX003-016-16S-V4_S58", "FX003-017-16S-V4_S59"]
-# SAMPLES, = glob_wildcards("data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz")
+# SAMPLES = ["FX003-016-16S-V4_S58", "FX003-017-16S-V4_S59"]
+SAMPLES, = glob_wildcards("data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz")
 
 rule all:
     input: expand("results/cutadapt/20190508_0074/{sample}_L001_R1_001.fastq.gz", sample = SAMPLES)
