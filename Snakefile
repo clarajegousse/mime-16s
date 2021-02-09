@@ -2,9 +2,7 @@ SAMPLES = ["FX003-016-16S-V4", "FX003-017-16S-V4"]
 
 rule cutadapt:
     input:
-
-        expand(
-        ["data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
+        expand(["data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
         "data/miseq/20190508_0074/{sample}_L001_R2_001.fastq.gz"],
         sample = SAMPLES)
     output:
