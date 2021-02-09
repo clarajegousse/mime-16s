@@ -18,7 +18,7 @@ rule cutadapt:
         adapter_a = "AGAGCACACGTCTGAACTCCAGTCAC",
         adapter_g = "AGATCGGAAGAGCACACGT",
         adapter_A = "AGAGCACACGTCTGAACTCCAGTCAC",
-        adapter_G = "AGATCGGAAGAGCACACGT"
+        adapter_G = "AGATCGGAAGAGCACACGT",
         # https://cutadapt.readthedocs.io/en/stable/guide.html#
         minimum_length = 100
         #quality_cutoff = 20
