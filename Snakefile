@@ -20,7 +20,7 @@ rule cutadapt:
         adapter_A = "AGAGCACACGTCTGAACTCCAGTCAC",
         adapter_G = "AGATCGGAAGAGCACACGT"
         # https://cutadapt.readthedocs.io/en/stable/guide.html#
-        minimum_length = 100,
+        minimum_length = 100
         #quality_cutoff = 20
     log:
         "logs/cutadapt/{sample}.log"
