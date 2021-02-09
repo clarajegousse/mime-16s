@@ -1,9 +1,10 @@
 #configfile: "config.yaml"
-RUNS = ["20190508_0074"]
+
 
 # SAMPLES = ["FX003-016-16S-V4_S58", "FX003-017-16S-V4_S59"]
 # RUNS, SAMPLES, = glob_wildcards("data/miseq/{run}/{sample}_L001_R1_001.fastq.gz")
-SAMPLES, = glob_wildcards("data/miseq/{run}/{sample}_L001_R1_001.fastq.gz", run = RUNS)
+SAMPLES, = glob_wildcards("data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz")
+RUNS = ["20190508_0074"]
 
 rule all:
     input: expand("results/trimmomatic/{run}/{sample}_unpaired_L001_R2_001.fastq.gz", sample = SAMPLES, run = RUNS)
