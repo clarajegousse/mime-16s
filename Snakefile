@@ -9,7 +9,7 @@ rule all:
         # rerun with all inputs uncommented.
         expand(
             "results/dada2/reports/quality-profile/{sample}-quality-profile.png",
-            sample=["a","b"]
+            sample=["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59"]
         ),
         "results/dada2/taxa.RDS"
 
