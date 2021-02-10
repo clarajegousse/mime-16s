@@ -11,11 +11,11 @@ rule all:
 
 rule cutadapt:
     input:
-        input_r1 = "data/miseq/{run}/{sample}_L001_R1_001.fastq.gz",
-        input_r2 = "data/miseq/{run}/{sample}_L001_R2_001.fastq.gz",
+        fwd = "data/miseq/{run}/{sample}_L001_R1_001.fastq.gz",
+        rev = "data/miseq/{run}/{sample}_L001_R2_001.fastq.gz",
     output:
-        r1 = "results/cutadapt/{run}/{sample}_L001_R1_001.fastq.gz",
-        r2 = "results/cutadapt/{run}/{sample}_L001_R2_001.fastq.gz",
+        fwd = "results/cutadapt/{run}/{sample}_L001_R1_001.fastq.gz",
+        rev = "results/cutadapt/{run}/{sample}_L001_R2_001.fastq.gz",
         report = "results/cutadapt/{run}/{sample}-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
@@ -31,19 +31,19 @@ rule cutadapt:
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
          -m {params.minimum_length} \
-         -o {output.r1} -p {output.r2} \
-          {input.input_r1} {input.input_r2} \
+         -o {output.fwd} -p {output.rev} \
+          {input.fwd} {input.rev} \
           2> {output.report}"
 
 rule trimmomatic:
     input:
-        r1 = "results/cutadapt/{run}/{sample}_L001_R1_001.fastq.gz",
-        r2 = "results/cutadapt/{run}/{sample}_L001_R2_001.fastq.gz"
+        fwd = "results/cutadapt/{run}/{sample}_L001_R1_001.fastq.gz",
+        rev = "results/cutadapt/{run}/{sample}_L001_R2_001.fastq.gz"
     output:
-        r1_paired = "results/trimmomatic/{run}/{sample}_paired_L001_R1_001.fastq.gz",
-        r2_paired = "results/trimmomatic/{run}/{sample}_paired_L001_R2_001.fastq.gz",
-        r1_unpaired = "results/trimmomatic/{run}/{sample}_unpaired_L001_R1_001.fastq.gz",
-        r2_unpaired = "results/trimmomatic/{run}/{sample}_unpaired_L001_R2_001.fastq.gz"
+        fwd_paired = "results/trimmomatic/{run}/{sample}_paired_L001_R1_001.fastq.gz",
+        rev_paired = "results/trimmomatic/{run}/{sample}_paired_L001_R2_001.fastq.gz",
+        fwd_unpaired = "results/trimmomatic/{run}/{sample}_unpaired_L001_R1_001.fastq.gz",
+        rev_unpaired = "results/trimmomatic/{run}/{sample}_unpaired_L001_R2_001.fastq.gz"
     params:
         leading = 5,
         trailing = 5,
@@ -54,8 +54,8 @@ rule trimmomatic:
         "logs/trimmomatic/{run}/{sample}.log"
     shell:
         "trimmomatic PE \
-        -phred33 {input.r1} {input.r2} \
-        {output.r1_paired} {output.r1_unpaired} \
-        {output.r2_paired} {output.r2_unpaired} \
+        -phred33 {input.fwd} {input.rev} \
+        {output.fwd_paired} {output.fwd_unpaired} \
+        {output.rev_paired} {output.rev_unpaired} \
         LEADING:{params.leading} TRAILING:{params.trailing} \
         SLIDINGWINDOW:{params.slidingwindow} MINLEN:{params.minlen}"
