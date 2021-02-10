@@ -142,7 +142,7 @@ rule dada2_make_table_pe:
         names= SAMPLES, # Sample names instead of paths
         orderBy="nsamples" # Change the ordering of samples
     log:
-        "logs/dada2/make-table/make-table-pe.log"
+        "logs/dada2/make-table/{{run}}/make-table-pe.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/make-table"
