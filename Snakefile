@@ -15,10 +15,40 @@ rule all:
         ),
         #"results/dada2/taxa.RDS"
 
+rule cutadapt:
+    input:
+        fwd = "data/miseq/{run}/{sample}_L001_R1_001.fastq.gz",
+        rev = "data/miseq/{run}/{sample}_L001_R2_001.fastq.gz",
+    output:
+        fwd = "trimmed/{run}/{sample}.1.fastq.gz",
+        rev = "trimmed/{run}/{sample}.1.fastq.gz",
+        report = "reports/cutadapt/{run}/{sample}-qc-report.txt"
+    params:
+        # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
+        # https://earthmicrobiome.org/protocols-and-standards/16s/
+        # Updated sequences: 515F (Parada)–806R (Apprill), forward-barcoded:
+        # FWD:GTGYCAGCMGCCGCGGTAA; REV:GGACTACNVGGGTWTCTAAT
+        # echo 'GGACTACNVGGGTWTCTAAT' | rev
+        adapter_a = "^GTGYCAGCMGCCGCGGTAA...AATGGCGCCGMCGACYGTG",
+        adapter_A = "^GGACTACNVGGGTWTCTAAT...TAATCTWTGGGVNCATCAGG",
+        # https://cutadapt.readthedocs.io/en/stable/guide.html#
+        minimum_length = 150
+        maximum_length = 280
+        #quality_cutoff = 20
+    log:
+        "logs/cutadapt/{run}/{sample}.log"
+    shell:
+        "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
+         -m {params.minimum_length} -M {params.maximum_length} \
+         --discard-untrimmed \
+         -o {output.fwd} -p {output.rev} \
+          {input.fwd} {input.rev} \
+          2> {output.report}"
+
 rule dada2_quality_profile_pe:
     input:
         # FASTQ file without primer sequences
-        expand("trimmed/{{sample}}.{orientation}.fastq.gz",orientation=[1,2])
+        expand("trimmed/{run}/{{sample}}.{orientation}.fastq.gz", orientation = [1,2])
     output:
         "reports/dada2/quality-profile/{sample}-quality-profile.png"
     log:
