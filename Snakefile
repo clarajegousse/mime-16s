@@ -13,6 +13,7 @@ rule all:
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
         expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
+        "logs/dada2/learn-errors/{run}/learn-errors_{orientation}.log",
         sample = SAMPLES,
         run = RUNS),
         #"results/dada2/taxa.RDS"
@@ -77,3 +78,18 @@ rule dada2_filter_trim_pe:
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/filter-trim"
+
+rule dada2_learn_errors:
+    input:
+    # Quality filtered and trimmed forward FASTQ files (potentially compressed)
+        expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.{{orientation}}.fastq.gz", sample=["a","b"])
+    output:
+        err="results/dada2/{run}/model_{orientation}.RDS",# save the error model
+        plot="reports/dada2/{run}/errors_{orientation}.png",# plot observed and estimated rates
+    params:
+        randomize=True
+    log:
+        "logs/dada2/learn-errors/{run}/learn-errors_{orientation}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/learn-errors"
