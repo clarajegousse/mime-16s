@@ -93,7 +93,6 @@ rule dada2_learn_errors:
     wrapper:
         "0.70.0/bio/dada2/learn-errors"
 
-
 rule dada2_dereplicate_fastq:
     input:
     # Quality filtered FASTQ file
@@ -136,7 +135,7 @@ rule dada2_merge_pairs:
 rule dada2_make_table_pe:
     input:
     # Merged composition
-        expand("results/merged/{run}/{sample}.RDS", sample=['a','b'])
+        expand("results/merged/{run}/{sample}.RDS", sample = SAMPLES, run = RUNS)
     output:
         "results/dada2/{run}/seqTab-pe.RDS"
     params:
