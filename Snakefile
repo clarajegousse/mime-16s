@@ -135,7 +135,7 @@ rule dada2_merge_pairs:
 rule dada2_make_table_pe:
     input:
     # Merged composition
-        expand("results/merged/{run}/{sample}.RDS", sample = SAMPLES, run = RUNS)
+        expand("results/merged/{{run}}/{sample}.RDS", sample = SAMPLES)
     output:
         "results/dada2/{{run}}/seqTab-pe.RDS"
     params:
