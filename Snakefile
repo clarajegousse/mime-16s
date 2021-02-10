@@ -10,7 +10,8 @@ rule all:
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
         expand(
-            "reports/dada2/quality-profile/{run}/{sample}-quality-profile.png",
+            #"reports/dada2/quality-profile/{run}/{sample}-quality-profile.png",
+            "reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
             sample = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"],
             run = "20190508_0074"
         ),
