@@ -134,48 +134,48 @@ rule dada2_merge_pairs:
 rule dada2_make_table_pe:
     input:
     # Merged composition
-        expand("results/merged/{{{run}}}/{sample}.RDS", sample = SAMPLES)
+        expand("results/merged/{{run}}/{sample}.RDS", sample = SAMPLES)
     output:
-        "results/dada2/{{{run}}}/seqTab-pe.RDS"
+        "results/dada2/{{run}}/seqTab-pe.RDS"
     params:
         names= SAMPLES, # Sample names instead of paths
         orderBy="nsamples" # Change the ordering of samples
     log:
-        "logs/dada2/make-table/{{{run}}}/make-table-pe.log"
+        "logs/dada2/make-table/{{run}}/make-table-pe.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/make-table"
 
 rule dada2_remove_chimeras:
     input:
-        "results/dada2/{{{run}}}/seqTab-pe.RDS" # Sequence table
+        "results/dada2/{{run}}/seqTab-pe.RDS" # Sequence table
     output:
-        "results/dada2/{{{run}}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
+        "results/dada2/{{run}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
     log:
-        "logs/dada2/remove-chimeras/{{{run}}}/remove-chimeras.log"
+        "logs/dada2/remove-chimeras/{{run}}/remove-chimeras.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/remove-chimeras"
 
 rule dada2_collapse_nomismatch:
     input:
-        "results/dada2/{{{run}}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
+        "results/dada2/{{run}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
     output:
-        "results/dada2/{{{run}}}/seqTab.collapsed.RDS"
+        "results/dada2/{{run}}/seqTab.collapsed.RDS"
     log:
-        "logs/dada2/{{{run}}}/collapse-nomismatch/collapse-nomismatch.log"
+        "logs/dada2/{{run}}/collapse-nomismatch/collapse-nomismatch.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/collapse-nomismatch"
 
 rule dada2_assign_taxonomy:
     input:
-        seqs="results/dada2/{{{run}}}/seqTab.collapsed.RDS", # Chimera-free sequence table
+        seqs="results/dada2/{{run}}/seqTab.collapsed.RDS", # Chimera-free sequence table
         refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
     output:
-        "results/dada2/{{{run}}}/taxa.RDS" # Taxonomic assignments
+        "results/dada2/{{run}}/taxa.RDS" # Taxonomic assignments
     log:
-        "logs/dada2/{{{run}}}/assign-taxonomy/assign-taxonomy.log"
+        "logs/dada2/{{run}}/assign-taxonomy/assign-taxonomy.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/assign-taxonomy"
