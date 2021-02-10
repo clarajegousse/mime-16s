@@ -14,6 +14,7 @@ rule all:
         # rerun with all inputs uncommented.
         expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
         sample = SAMPLES, run = RUNS),
+        expand("results/dada2/{run}/taxa.RDS", run = RUNS)
 
 rule cutadapt:
     input:
