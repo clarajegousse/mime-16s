@@ -12,19 +12,18 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        #expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
-        #sample = SAMPLES,
-        #run = RUNS),
-        expand("results/dada2/{run}/taxa.RDS", run = RUNS)
+        expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
+        sample = SAMPLES,
+        run = RUNS),
 
 rule cutadapt:
     input:
-        fwd = "data/miseq/{run}/{sample}_L001_R1_001.fastq.gz",
-        rev = "data/miseq/{run}/{sample}_L001_R2_001.fastq.gz",
+        fwd = "data/miseq/{{run}}/{sample}_L001_R1_001.fastq.gz",
+        rev = "data/miseq/{{run}}/{sample}_L001_R2_001.fastq.gz",
     output:
-        fwd = "results/trimmed/{run}/{sample}.1.fastq.gz",
-        rev = "results/trimmed/{run}/{sample}.2.fastq.gz",
-        report = "results/reports/cutadapt/{run}/{sample}-qc-report.txt"
+        fwd = "results/trimmed/{{run}}/{sample}.1.fastq.gz",
+        rev = "results/trimmed/{{run}}/{sample}.2.fastq.gz",
+        report = "results/reports/cutadapt/{{run}}/{sample}-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
         # https://earthmicrobiome.org/protocols-and-standards/16s/
@@ -38,7 +37,7 @@ rule cutadapt:
         maximum_length = 280
         #quality_cutoff = 20
     log:
-        "logs/cutadapt/{run}/{sample}.log"
+        "logs/cutadapt/{{run}}/{sample}.log"
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
          -m {params.minimum_length} -M {params.maximum_length} \
@@ -50,30 +49,30 @@ rule cutadapt:
 rule dada2_quality_profile_pe:
     input:
         # FASTQ file without primer sequences
-        expand("results/trimmed/{{run}}/{{sample}}.{orientation}.fastq.gz", orientation = [1,2])
+        expand("results/trimmed/{{{run}}}/{{sample}}.{orientation}.fastq.gz", orientation = [1,2])
     output:
-        "results/reports/dada2/quality-profile/{run}/{sample}-quality-profile.png"
+        "results/reports/dada2/quality-profile/{{run}}/{sample}-quality-profile.png"
     log:
-        "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
+        "logs/dada2/quality-profile/{{run}}/{sample}-quality-profile-pe.log"
     wrapper:
         "0.70.0/bio/dada2/quality-profile"
 
 rule dada2_filter_trim_pe:
     input:
         # Paired-end files without primer sequences
-        fwd="results/trimmed/{run}/{sample}.1.fastq.gz",
-        rev="results/trimmed/{run}/{sample}.2.fastq.gz"
+        fwd="results/trimmed/{{run}}/{sample}.1.fastq.gz",
+        rev="results/trimmed/{{run}}/{sample}.2.fastq.gz"
     output:
-        filt="results/filtered-pe/{run}/{sample}.1.fastq.gz",
-        filt_rev="results/filtered-pe/{run}/{sample}.2.fastq.gz",
-        stats="results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv"
+        filt="results/filtered-pe/{{run}}/{sample}.1.fastq.gz",
+        filt_rev="results/filtered-pe/{{run}}/{sample}.2.fastq.gz",
+        stats="results/reports/dada2/filter-trim-pe/{{run}}/{sample}.tsv"
     params:
         # Set the maximum expected errors tolerated in filtered reads
         maxEE=[2,2],
         # Set the number of kept bases in forward and reverse reads
         truncLen=[240,200]
     log:
-        "logs/dada2/filter-trim-pe/{run}/{sample}.log"
+        "logs/dada2/filter-trim-pe/{{run}}/{sample}.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/filter-trim"
@@ -81,14 +80,14 @@ rule dada2_filter_trim_pe:
 rule dada2_learn_errors:
     input:
     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-        expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES, run = RUNS)
+        expand("results/reports/dada2/filter-trim-pe/{{run}}/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
     output:
-        err="results/dada2/{run}/model_{orientation}.RDS",# save the error model
-        plot="reports/dada2/{run}/errors_{orientation}.png",# plot observed and estimated rates
+        err="results/dada2/{{run}}/model_{orientation}.RDS",# save the error model
+        plot="reports/dada2/{{run}}/errors_{orientation}.png",# plot observed and estimated rates
     params:
         randomize=True
     log:
-        "logs/dada2/learn-errors/{run}/learn-errors_{orientation}.log"
+        "logs/dada2/learn-errors/{{run}}/learn-errors_{orientation}.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/learn-errors"
@@ -96,38 +95,38 @@ rule dada2_learn_errors:
 rule dada2_dereplicate_fastq:
     input:
     # Quality filtered FASTQ file
-        "results/filtered-pe/{run}/{fastq}.fastq.gz"
+        "results/filtered-pe/{{run}}/{fastq}.fastq.gz"
     output:
     # Dereplicated sequences stored as `derep-class` object in a RDS file
-        "results/uniques/{run}/{fastq}.RDS"
+        "results/uniques/{{run}}/{fastq}.RDS"
     log:
-        "logs/dada2/dereplicate-fastq/{run}/{fastq}.log"
+        "logs/dada2/dereplicate-fastq/{{run}}/{fastq}.log"
     wrapper:
         "0.70.0/bio/dada2/dereplicate-fastq"
 
 rule dada2_sample_inference:
     input:
     # Dereplicated (aka unique) sequences of the sample
-        derep="results/uniques/{run}/{sample}.{orientation}.RDS",
-        err="results/dada2/{run}/model_{orientation}.RDS" # Error model
+        derep="results/uniques/{{run}}/{sample}.{orientation}.RDS",
+        err="results/dada2/{{run}}/model_{orientation}.RDS" # Error model
     output:
-        "results/denoised/{run}/{sample}.{orientation}.RDS" # Inferred sample composition
+        "results/denoised/{{run}}/{sample}.{orientation}.RDS" # Inferred sample composition
     log:
-        "logs/dada2/sample-inference/{run}/{sample}.{orientation}.log"
+        "logs/dada2/sample-inference/{{run}}/{sample}.{orientation}.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/sample-inference"
 
 rule dada2_merge_pairs:
     input:
-      dadaF="results/denoised/{run}/{sample}.1.RDS",# Inferred composition
-      dadaR="results/denoised/{run}/{sample}.2.RDS",
-      derepF="results/uniques/{run}/{sample}.1.RDS",# Dereplicated sequences
-      derepR="results/uniques/{run}/{sample}.2.RDS"
+      dadaF="results/denoised/{{run}}/{sample}.1.RDS",# Inferred composition
+      dadaR="results/denoised/{{run}}/{sample}.2.RDS",
+      derepF="results/uniques/{{run}}/{sample}.1.RDS",# Dereplicated sequences
+      derepR="results/uniques/{{run}}/{sample}.2.RDS"
     output:
-        "results/merged/{run}/{sample}.RDS"
+        "results/merged/{{run}}/{sample}.RDS"
     log:
-        "logs/dada2/merge-pairs/{run}/{sample}.log"
+        "logs/dada2/merge-pairs/{{run}}/{sample}.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/merge-pairs"
@@ -135,48 +134,48 @@ rule dada2_merge_pairs:
 rule dada2_make_table_pe:
     input:
     # Merged composition
-        expand("results/merged/{{run}}/{sample}.RDS", sample = SAMPLES)
+        expand("results/merged/{{{run}}}/{sample}.RDS", sample = SAMPLES)
     output:
-        "results/dada2/{{run}}/seqTab-pe.RDS"
+        "results/dada2/{{{run}}}/seqTab-pe.RDS"
     params:
         names= SAMPLES, # Sample names instead of paths
         orderBy="nsamples" # Change the ordering of samples
     log:
-        "logs/dada2/make-table/{{run}}/make-table-pe.log"
+        "logs/dada2/make-table/{{{run}}}/make-table-pe.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/make-table"
 
 rule dada2_remove_chimeras:
     input:
-        "results/dada2/{{run}}/seqTab-pe.RDS" # Sequence table
+        "results/dada2/{{{run}}}/seqTab-pe.RDS" # Sequence table
     output:
-        "results/dada2/{{run}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
+        "results/dada2/{{{run}}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
     log:
-        "logs/dada2/remove-chimeras/{{run}}/remove-chimeras.log"
+        "logs/dada2/remove-chimeras/{{{run}}}/remove-chimeras.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/remove-chimeras"
 
 rule dada2_collapse_nomismatch:
     input:
-        "results/dada2/{{run}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
+        "results/dada2/{{{run}}}/seqTab.nochimeras.RDS" # Chimera-free sequence table
     output:
-        "results/dada2/{{run}}/seqTab.collapsed.RDS"
+        "results/dada2/{{{run}}}/seqTab.collapsed.RDS"
     log:
-        "logs/dada2/{{run}}/collapse-nomismatch/collapse-nomismatch.log"
+        "logs/dada2/{{{run}}}/collapse-nomismatch/collapse-nomismatch.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/collapse-nomismatch"
 
 rule dada2_assign_taxonomy:
     input:
-        seqs="results/dada2/{{run}}/seqTab.collapsed.RDS", # Chimera-free sequence table
+        seqs="results/dada2/{{{run}}}/seqTab.collapsed.RDS", # Chimera-free sequence table
         refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
     output:
-        "results/dada2/{{run}}/taxa.RDS" # Taxonomic assignments
+        "results/dada2/{{{run}}}/taxa.RDS" # Taxonomic assignments
     log:
-        "logs/dada2/{{run}}/assign-taxonomy/assign-taxonomy.log"
+        "logs/dada2/{{{run}}}/assign-taxonomy/assign-taxonomy.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/assign-taxonomy"
