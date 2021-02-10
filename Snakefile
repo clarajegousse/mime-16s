@@ -6,12 +6,13 @@
 
 SAMPLES = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"]
 RUNS = ["20190508_0074"]
+
 rule all:
     input:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand("results/reports/cutadapt/{run}/{sample}-qc-report.txt",
+        expand("results/reports/dada2/quality-profile/{run}/{sample}-quality-profile.png",
         sample = SAMPLES,
         run = RUNS),
         #"results/dada2/taxa.RDS"
@@ -45,3 +46,14 @@ rule cutadapt:
          -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
           2> {output.report}"
+
+rule dada2_quality_profile_pe:
+    input:
+        # FASTQ file without primer sequences
+        expand("results/trimmed/{{run}}/{{sample}}.{orientation}.fastq.gz", orientation = [1,2])
+    output:
+        "results/reports/dada2/quality-profile/{run}/{sample}-quality-profile.png"
+    log:
+        "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
+    wrapper:
+        "0.70.0/bio/dada2/quality-profile"
