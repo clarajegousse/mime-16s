@@ -20,8 +20,8 @@ rule cutadapt:
         fwd = "data/miseq/{run}/{sample}_L001_R1_001.fastq.gz",
         rev = "data/miseq/{run}/{sample}_L001_R2_001.fastq.gz",
     output:
-        out_fwd = "trimmed/{run}/{sample}.1.fastq.gz",
-        out_rev = "trimmed/{run}/{sample}.1.fastq.gz",
+        fwd = "trimmed/{run}/{sample}.1.fastq.gz",
+        rev = "trimmed/{run}/{sample}.2.fastq.gz",
         report = "reports/cutadapt/{run}/{sample}-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
@@ -41,7 +41,7 @@ rule cutadapt:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
          -m {params.minimum_length} -M {params.maximum_length} \
          --discard-untrimmed \
-         -o {output.out_fwd} -p {output.out_rev} \
+         -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
           2> {output.report}"
 
