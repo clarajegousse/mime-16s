@@ -12,7 +12,7 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand("results/reports/dada2/quality-profile/{run}/{sample}-quality-profile.png",
+        expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
         sample = SAMPLES,
         run = RUNS),
         #"results/dada2/taxa.RDS"
@@ -57,3 +57,23 @@ rule dada2_quality_profile_pe:
         "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
     wrapper:
         "0.70.0/bio/dada2/quality-profile"
+
+rule dada2_filter_trim_pe:
+    input:
+        # Paired-end files without primer sequences
+        fwd="results/trimmed/{run}/{sample}.1.fastq.gz",
+        rev="results/trimmed/{run}/{sample}.2.fastq.gz"
+    output:
+        filt="results/filtered-pe/{run}/{sample}.1.fastq.gz",
+        filt_rev="results/filtered-pe/{run}/{sample}.2.fastq.gz",
+        stats="results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv"
+    params:
+        # Set the maximum expected errors tolerated in filtered reads
+        maxEE=[2,2],
+        # Set the number of kept bases in forward and reverse reads
+        truncLen=[240,200]
+    log:
+        "logs/dada2/filter-trim-pe/{run}/{sample}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/filter-trim"
