@@ -11,7 +11,7 @@ rule all:
         # rerun with all inputs uncommented.
         expand(
             "reports/dada2/quality-profile/{run}/{sample}-quality-profile.png",
-            sample = ["FX003-016-16S-V4","FX003-017-16S-V4", "FX008-028-16S-V4"],
+            sample = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"],
             run = "20190508_0074"
         ),
         #"results/dada2/taxa.RDS"
