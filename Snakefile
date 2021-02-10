@@ -137,7 +137,7 @@ rule dada2_make_table_pe:
     # Merged composition
         expand("results/merged/{run}/{sample}.RDS", sample = SAMPLES, run = RUNS)
     output:
-        "results/dada2/{run}/seqTab-pe.RDS"
+        "results/dada2/{{run}}/seqTab-pe.RDS"
     params:
         names= SAMPLES, # Sample names instead of paths
         orderBy="nsamples" # Change the ordering of samples
