@@ -32,7 +32,7 @@ rule cutadapt:
         adapter_a = "^GTGYCAGCMGCCGCGGTAA...AATGGCGCCGMCGACYGTG",
         adapter_A = "^GGACTACNVGGGTWTCTAAT...TAATCTWTGGGVNCATCAGG",
         # https://cutadapt.readthedocs.io/en/stable/guide.html#
-        minimum_length = 150
+        minimum_length = 150,
         maximum_length = 280
         #quality_cutoff = 20
     log:
