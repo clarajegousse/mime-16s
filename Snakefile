@@ -11,7 +11,9 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand(),
+        expand("results/reports/cutadapt/{run}/{sample}-qc-report.txt",
+        sample = SAMPLES,
+        run = RUNS),
         #"results/dada2/taxa.RDS"
 
 rule cutadapt:
