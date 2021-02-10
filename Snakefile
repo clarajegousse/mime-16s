@@ -5,16 +5,16 @@
 # If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
 
 SAMPLES = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"]
-RUNS = ["20190508_0074"]
+RUN = ["20190508_0074"]
+run = RUN
 
 rule all:
     input:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
-        sample = SAMPLES,
-        run = RUNS),
+        expand("results/reports/dada2/filter-trim-pe/{{run}}/{sample}.tsv",
+        sample = SAMPLES),
 
 rule cutadapt:
     input:
