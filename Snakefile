@@ -13,9 +13,9 @@ rule all:
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
         expand("results/reports/dada2/filter-trim-pe/{run}/{sample}.tsv",
+        "results/dada2/{run}/taxa.RDS",
         sample = SAMPLES,
-        run = RUNS),
-        "results/dada2/taxa.RDS"
+        run = RUNS)
 
 rule cutadapt:
     input:
