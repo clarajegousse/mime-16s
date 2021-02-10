@@ -12,7 +12,7 @@ rule all:
         expand(
             "reports/dada2/quality-profile/{run}/{sample}-quality-profile.png",
             sample=["FX003-016-16S-V4","FX003-017-16S-V4", "FX008-028-16S-V4"],
-            run = ["20190508_0074"]
+            run = "20190508_0074"
         ),
         #"results/dada2/taxa.RDS"
 
