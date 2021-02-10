@@ -11,7 +11,7 @@ rule all:
         # rerun with all inputs uncommented.
         expand(
             "reports/dada2/quality-profile/{run}/{sample}-quality-profile.png",
-            sample=["FX003-016-16S-V4","FX003-017-16S-V4", "FX008-028-16S-V4"],
+            sample = ["FX003-016-16S-V4","FX003-017-16S-V4", "FX008-028-16S-V4"],
             run = "20190508_0074"
         ),
         #"results/dada2/taxa.RDS"
@@ -51,9 +51,9 @@ rule dada2_quality_profile_pe:
         # FASTQ file without primer sequences
         expand("trimmed/{run}/{{sample}}.{orientation}.fastq.gz", orientation = [1,2])
     output:
-        "reports/dada2/quality-profile/{sample}-quality-profile.png"
+        "reports/dada2/quality-profile/{run}/{sample}-quality-profile.png"
     log:
-        "logs/dada2/quality-profile/{sample}-quality-profile-pe.log"
+        "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
     wrapper:
         "0.70.0/bio/dada2/quality-profile"
 
