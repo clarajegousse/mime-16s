@@ -67,7 +67,7 @@ rule dada2_filter_trim_pe:
         stats="results/reports/dada2/filter-trim-pe/20190508_0074/{sample}.tsv"
     params:
         # Set the maximum expected errors tolerated in filtered reads
-        maxEE=[2,2],
+        maxEE=2,
         # Set the number of kept bases in forward and reverse reads
         truncLen=[240,200]
     log:
