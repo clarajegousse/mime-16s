@@ -3,7 +3,7 @@
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
 # If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
-
+import pandas as pd
 configfile: "config.yaml"
 
 rule all:
