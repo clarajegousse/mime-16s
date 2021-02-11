@@ -3,8 +3,6 @@
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
 # If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
-import rpy2
-from snakemake.utils import R
 
 SAMPLES = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"]
 #RUNS = ["20190508_0074"]
@@ -162,6 +160,16 @@ rule dada2_make_table_pe:
 #         # Access any global or local variables from the Snakefile with the braces notation
 #         uniquesToFasta(seqtab, {output})
 #         """)
+
+rule export_seqtab_to_fasta:
+    input:
+        "results/dada2/merged/20190508_0074/{sample}.RDS"
+    output:
+        "results/dada2/seqtab/20190508_0074/{sample}-seqtab-pe.fa"
+    shell:
+        "Rscript scripts/export_seqtab_to_fasta.R {input} {output}"
+# Rscript a.R
+
 
 rule dada2_remove_chimeras:
     input:
