@@ -14,10 +14,9 @@ rule all:
         # rerun with all inputs uncommented.
         # expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
         # sample = SAMPLES)
-        #expand("results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS", orientation = [1,2])
         expand("results/dada2/seqtab/20190508_0074/{sample}-seqtab-pe.fa", sample = SAMPLES)
-        # expand("results/dada2/seqtab/20190508_0074/{sample}-seqtab-pe.fa", sample = SAMPLES)
         #"results/dada2/taxa/20190508_0074/taxa.RDS"
+
 rule cutadapt:
     input:
         fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
@@ -147,29 +146,14 @@ rule dada2_make_table_pe:
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/make-table"
-#
-# rule export_seqtab_to_fasta:
-#     input:
-#         "results/dada2/merged/20190508_0074/{sample}.RDS"
-#     output:
-#         "results/dada2/seqtab/20190508_0074/{sample}-seqtab-pe.fa"
-#     run:
-#         R("""
-#         library(dada2)
-#         seqtab <- readRDS({input})
-#         # Access any global or local variables from the Snakefile with the braces notation
-#         uniquesToFasta(seqtab, {output})
-#         """)
 
 rule export_seqtab_to_fasta:
     input:
         "results/dada2/merged/20190508_0074/{sample}.RDS"
     output:
-        "results/dada2/seqtab/20190508_0074/{sample}-seqtab-pe.fa"
+        "results/dada2/merged/20190508_0074/{sample}-seqtab-merged.fa"
     shell:
         "./scripts/export_seqtab_to_fasta.R {input} {output}"
-# Rscript a.R
-
 
 rule dada2_remove_chimeras:
     input:
