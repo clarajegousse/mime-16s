@@ -62,8 +62,8 @@ rule dada2_filter_trim_pe:
         fwd="results/trimmed/20190508_0074/{sample}.1.fastq.gz",
         rev="results/trimmed/20190508_0074/{sample}.2.fastq.gz"
     output:
-        filt="results/filtered-pe/20190508_0074/{sample}.1.fastq.gz",
-        filt_rev="results/filtered-pe/20190508_0074/{sample}.2.fastq.gz",
+        filt="results/dada2/filtered-pe/20190508_0074/{sample}.1.fastq.gz",
+        filt_rev="results/dada2/filtered-pe/20190508_0074/{sample}.2.fastq.gz",
         stats="results/reports/dada2/filter-trim-pe/20190508_0074/{sample}.tsv"
     params:
         # Set the maximum expected errors tolerated in filtered reads
