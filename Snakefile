@@ -12,6 +12,7 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
+
         # expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
         # sample = SAMPLES)
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
@@ -81,7 +82,7 @@ rule dada2_filter_trim_pe:
 rule dada2_learn_errors:
     input:
     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-        expand("results/dada2/filtered_trim_pe/20190508_0074/{{sample}}.{{orientation}}.fastq.gz")
+        expand("results/dada2/filtered_trim_pe/20190508_0074/{sample}.{{orientation}}.fastq.gz")
     output:
         err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS",# save the error model
         plot="reports/dada2/learn-errors/20190508_0074/errors_{orientation}.png",# plot observed and estimated rates
