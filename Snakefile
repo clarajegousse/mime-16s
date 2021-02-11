@@ -79,7 +79,7 @@ rule dada2_filter_trim_pe:
 rule dada2_learn_errors:
     input:
     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-        expand("results/reports/dada2/filter-trim-pe/20190508_0074/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
+        expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
     output:
         err="results/dada2/20190508_0074/model_{orientation}.RDS",# save the error model
         plot="reports/dada2/20190508_0074/errors_{orientation}.png",# plot observed and estimated rates
