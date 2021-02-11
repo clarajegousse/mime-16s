@@ -164,7 +164,7 @@ rule kraken2:
         stdout = "results/kraken2/20190508_0074/{sample}-kraken2-stdout.txt",
         stderr = "results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt"
     shell:
-        "kraken2 --db {input.db} --threads 4 --report {output.report} 1> {output.stdout} 2> {output.stderr}"
+        "kraken2 --db {input.db} --threads 4 --report {output.report} {input.fasta} 1> {output.stdout} 2> {output.stderr}"
 
 rule dada2_remove_chimeras:
     input:
