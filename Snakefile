@@ -167,7 +167,7 @@ rule export_seqtab_to_fasta:
     output:
         "results/dada2/seqtab/20190508_0074/{sample}-seqtab-pe.fa"
     shell:
-        "Rscript scripts/export_seqtab_to_fasta.R {input} {output}"
+        "./scripts/export_seqtab_to_fasta.R {input} {output}"
 # Rscript a.R
 
 
