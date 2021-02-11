@@ -13,7 +13,7 @@ rule all:
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
 
-        # expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
+        expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv")
         # sample = SAMPLES)
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
         "results/dada2/taxa/20190508_0074/taxa.RDS"
