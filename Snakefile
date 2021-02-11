@@ -13,8 +13,7 @@ rule all:
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
         expand("results/reports/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
-        sample = SAMPLES),
-        "results/dada2/20190508_0074/taxa.RDS"
+        sample = SAMPLES)
 rule cutadapt:
     input:
         fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
