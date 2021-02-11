@@ -7,16 +7,16 @@
 #SAMPLES = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"]
 #RUNS = ["20190508_0074"]
 
-rule all:
-    input:
-        # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
-        # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
-        # rerun with all inputs uncommented.
-
-        "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
-        # sample = SAMPLES)
-        #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
-        "results/dada2/taxa/20190508_0074/taxa.RDS"
+# rule all:
+#     input:
+#         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
+#         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
+#         # rerun with all inputs uncommented.
+#
+#         "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
+#         # sample = SAMPLES)
+#         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
+#         "results/dada2/taxa/20190508_0074/taxa.RDS"
 
 rule cutadapt:
     input:
