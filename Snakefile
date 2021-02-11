@@ -3,7 +3,7 @@
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
 # If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
-
+import rpy2
 from snakemake.utils import R
 
 SAMPLES = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"]
