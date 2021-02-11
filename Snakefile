@@ -12,8 +12,9 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
-        sample = SAMPLES)
+        # expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
+        # sample = SAMPLES)
+        expand("results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS", orientation = [1,2])
 rule cutadapt:
     input:
         fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
@@ -75,20 +76,20 @@ rule dada2_filter_trim_pe:
     wrapper:
         "0.70.0/bio/dada2/filter-trim"
 
-# rule dada2_learn_errors:
-#     input:
-#     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-#         expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
-#     output:
-#         err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS",# save the error model
-#         plot="reports/dada2/learn-errors/20190508_0074/errors_{orientation}.png",# plot observed and estimated rates
-#     params:
-#         randomize=True
-#     log:
-#         "logs/dada2/learn-errors/20190508_0074/learn-errors_{orientation}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/learn-errors"
+rule dada2_learn_errors:
+    input:
+    # Quality filtered and trimmed forward FASTQ files (potentially compressed)
+        expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
+    output:
+        err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS",# save the error model
+        plot="reports/dada2/learn-errors/20190508_0074/errors_{orientation}.png",# plot observed and estimated rates
+    params:
+        randomize=True
+    log:
+        "logs/dada2/learn-errors/20190508_0074/learn-errors_{orientation}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/learn-errors"
 #
 # rule dada2_dereplicate_fastq:
 #     input:
