@@ -12,11 +12,8 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-
-        # TO RUN dada2_filter_trim_pe
-        expand("results/dada2/filtered-pe/20190508_0074/{sample}.2.fastq.gz",
-        sample = SAMPLES),
-        #expand("results/dada2/20190508_0074/model_{orientation}.RDS", orientation = [1,2])
+        expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
+        sample = SAMPLES)
 rule cutadapt:
     input:
         fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
