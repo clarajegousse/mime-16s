@@ -4,7 +4,7 @@
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
 # If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
 import pandas as pd
-
+from snakemake.utils import validate
 
 configfile: "config.yaml"
 validate(config, "config.schema.yaml")
