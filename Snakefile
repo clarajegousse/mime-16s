@@ -15,7 +15,7 @@ rule all:
         # expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
         # sample = SAMPLES)
         #expand("results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS", orientation = [1,2])
-        "results/dada2/uniques/20190508_0074/{fastq}.RDS"
+        expand("results/dada2/merged/20190508_0074/{sample}.RDS", sample = SAMPLES)
 rule cutadapt:
     input:
         fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
@@ -103,33 +103,33 @@ rule dada2_dereplicate_fastq:
         "logs/dada2/dereplicate-fastq/20190508_0074/{fastq}.log"
     wrapper:
         "0.70.0/bio/dada2/dereplicate-fastq"
-#
-# rule dada2_sample_inference:
-#     input:
-#     # Dereplicated (aka unique) sequences of the sample
-#         derep="results/uniques/20190508_0074/{sample}.{orientation}.RDS",
-#         err="results/dada2/20190508_0074/model_{orientation}.RDS" # Error model
-#     output:
-#         "results/denoised/20190508_0074/{sample}.{orientation}.RDS" # Inferred sample composition
-#     log:
-#         "logs/dada2/sample-inference/20190508_0074/{sample}.{orientation}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/sample-inference"
-#
-# rule dada2_merge_pairs:
-#     input:
-#       dadaF="results/denoised/20190508_0074/{sample}.1.RDS",# Inferred composition
-#       dadaR="results/denoised/20190508_0074/{sample}.2.RDS",
-#       derepF="results/uniques/20190508_0074/{sample}.1.RDS",# Dereplicated sequences
-#       derepR="results/uniques/20190508_0074/{sample}.2.RDS"
-#     output:
-#         "results/merged/20190508_0074/{sample}.RDS"
-#     log:
-#         "logs/dada2/merge-pairs/20190508_0074/{sample}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/merge-pairs"
+
+rule dada2_sample_inference:
+    input:
+    # Dereplicated (aka unique) sequences of the sample
+        derep="results/dada2/uniques/20190508_0074/{sample}.{orientation}.RDS",
+        err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS" # Error model
+    output:
+        "results/dada2/denoised/20190508_0074/{sample}.{orientation}.RDS" # Inferred sample composition
+    log:
+        "logs/dada2/sample-inference/20190508_0074/{sample}.{orientation}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/sample-inference"
+
+rule dada2_merge_pairs:
+    input:
+      dadaF="results/dada2/denoised/20190508_0074/{sample}.1.RDS",# Inferred composition
+      dadaR="results/dada2/denoised/20190508_0074/{sample}.2.RDS",
+      derepF="results/dada2/uniques/20190508_0074/{sample}.1.RDS",# Dereplicated sequences
+      derepR="results/dada2/uniques/20190508_0074/{sample}.2.RDS"
+    output:
+        "results/dada2/merged/20190508_0074/{sample}.RDS"
+    log:
+        "logs/dada2/merge-pairs/20190508_0074/{sample}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/merge-pairs"
 #
 # rule dada2_make_table_pe:
 #     input:
