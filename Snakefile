@@ -140,7 +140,7 @@ rule dada2_make_table_pe:
     output:
         "results/dada2/seqtab/20190508_0074/seqtab-pe.RDS"
     params:
-        names= SAMPLES, # Sample names instead of paths
+        # names= SAMPLES, # Sample names instead of paths
         orderBy="nsamples" # Change the ordering of samples
     log:
         "logs/dada2/make-table/20190508_0074/make-table-pe.log"
