@@ -11,8 +11,7 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-
-        expand("data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
+        expand("esults/dada2/quality-profile/20190508_0074/{sample}-quality-profile.png",
         sample = SAMPLES),
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
         "results/dada2/taxa/20190508_0074/taxa.RDS"
