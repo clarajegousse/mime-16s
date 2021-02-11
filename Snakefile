@@ -4,7 +4,7 @@
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
 # If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
 
-SAMPLES = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"]
+#SAMPLES = ["FX003-016-16S-V4_S58","FX003-017-16S-V4_S59", "FX003-018-16S-V4_S60"]
 #RUNS = ["20190508_0074"]
 
 rule all:
@@ -14,8 +14,8 @@ rule all:
         # rerun with all inputs uncommented.
         # expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
         # sample = SAMPLES)
-        expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
-        #"results/dada2/taxa/20190508_0074/taxa.RDS"
+        #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
+        "results/dada2/taxa/20190508_0074/taxa.RDS"
 
 rule cutadapt:
     input:
@@ -81,7 +81,7 @@ rule dada2_filter_trim_pe:
 rule dada2_learn_errors:
     input:
     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-        expand("results/dada2/filtered_trim_pe/20190508_0074/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
+        expand("results/dada2/filtered_trim_pe/20190508_0074/{{sample}}.{{orientation}}.fastq.gz")
     output:
         err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS",# save the error model
         plot="reports/dada2/learn-errors/20190508_0074/errors_{orientation}.png",# plot observed and estimated rates
