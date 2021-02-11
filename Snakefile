@@ -62,9 +62,9 @@ rule dada2_filter_trim_pe:
         fwd="results/trimmed/20190508_0074/{sample}.1.fastq.gz",
         rev="results/trimmed/20190508_0074/{sample}.2.fastq.gz"
     output:
-        filt="results/dada2/filtered-pe/20190508_0074/{sample}.1.fastq.gz",
-        filt_rev="results/dada2/filtered-pe/20190508_0074/{sample}.2.fastq.gz",
-        stats="results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv"
+        filt="results/dada2/filtered_trim_pe/20190508_0074/{sample}.1.fastq.gz",
+        filt_rev="results/dada2/filtered_trim_pe/20190508_0074/{sample}.2.fastq.gz",
+        stats="results/dada2/filtered_trim_pe/20190508_0074/{sample}.tsv"
     params:
         # Set the maximum expected errors tolerated in filtered reads
         maxEE=2,
@@ -79,7 +79,7 @@ rule dada2_filter_trim_pe:
 rule dada2_learn_errors:
     input:
     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-        expand("results/dada2/filtered-pe/20190508_0074/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
+        expand("results/dada2/filtered_trim_pe/20190508_0074/{sample}.{{orientation}}.fastq.gz", sample = SAMPLES)
     output:
         err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS",# save the error model
         plot="reports/dada2/learn-errors/20190508_0074/errors_{orientation}.png",# plot observed and estimated rates
