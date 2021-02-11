@@ -15,7 +15,8 @@ rule all:
         # expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
         # sample = SAMPLES)
         #expand("results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS", orientation = [1,2])
-        expand("results/dada2/merged/20190508_0074/{sample}.RDS", sample = SAMPLES)
+        #expand("results/dada2/merged/20190508_0074/{sample}.RDS", sample = SAMPLES)
+        "results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS"
 rule cutadapt:
     input:
         fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
@@ -130,33 +131,33 @@ rule dada2_merge_pairs:
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/merge-pairs"
-#
-# rule dada2_make_table_pe:
-#     input:
-#     # Merged composition
-#         expand("results/merged/20190508_0074/{sample}.RDS", sample = SAMPLES)
-#     output:
-#         "results/dada2/20190508_0074/seqTab-pe.RDS"
-#     params:
-#         names= SAMPLES, # Sample names instead of paths
-#         orderBy="nsamples" # Change the ordering of samples
-#     log:
-#         "logs/dada2/make-table/20190508_0074/make-table-pe.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/make-table"
-#
-# rule dada2_remove_chimeras:
-#     input:
-#         "results/dada2/20190508_0074/seqTab-pe.RDS" # Sequence table
-#     output:
-#         "results/dada2/20190508_0074/seqTab.nochimeras.RDS" # Chimera-free sequence table
-#     log:
-#         "logs/dada2/remove-chimeras/20190508_0074/remove-chimeras.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/remove-chimeras"
-#
+
+rule dada2_make_table_pe:
+    input:
+    # Merged composition
+        expand("results/dada2/merged/20190508_0074/{sample}.RDS", sample = SAMPLES)
+    output:
+        "results/dada2/seqtab/20190508_0074/seqtab-pe.RDS"
+    params:
+        names= SAMPLES, # Sample names instead of paths
+        orderBy="nsamples" # Change the ordering of samples
+    log:
+        "logs/dada2/make-table/20190508_0074/make-table-pe.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/make-table"
+
+rule dada2_remove_chimeras:
+    input:
+        "results/dada2/seqtab/20190508_0074/seqtab-pe.RDS" # Sequence table
+    output:
+        "results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS" # Chimera-free sequence table
+    log:
+        "logs/dada2/remove-chimeras/20190508_0074/remove-chimeras.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/remove-chimeras"
+
 # rule dada2_collapse_nomismatch:
 #     input:
 #         "results/dada2/20190508_0074/seqTab.nochimeras.RDS" # Chimera-free sequence table
