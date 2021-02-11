@@ -16,7 +16,7 @@ rule all:
         # sample = SAMPLES)
         #expand("results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS", orientation = [1,2])
         #expand("results/dada2/merged/20190508_0074/{sample}.RDS", sample = SAMPLES)
-        "results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS"
+        "results/dada2/taxa/20190508_0074/taxa.RDS"
 rule cutadapt:
     input:
         fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
@@ -158,25 +158,25 @@ rule dada2_remove_chimeras:
     wrapper:
         "0.70.0/bio/dada2/remove-chimeras"
 
-# rule dada2_collapse_nomismatch:
-#     input:
-#         "results/dada2/20190508_0074/seqTab.nochimeras.RDS" # Chimera-free sequence table
-#     output:
-#         "results/dada2/20190508_0074/seqTab.collapsed.RDS"
-#     log:
-#         "logs/dada2/20190508_0074/collapse-nomismatch/collapse-nomismatch.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/collapse-nomismatch"
-#
-# rule dada2_assign_taxonomy:
-#     input:
-#         seqs="results/dada2/20190508_0074/seqTab.collapsed.RDS", # Chimera-free sequence table
-#         refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
-#     output:
-#         "results/dada2/20190508_0074/taxa.RDS" # Taxonomic assignments
-#     log:
-#         "logs/dada2/20190508_0074/assign-taxonomy/assign-taxonomy.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/assign-taxonomy"
+rule dada2_collapse_nomismatch:
+    input:
+        "results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS" # Chimera-free sequence table
+    output:
+        "results/dada2/seqtab/20190508_0074/seqtab.collapsed.RDS"
+    log:
+        "logs/dada2/collapse-nomismatch/20190508_0074/collapse-nomismatch.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/collapse-nomismatch"
+
+rule dada2_assign_taxonomy:
+    input:
+        seqs="results/dada2/seqtab/20190508_0074/seqtab.collapsed.RDS", # Chimera-free sequence table
+        refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
+    output:
+        "results/dada2/taxa/20190508_0074/taxa.RDS" # Taxonomic assignments
+    log:
+        "logs/dada2/assign-taxonomy/20190508_0074/assign-taxonomy.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/assign-taxonomy"
