@@ -14,7 +14,7 @@ rule all:
         # rerun with all inputs uncommented.
 
         # TO RUN dada2_filter_trim_pe
-        expand("results/dada2/filter-trim-pe/20190508_0074/{sample}.tsv",
+        expand("results/dada2/filtered-pe/20190508_0074/{sample}.2.fastq.gz",
         sample = SAMPLES),
         #expand("results/dada2/20190508_0074/model_{orientation}.RDS", orientation = [1,2])
 rule cutadapt:
