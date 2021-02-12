@@ -60,7 +60,7 @@ rule cutadapt:
 rule dada2_quality_profile_pe:
     input:
         # FASTQ file without primer sequences
-        expand("results/trimmed/{run}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
+        expand("results/trimmed/{{run}}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
     output:
         "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
     log:
