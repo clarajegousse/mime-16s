@@ -116,7 +116,7 @@ rule dada2_dereplicate_fastq:
 rule dada2_sample_inference:
     input:
     # Dereplicated (aka unique) sequences of the sample
-        derep="results/dada2/uniques/{run}/{sample}.{orientation}.RDS",
+        derep="results/dada2/uniques/{run}/{sample}_{orientation}.RDS",
         err="results/dada2/learn-errors/{run}/model_{orientation}.RDS" # Error model
     output:
         "results/dada2/denoised/{run}/{sample}.{orientation}.RDS" # Inferred sample composition
