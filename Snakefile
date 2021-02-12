@@ -29,8 +29,8 @@ rule all:
 
 rule cutadapt:
     input:
-        fwd = "data/miseq/20190508_0074/{sample}_L001_R1_001.fastq.gz",
-        rev = "data/miseq/20190508_0074/{sample}_L001_R2_001.fastq.gz",
+        fwd = "data/miseq/20190508_0074/{sample}_R1.fastq.gz",
+        rev = "data/miseq/20190508_0074/{sample}_R2.fastq.gz",
     output:
         fwd = "results/trimmed/20190508_0074/{sample}.1.fastq.gz",
         rev = "results/trimmed/20190508_0074/{sample}.2.fastq.gz",
