@@ -9,7 +9,7 @@ import pandas as pd
 #
 configfile: "config.yaml"
 
-SampleTable = pd.read_table(config['sampletable'], delimiter = "\t", index_col = 0)
+SampleTable = pd.read_table(config['sampletable'], sep = "\t", header = 1, index_col = 0)
 
 print(SampleTable)
 SAMPLES = list(SampleTable.index)
