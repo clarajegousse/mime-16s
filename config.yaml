@@ -1,7 +1,7 @@
 
 RUNS: "20190508_0074"
 
-sampletable: "samples.tsv"
+sampletable: "samples.csv"
 
 R1: "_L001_R1_001"
 R2: "_L001_R2_001"
