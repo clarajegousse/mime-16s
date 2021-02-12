@@ -23,8 +23,7 @@ rule all:
         #expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv",
         #sample = SAMPLES, run = RUN),
 
-        expand("results/dada2/learn-errors/{run}/model_{orientation}.RDS",
-        run = RUN, orientation = ORIENTATION)
+        expand("results/dada2/learn-errors/{run}/model_{orientation}.RDS", run = RUN, orientation = ORIENTATION)
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
         # "results/dada2/taxa/20190508_0074/taxa.RDS"
 
@@ -103,60 +102,60 @@ rule dada2_learn_errors:
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/learn-errors"
-#
-# rule dada2_dereplicate_fastq:
-#     input:
-#     # Quality filtered FASTQ file
-#         "results/dada2/filtered_trim_pe/20190508_0074/{fastq}.fastq.gz"
-#     output:
-#     # Dereplicated sequences stored as `derep-class` object in a RDS file
-#         "results/dada2/uniques/20190508_0074/{fastq}.RDS"
-#     log:
-#         "logs/dada2/dereplicate-fastq/20190508_0074/{fastq}.log"
-#     wrapper:
-#         "0.70.0/bio/dada2/dereplicate-fastq"
-#
-# rule dada2_sample_inference:
-#     input:
-#     # Dereplicated (aka unique) sequences of the sample
-#         derep="results/dada2/uniques/20190508_0074/{sample}.{orientation}.RDS",
-#         err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS" # Error model
-#     output:
-#         "results/dada2/denoised/20190508_0074/{sample}.{orientation}.RDS" # Inferred sample composition
-#     log:
-#         "logs/dada2/sample-inference/20190508_0074/{sample}.{orientation}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/sample-inference"
-#
-# rule dada2_merge_pairs:
-#     input:
-#       dadaF="results/dada2/denoised/20190508_0074/{sample}.1.RDS",# Inferred composition
-#       dadaR="results/dada2/denoised/20190508_0074/{sample}.2.RDS",
-#       derepF="results/dada2/uniques/20190508_0074/{sample}.1.RDS",# Dereplicated sequences
-#       derepR="results/dada2/uniques/20190508_0074/{sample}.2.RDS"
-#     output:
-#         "results/dada2/merged/20190508_0074/{sample}.RDS"
-#     log:
-#         "logs/dada2/merge-pairs/20190508_0074/{sample}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/merge-pairs"
-#
-# rule dada2_make_table_pe:
-#     input:
-#     # Merged composition
-#         "results/dada2/merged/20190508_0074/{sample}.RDS"
-#     output:
-#         "results/dada2/seqtab/20190508_0074/seqtab-pe.RDS"
-#     params:
-#         # names= SAMPLES, # Sample names instead of paths
-#         orderBy="nsamples" # Change the ordering of samples
-#     log:
-#         "logs/dada2/make-table/20190508_0074/make-table-pe.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/make-table"
+
+rule dada2_dereplicate_fastq:
+    input:
+    # Quality filtered FASTQ file
+        "results/dada2/filtered_trim_pe/{{run}}/{fastq}.fastq.gz"
+    output:
+    # Dereplicated sequences stored as `derep-class` object in a RDS file
+        "results/dada2/uniques/{{run}}/{fastq}.RDS"
+    log:
+        "logs/dada2/dereplicate-fastq/{{run}}/{fastq}.log"
+    wrapper:
+        "0.70.0/bio/dada2/dereplicate-fastq"
+
+rule dada2_sample_inference:
+    input:
+    # Dereplicated (aka unique) sequences of the sample
+        derep="results/dada2/uniques/{{run}}/{sample}.{orientation}.RDS",
+        err="results/dada2/learn-errors/{{run}}/model_{orientation}.RDS" # Error model
+    output:
+        "results/dada2/denoised/{{run}}/{sample}.{orientation}.RDS" # Inferred sample composition
+    log:
+        "logs/dada2/sample-inference/{{run}}/{sample}.{orientation}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/sample-inference"
+
+rule dada2_merge_pairs:
+    input:
+      dadaF="results/dada2/denoised/{{run}}/{sample}_R1.RDS",# Inferred composition
+      dadaR="results/dada2/denoised/{{run}}/{sample}_R2.RDS",
+      derepF="results/dada2/uniques/{{run}}/{sample}_R1.RDS",# Dereplicated sequences
+      derepR="results/dada2/uniques/{{run}}/{sample}_R2.RDS"
+    output:
+        "results/dada2/merged/{{run}}/{sample}.RDS"
+    log:
+        "logs/dada2/merge-pairs/{{run}}/{sample}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/merge-pairs"
+
+rule dada2_make_table_pe:
+    input:
+    # Merged composition
+        "results/dada2/merged/{{run}}/{sample}.RDS"
+    output:
+        "results/dada2/seqtab/{{run}}/seqtab-pe.RDS"
+    params:
+        names= SAMPLES, # Sample names instead of paths
+        orderBy="nsamples" # Change the ordering of samples
+    log:
+        "logs/dada2/make-table/{{run}}/make-table-pe.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/make-table"
 #
 # rule export_seqtab_to_fasta:
 #     input:
@@ -177,36 +176,36 @@ rule dada2_learn_errors:
 #     shell:
 #         "kraken2 --db {input.db} --threads 4 --report {output.report} {input.fasta} 1> {output.stdout} 2> {output.stderr}"
 #
-# rule dada2_remove_chimeras:
-#     input:
-#         "results/dada2/seqtab/20190508_0074/seqtab-pe.RDS" # Sequence table
-#     output:
-#         "results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS" # Chimera-free sequence table
-#     log:
-#         "logs/dada2/remove-chimeras/20190508_0074/remove-chimeras.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/remove-chimeras"
-#
-# rule dada2_collapse_nomismatch:
-#     input:
-#         "results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS" # Chimera-free sequence table
-#     output:
-#         "results/dada2/seqtab/20190508_0074/seqtab.collapsed.RDS"
-#     log:
-#         "logs/dada2/collapse-nomismatch/20190508_0074/collapse-nomismatch.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/collapse-nomismatch"
-#
-# rule dada2_assign_taxonomy:
-#     input:
-#         seqs="results/dada2/seqtab/20190508_0074/seqtab.collapsed.RDS", # Chimera-free sequence table
-#         refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
-#     output:
-#         "results/dada2/taxa/20190508_0074/taxa.RDS" # Taxonomic assignments
-#     log:
-#         "logs/dada2/assign-taxonomy/20190508_0074/assign-taxonomy.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/assign-taxonomy"
+rule dada2_remove_chimeras:
+    input:
+        "results/dada2/seqtab/{run}/seqtab-pe.RDS" # Sequence table
+    output:
+        "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS" # Chimera-free sequence table
+    log:
+        "logs/dada2/remove-chimeras/{run}/remove-chimeras.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/remove-chimeras"
+
+rule dada2_collapse_nomismatch:
+    input:
+        "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS" # Chimera-free sequence table
+    output:
+        "results/dada2/seqtab/{run}/seqtab.collapsed.RDS"
+    log:
+        "logs/dada2/collapse-nomismatch/{run}/collapse-nomismatch.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/collapse-nomismatch"
+
+rule dada2_assign_taxonomy:
+    input:
+        seqs="results/dada2/seqtab/{run}/seqtab.collapsed.RDS", # Chimera-free sequence table
+        refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
+    output:
+        "results/dada2/taxa/{run}/taxa.RDS" # Taxonomic assignments
+    log:
+        "logs/dada2/assign-taxonomy/{run}/assign-taxonomy.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/assign-taxonomy"
