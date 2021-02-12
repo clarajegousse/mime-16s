@@ -17,8 +17,8 @@ run = config["RUN"]
 
 rule all:
     input:
-        expand("results/trimmed/{{run}}/{sample}_.fastq.gz", sample = SAMPLES),
-        expand("results/dada2/quality-profile/{{run}}/{sample}-quality-profile.png", sample = SAMPLES)
+        expand("results/trimmed/{run}/{sample}_.fastq.gz", run = RUN, sample = SAMPLES),
+        expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES)
 
 rule cutadapt:
     input:
