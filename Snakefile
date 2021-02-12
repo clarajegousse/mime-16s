@@ -20,7 +20,7 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand("results/dada2/trimmed/{run}/{sample}_R2.fastq.gz", run = RUN, sample = SAMPLES),
+        expand("results/reports/cutadapt/{run}/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
 
         #expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         #expand("results/dada2/seqtab/{run}/seqtab-pe.RDS", run = RUN),
