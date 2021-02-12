@@ -97,7 +97,7 @@ rule dada2_learn_errors:
     params:
         randomize=True
     log:
-        "logs/dada2/learn-errors/{{run}}/learn-errors_{orientation}.log"
+        "logs/dada2/learn-errors/{run}/learn-errors_{orientation}.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/learn-errors"
@@ -105,12 +105,12 @@ rule dada2_learn_errors:
 rule dada2_dereplicate_fastq:
     input:
     # Quality filtered FASTQ file
-        "results/dada2/filtered_trim_pe/{{run}}/{fastq}.fastq.gz"
+        "results/dada2/filtered_trim_pe/{run}/{fastq}.fastq.gz"
     output:
     # Dereplicated sequences stored as `derep-class` object in a RDS file
-        "results/dada2/uniques/{{run}}/{fastq}.RDS"
+        "results/dada2/uniques/{run}/{fastq}.RDS"
     log:
-        "logs/dada2/dereplicate-fastq/{{run}}/{fastq}.log"
+        "logs/dada2/dereplicate-fastq/{run}/{fastq}.log"
     wrapper:
         "0.70.0/bio/dada2/dereplicate-fastq"
 
