@@ -23,9 +23,9 @@ rule all:
         #expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv",
         #sample = SAMPLES, run = RUN),
 
-        expand("results/dada2/learn-errors/{run}/model_{orientation}.RDS", run = RUN, orientation = ORIENTATION)
+        #expand("results/dada2/learn-errors/{run}/model_{orientation}.RDS", run = RUN, orientation = ORIENTATION)
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
-        # "results/dada2/taxa/20190508_0074/taxa.RDS"
+        expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
 
 rule cutadapt:
     input:
