@@ -218,8 +218,8 @@ rule export_seqtab_to_fasta:
     input:
         "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS"
     output:
-        asv_seq = "results/dada2/final/{run}/ASVs.fa"
-        asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv"
+        asv_seq = "results/dada2/final/{run}/ASVs.fa",
+        asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv",
         asv_tax = "results/dada2/final/{run}/ASVs_taxonomy.tsv"
     shell:
         "./scripts/export_seqtab_to_fasta.R {input} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
