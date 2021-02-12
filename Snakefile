@@ -13,7 +13,7 @@ SampleTable = pd.read_csv(config['SAMPLETABLE'], sep = ",", header = 0, index_co
 SAMPLES = list(SampleTable.index)
 
 ORIENTATION = config["ORIENTATION"]
-run = config["RUN"]
+RUN = config["RUN"]
 
 rule all:
     input:
