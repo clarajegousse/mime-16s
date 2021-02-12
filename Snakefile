@@ -196,12 +196,12 @@ rule dada2_collapse_nomismatch:
 
 rule dada2_assign_taxonomy:
     input:
-        seqs="results/dada2/seqtab/{{run}}/seqtab.collapsed.RDS", # Chimera-free sequence table
+        seqs="results/dada2/seqtab/{run}/seqtab.collapsed.RDS", # Chimera-free sequence table
         refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
     output:
-        "results/dada2/taxa/{{run}}/taxa.RDS" # Taxonomic assignments
+        "results/dada2/taxa/{run}/taxa.RDS" # Taxonomic assignments
     log:
-        "logs/dada2/assign-taxonomy/{{run}}/assign-taxonomy.log"
+        "logs/dada2/assign-taxonomy/{run}/assign-taxonomy.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/assign-taxonomy"
