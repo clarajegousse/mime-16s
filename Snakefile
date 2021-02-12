@@ -1,4 +1,5 @@
-# cp results/cutadapt/*/*.fastq.gz trimmed/
+
+# snakemake --cluster qsub -j 32 -R cutadapt --latency-wait 60
 
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
@@ -84,21 +85,21 @@ rule dada2_filter_trim_pe:
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/filter-trim"
-#
-# rule dada2_learn_errors:
-#     input:
-#     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-#         expand("results/dada2/filtered_trim_pe/20190508_0074/{{sample}}.{orientation}.fastq.gz", orientation = [1,2])
-#     output:
-#         err="results/dada2/learn-errors/20190508_0074/model_{orientation}.RDS",# save the error model
-#         plot="reports/dada2/learn-errors/20190508_0074/errors_{orientation}.png",# plot observed and estimated rates
-#     params:
-#         randomize=True
-#     log:
-#         "logs/dada2/learn-errors/20190508_0074/learn-errors_{orientation}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/learn-errors"
+
+rule dada2_learn_errors:
+    input:
+    # Quality filtered and trimmed forward FASTQ files (potentially compressed)
+        expand("results/dada2/filtered_trim_pe/{{run}}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
+    output:
+        err="results/dada2/learn-errors/{{run}}/model_{orientation}.RDS",# save the error model
+        plot="reports/dada2/learn-errors/{{run}}/errors_{orientation}.png",# plot observed and estimated rates
+    params:
+        randomize=True
+    log:
+        "logs/dada2/learn-errors/{{run}}/learn-errors_{orientation}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/learn-errors"
 #
 # rule dada2_dereplicate_fastq:
 #     input:
