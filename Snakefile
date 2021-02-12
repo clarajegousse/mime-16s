@@ -20,8 +20,8 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        #expand("results/dada2/learn-errors/{run}/model_{orientation}.RDS", run = RUN, orientation = ORIENTATION)
-        #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
+        expand("results/dada2/filtered_trim_pe/{run}/{sample}_R2.fastq.gz", run = RUN, sample = SAMPLES),
+        expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
 
 rule cutadapt:
@@ -196,12 +196,12 @@ rule dada2_collapse_nomismatch:
 
 rule dada2_assign_taxonomy:
     input:
-        seqs="results/dada2/seqtab/{run}/seqtab.collapsed.RDS", # Chimera-free sequence table
+        seqs="results/dada2/seqtab/{{run}}/seqtab.collapsed.RDS", # Chimera-free sequence table
         refFasta="/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz" # Reference FASTA for taxonomy
     output:
-        "results/dada2/taxa/{run}/taxa.RDS" # Taxonomic assignments
+        "results/dada2/taxa/{{run}}/taxa.RDS" # Taxonomic assignments
     log:
-        "logs/dada2/assign-taxonomy/{run}/assign-taxonomy.log"
+        "logs/dada2/assign-taxonomy/{{run}}/assign-taxonomy.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/assign-taxonomy"
