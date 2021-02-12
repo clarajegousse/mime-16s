@@ -179,6 +179,7 @@ rule export_seqtab_to_fasta:
 # #     shell:
 # #         "kraken2 --db {input.db} --threads 4 --report {output.report} {input.fasta} 1> {output.stdout} 2> {output.stderr}"
 # #
+
 rule dada2_remove_chimeras:
     input:
         "results/dada2/seqtab/{run}/seqtab-pe.RDS" # Sequence table
@@ -213,7 +214,6 @@ rule dada2_assign_taxonomy:
     wrapper:
         "0.70.0/bio/dada2/assign-taxonomy"
 
-
 rule extract_dada2_results:
     input:
         seqtab = "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS",
@@ -222,4 +222,5 @@ rule extract_dada2_results:
         asv_seq = "results/dada2/final/{run}/ASVs.fa",
         asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv"
     shell:
-        "./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts}"
+        "mkdir results/dada2/final/{run}/ \
+         ./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts}"
