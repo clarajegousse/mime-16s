@@ -11,7 +11,9 @@ configfile: "config.yaml"
 
 SampleTable = pd.read_table(config['sampletable'], delimiter = "\t", index_col = 0)
 
+print(SampleTable)
 SAMPLES = list(SampleTable.index)
+print(SAMPLES)
 ORIENTATION = config["ORIENTATION"]
 
 #SAMPLES = config["SAMPLES"]
