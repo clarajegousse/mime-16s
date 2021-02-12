@@ -141,13 +141,12 @@ rule dada2_merge_pairs:
 
 rule dada2_make_table_pe:
     input:
-    # Merged composition
         "results/dada2/merged/{run}/{sample}.RDS"
     output:
         "results/dada2/seqtab/{run}/seqtab-pe.RDS"
     params:
-        names= SAMPLES, # Sample names instead of paths
-        orderBy="nsamples" # Change the ordering of samples
+        names = SAMPLES, # Sample names instead of paths
+        orderBy = "nsamples" # Change the ordering of samples
     log:
         "logs/dada2/make-table/{run}/make-table-pe.log"
     threads: 1 # set desired number of threads here
