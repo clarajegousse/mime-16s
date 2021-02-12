@@ -214,7 +214,7 @@ rule dada2_assign_taxonomy:
         "0.70.0/bio/dada2/assign-taxonomy"
 
 
-rule export_seqtab_to_fasta:
+rule extract_dada2_results:
     input:
         "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS"
     output:
@@ -222,4 +222,4 @@ rule export_seqtab_to_fasta:
         asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv",
         asv_tax = "results/dada2/final/{run}/ASVs_taxonomy.tsv"
     shell:
-        "./scripts/extract_dada2)results.R {input} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
+        "./scripts/extract_dada2_results.R {input} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
