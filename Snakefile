@@ -17,7 +17,8 @@ run = config["RUN"]
 
 rule all:
     input:
-        expand("results/trimmed/{{run}}/{sample}_.fastq.gz", sample = SAMPLES)
+        expand("results/trimmed/{{run}}/{sample}_.fastq.gz", sample = SAMPLES),
+        expand("results/dada2/quality-profile/{{run}}/{sample}-quality-profile.png", sample = SAMPLES)
 
 rule cutadapt:
     input:
@@ -49,16 +50,16 @@ rule cutadapt:
           {input.fwd} {input.rev} \
           2> {output.report}"
 
-# rule dada2_quality_profile_pe:
-#     input:
-#         "results/trimmed/{run}/{sample}_{orientation}.fastq.gz",
-#     output:
-#         "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
-#     log:
-#         "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
-#     wrapper:
-#         "0.70.0/bio/dada2/quality-profile"
-# #
+rule dada2_quality_profile_pe:
+    input:
+        "results/trimmed/{run}/{sample}_{orientation}.fastq.gz",
+    output:
+        "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
+    log:
+        "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
+    wrapper:
+        "0.70.0/bio/dada2/quality-profile"
+#
 # rule dada2_filter_trim_pe:
 #     input:
 #         # Paired-end files without primer sequences
