@@ -15,17 +15,6 @@ SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
 
-rule all:
-    input:
-        # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
-        # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
-        # rerun with all inputs uncommented.
-        expand("results/dada2/filtered_trim_pe/{run}/{sample}_R2.fastq.gz", run = RUN, sample = SAMPLES),
-        expand("results/dada2/learn-errors/{run}/model_{orientation}.RDS",  run = RUN, orientation = ORIENTATION),
-        #expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
-        #expand("results/dada2/seqtab/{run}/seqtab-pe.RDS", run = RUN),
-        #expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
-
 rule cutadapt:
     input:
         fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
@@ -58,7 +47,6 @@ rule cutadapt:
 
 rule dada2_quality_profile_pe:
     input:
-        # FASTQ file without primer sequences
         expand("results/trimmed/{{run}}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
     output:
         "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
