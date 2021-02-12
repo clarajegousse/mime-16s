@@ -1,5 +1,5 @@
 
-# snakemake --cluster qsub -j 32 -R cutadapt --latency-wait 60
+# snakemake --cluster qsub -j 32 -R dada2_learn_errors --latency-wait 60
 
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
@@ -24,7 +24,7 @@ rule all:
         #sample = SAMPLES, run = RUN),
 
         expand("results/dada2/learn-errors/{run}/model_{orientation}.RDS",
-        run = RUN, orientation = ORIENTATION),
+        run = RUN, orientation = ORIENTATION)
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
         # "results/dada2/taxa/20190508_0074/taxa.RDS"
 
