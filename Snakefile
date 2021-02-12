@@ -216,10 +216,10 @@ rule dada2_assign_taxonomy:
 
 rule extract_dada2_results:
     input:
-        "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS"
+        seqtab = "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS",
+        taxo = "results/dada2/taxa/{run}/taxa.RDS"
     output:
         asv_seq = "results/dada2/final/{run}/ASVs.fa",
-        asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv",
-        asv_tax = "results/dada2/final/{run}/ASVs_taxonomy.tsv"
+        asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv"
     shell:
-        "./scripts/extract_dada2_results.R {input} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
+        "./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts}"

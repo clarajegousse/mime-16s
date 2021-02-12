@@ -1,8 +1,6 @@
 #!/usr/bin/env Rscript
 
-# ./scripts/export_seqtab_to_fasta.R \
-# results/dada2/merged/20190508_0074/FX003-016-16S-V4_S58.RDS
-# results/dada2/merged/20190508_0074/FX003-016-16S-V4_S58.fasta
+# "./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -13,39 +11,28 @@ if (length(args)<4) {
 
 library(dada2)
 
-# args <- c("results/dada2/merged/20190508_0074/FX003-016-16S-V4_S58.RDS", "results/dada2/merged/20190508_0074/FX003-016-16S-V4_S58.fasta")
+# args <- c("results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS",
+  "results/dada2/taxa/20190508_0074/taxa.RDS",
+  "results/dada2/final/20190508_0074/ASVs.fa",
+  "results/dada2/final/20190508_0074/ASVs_counts.tsv")
 
 seqtab <- readRDS(args[1])
-
+tax_info <- readRDS(args[2])
 
 # making and writing out a fasta of our final ASV seqs:
-asv_seqs <- seqtab$sequence
-asv_headers <- vector(dim(seqtab)[1], mode="character")
+# giving our seq headers more manageable names (ASV_1, ASV_2...)
+asv_seqs <- colnames(seqtab)
+asv_headers <- vector(dim(seqtab)[2], mode="character")
 
-for (i in 1:dim(seqtab)[1]) {
+for (i in 1:dim(seqtab)[2]) {
   asv_headers[i] <- paste(">ASV", i, sep="_")
 }
 
 # making and writing out a fasta of our final ASV seqs:
 asv_fasta <- c(rbind(asv_headers, asv_seqs))
-write(asv_fasta, args[2])
-
+write(asv_fasta, args[3])
 
 # count table:
 asv_tab <- t(seqtab)
 row.names(asv_tab) <- sub(">", "", asv_headers)
-write.table(asv_tab, args[3], sep="\t", quote=F, col.names=NA)
-
-# tax table:
-# creating table of taxonomy and setting any that are unclassified as "NA"
-ranks <- c("domain", "phylum", "class", "order", "family", "genus", "species")
-asv_tax <- t(sapply(tax_info, function(x) {
-  m <- match(ranks, x$rank)
-  taxa <- x$taxon[m]
-  taxa[startsWith(taxa, "unclassified_")] <- NA
-  taxa
-}))
-colnames(asv_tax) <- ranks
-rownames(asv_tax) <- gsub(pattern=">", replacement="", x=asv_headers)
-
-write.table(asv_tax, args[4], sep = "\t", quote=F, col.names=NA)
+write.table(asv_tab, args[4], sep="\t", quote=F, col.names=NA)
