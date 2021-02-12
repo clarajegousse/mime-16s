@@ -23,7 +23,7 @@ rule all:
         expand("results/reports/cutadapt/{run}/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
         expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
         expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
-
+        expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION)
 rule cutadapt:
     input:
         fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
@@ -84,21 +84,21 @@ rule dada2_filter_trim_pe:
     wrapper:
         "0.70.0/bio/dada2/filter-trim"
 
-# rule dada2_learn_errors:
-#     input:
-#     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
-#         expand("results/dada2/filtered_trim_pe/{run}/{sample}_{orientation}.fastq.gz", orientation = ORIENTATION, sample = SAMPLES, run = RUN)
-#     output:
-#         err="results/dada2/learn-errors/{run}/model_{orientation}.RDS",# save the error model
-#         plot="reports/dada2/learn-errors/{run}/errors_{orientation}.png",# plot observed and estimated rates
-#     params:
-#         randomize=True
-#     log:
-#         "logs/dada2/learn-errors/{run}/learn-errors_{orientation}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/learn-errors"
-#
+rule dada2_learn_errors:
+    input:
+    # Quality filtered and trimmed forward FASTQ files (potentially compressed)
+        expand("results/dada2/filtered_trim_pe/{{run}}/{sample}_{{orientation}}.fastq.gz", sample = SAMPLES)
+    output:
+        err="results/dada2/learn-errors/{run}/model_{orientation}.RDS",# save the error model
+        plot="reports/dada2/learn-errors/{run}/errors_{orientation}.png",# plot observed and estimated rates
+    params:
+        randomize=True
+    log:
+        "logs/dada2/learn-errors/{run}/learn-errors_{orientation}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/learn-errors"
+
 # rule dada2_dereplicate_fastq:
 #     input:
 #     # Quality filtered FASTQ file
