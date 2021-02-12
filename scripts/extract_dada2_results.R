@@ -1,6 +1,9 @@
 #!/usr/bin/env Rscript
 
-# "./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
+# ./scripts/extract_dada2_results.R "results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS" \
+"results/dada2/taxa/20190508_0074/taxa.RDS" \
+"results/dada2/final/20190508_0074-ASVs.fa" \
+"results/dada2/final/20190508_0074-ASVs_counts.tsv"
 
 args = commandArgs(trailingOnly=TRUE)
 
@@ -8,11 +11,11 @@ library(dada2)
 
 # args <- c("results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS",
   "results/dada2/taxa/20190508_0074/taxa.RDS",
-  "results/dada2/final/20190508_0074/ASVs.fa",
-  "results/dada2/final/20190508_0074/ASVs_counts.tsv")
+  "results/dada2/final/20190508_0074-ASVs.fa",
+  "results/dada2/final/20190508_0074-ASVs_counts.tsv")
 
 seqtab <- readRDS(args[1])
-tax_info <- readRDS(args[2])
+# tax_info <- readRDS(args[2])
 
 # making and writing out a fasta of our final ASV seqs:
 # giving our seq headers more manageable names (ASV_1, ASV_2...)
