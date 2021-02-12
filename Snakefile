@@ -19,7 +19,7 @@ rule all:
         expand("results/reports/cutadapt/20190508_0074/{sample}-qc-report.txt",
         sample = config["SAMPLES"]),
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
-        "results/dada2/taxa/20190508_0074/taxa.RDS"
+        # "results/dada2/taxa/20190508_0074/taxa.RDS"
 
 rule cutadapt:
     input:
