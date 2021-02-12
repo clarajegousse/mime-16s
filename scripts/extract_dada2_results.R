@@ -4,11 +4,6 @@
 
 args = commandArgs(trailingOnly=TRUE)
 
-# test if there is at least one argument: if not, return an error
-if (length(args)<4) {
-  stop("At least four arguments must be supplied (one input and three output files).n", call.=FALSE)
-}
-
 library(dada2)
 
 # args <- c("results/dada2/seqtab/20190508_0074/seqtab.nochimeras.RDS",
@@ -30,7 +25,7 @@ for (i in 1:dim(seqtab)[2]) {
 
 # making and writing out a fasta of our final ASV seqs:
 asv_fasta <- c(rbind(asv_headers, asv_seqs))
-write(asv_fasta, args[3])
+write(asv_fasta, file = args[3])
 
 # count table:
 asv_tab <- t(seqtab)
