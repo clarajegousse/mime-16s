@@ -5,17 +5,14 @@
 # If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
 
 import pandas as pd
-# from snakemake.utils import validate
-#
+
 configfile: "config.yaml"
 
 SampleTable = pd.read_csv(config['SAMPLETABLE'], sep = ",", header = 0, index_col = 0)
-
 SAMPLES = list(SampleTable.index)
+
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
-
-#SAMPLES = config["SAMPLES"]
 
 rule all:
     input:
