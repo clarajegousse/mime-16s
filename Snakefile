@@ -58,6 +58,9 @@ rule cutadapt:
           {input.fwd} {input.rev} \
           2> {output.report}"
 
+          # quick and dirty way to check the average number of reads written
+          # cat snakejob.cutadapt.*.sh.o* | grep "Pairs written" | cut -f 3 -d "(" | sed 's/%)//' | awk '{ total += $1 } END { print total/NR }'
+
 rule dada2_quality_profile_pe:
     input:
         expand("results/trimmed/{{run}}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
@@ -158,9 +161,9 @@ rule dada2_make_table_pe:
 
 rule export_seqtab_to_fasta:
     input:
-        "results/dada2/merged/20190508_0074/{sample}.RDS"
+        "results/dada2/merged/{run}/{sample}.RDS"
     output:
-        "results/dada2/merged/20190508_0074/{sample}-seqtab-merged.fa"
+        "results/dada2/merged/{run}/{sample}-seqtab-merged.fa"
     shell:
         "./scripts/export_seqtab_to_fasta.R {input} {output}"
 
@@ -208,3 +211,14 @@ rule dada2_assign_taxonomy:
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/assign-taxonomy"
+
+
+rule export_seqtab_to_fasta:
+    input:
+        "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS"
+    output:
+        asv_seq = "results/dada2/final/{run}/ASVs.fa"
+        asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv"
+        asv_tax = "results/dada2/final/{run}/ASVs_taxonomy.tsv"
+    shell:
+        "./scripts/export_seqtab_to_fasta.R {input} {output.asv_seq} {output.asv_counts} {output.asv_tax}"

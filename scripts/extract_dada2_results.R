@@ -7,8 +7,8 @@
 args = commandArgs(trailingOnly=TRUE)
 
 # test if there is at least one argument: if not, return an error
-if (length(args)<2) {
-  stop("At least two arguments must be supplied (input and output file).n", call.=FALSE)
+if (length(args)<4) {
+  stop("At least four arguments must be supplied (one input and three output files).n", call.=FALSE)
 }
 
 library(dada2)
@@ -31,10 +31,10 @@ asv_fasta <- c(rbind(asv_headers, asv_seqs))
 write(asv_fasta, args[2])
 
 
-  # count table:
+# count table:
 asv_tab <- t(seqtab)
 row.names(asv_tab) <- sub(">", "", asv_headers)
-write.table(asv_tab, "ASVs_counts.tsv", sep="\t", quote=F, col.names=NA)
+write.table(asv_tab, args[3], sep="\t", quote=F, col.names=NA)
 
 # tax table:
 # creating table of taxonomy and setting any that are unclassified as "NA"
@@ -48,4 +48,4 @@ asv_tax <- t(sapply(tax_info, function(x) {
 colnames(asv_tax) <- ranks
 rownames(asv_tax) <- gsub(pattern=">", replacement="", x=asv_headers)
 
-write.table(asv_tax, "ASVs_taxonomy.tsv", sep = "\t", quote=F, col.names=NA)
+write.table(asv_tax, args[4], sep = "\t", quote=F, col.names=NA)
