@@ -60,33 +60,33 @@ rule cutadapt:
 rule dada2_quality_profile_pe:
     input:
         # FASTQ file without primer sequences
-        expand("results/trimmed/20190508_0074/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
+        expand("results/trimmed/{run}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
     output:
-        "results/dada2/quality-profile/20190508_0074/{sample}-quality-profile.png"
+        "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
     log:
-        "logs/dada2/quality-profile/20190508_0074/{sample}-quality-profile-pe.log"
+        "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
     wrapper:
         "0.70.0/bio/dada2/quality-profile"
 
-# rule dada2_filter_trim_pe:
-#     input:
-#         # Paired-end files without primer sequences
-#         fwd="results/trimmed/20190508_0074/{sample}.1.fastq.gz",
-#         rev="results/trimmed/20190508_0074/{sample}.2.fastq.gz"
-#     output:
-#         filt="results/dada2/filtered_trim_pe/20190508_0074/{sample}.1.fastq.gz",
-#         filt_rev="results/dada2/filtered_trim_pe/20190508_0074/{sample}.2.fastq.gz",
-#         stats="results/dada2/filtered_trim_pe/20190508_0074/{sample}.tsv"
-#     params:
-#         # Set the maximum expected errors tolerated in filtered reads
-#         maxEE=2,
-#         # Set the number of kept bases in forward and reverse reads
-#         truncLen=[240,200]
-#     log:
-#         "logs/dada2/filter-trim-pe/20190508_0074/{sample}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/filter-trim"
+rule dada2_filter_trim_pe:
+    input:
+        # Paired-end files without primer sequences
+        fwd="results/trimmed/{run}/{sample}_R1.fastq.gz",
+        rev="results/trimmed/{run}/{sample}_R2.fastq.gz"
+    output:
+        filt="results/dada2/filtered_trim_pe/{run}/{sample}_R1.fastq.gz",
+        filt_rev="results/dada2/filtered_trim_pe/{run}/{sample}_R2.fastq.gz",
+        stats="results/dada2/filtered_trim_pe/{run}/{sample}.tsv"
+    params:
+        # Set the maximum expected errors tolerated in filtered reads
+        maxEE=2,
+        # Set the number of kept bases in forward and reverse reads
+        truncLen=[240,200]
+    log:
+        "logs/dada2/filter-trim-pe/{run}/{sample}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/filter-trim"
 #
 # rule dada2_learn_errors:
 #     input:
