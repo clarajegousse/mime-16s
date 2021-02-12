@@ -13,7 +13,7 @@ SampleTable = pd.read_csv(config['SAMPLETABLE'], sep = ",", header = 0, index_co
 SAMPLES = list(SampleTable.index)
 
 ORIENTATION = config["ORIENTATION"]
-RUN = config["RUN"]
+run = config["RUN"]
 
 rule all:
     expand("results/trimmed/{{run}}/{sample}_{orientation}.fastq.gz", sample = SAMPLES, orientation = ORIENTATION)
