@@ -24,7 +24,8 @@ rule all:
         expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
         expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
         expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION),
-        expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION)
+        expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION),
+        expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES)
 rule cutadapt:
     input:
         fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
@@ -125,20 +126,20 @@ rule dada2_sample_inference:
     wrapper:
         "0.70.0/bio/dada2/sample-inference"
 
-# rule dada2_merge_pairs:
-#     input:
-#       dadaF="results/dada2/denoised/{run}/{sample}_R1.RDS",# Inferred composition
-#       dadaR="results/dada2/denoised/{run}/{sample}_R2.RDS",
-#       derepF="results/dada2/uniques/{run}/{sample}_R1.RDS",# Dereplicated sequences
-#       derepR="results/dada2/uniques/{run}/{sample}_R2.RDS"
-#     output:
-#         "results/dada2/merged/{run}/{sample}.RDS"
-#     log:
-#         "logs/dada2/merge-pairs/{run}/{sample}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/merge-pairs"
-#
+rule dada2_merge_pairs:
+    input:
+      dadaF="results/dada2/denoised/{run}/{sample}_R1.RDS",# Inferred composition
+      dadaR="results/dada2/denoised/{run}/{sample}_R2.RDS",
+      derepF="results/dada2/uniques/{run}/{sample}_R1.RDS",# Dereplicated sequences
+      derepR="results/dada2/uniques/{run}/{sample}_R2.RDS"
+    output:
+        "results/dada2/merged/{run}/{sample}.RDS"
+    log:
+        "logs/dada2/merge-pairs/{run}/{sample}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/merge-pairs"
+
 # rule dada2_make_table_pe:
 #     input:
 #         expand("results/dada2/merged/{{run}}/{sample}.RDS", sample = SAMPLES)
