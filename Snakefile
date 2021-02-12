@@ -9,7 +9,7 @@ import pandas as pd
 #
 configfile: "config.yaml"
 
-SampleTable = pd.read_table(config['sampletable'], dilimiter = "\t", index_col = 0)
+SampleTable = pd.read_table(config['sampletable'], delimiter = "\t", index_col = 0)
 
 SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
