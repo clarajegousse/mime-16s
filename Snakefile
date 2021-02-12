@@ -22,9 +22,7 @@ rule all:
         # rerun with all inputs uncommented.
         expand("results/reports/cutadapt/{run}/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
         expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
-        #expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
-        #expand("results/dada2/seqtab/{run}/seqtab-pe.RDS", run = RUN),
-        #expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
+        expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
 
 rule cutadapt:
     input:
@@ -65,27 +63,27 @@ rule dada2_quality_profile_pe:
         "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
     wrapper:
         "0.70.0/bio/dada2/quality-profile"
-#
-# rule dada2_filter_trim_pe:
-#     input:
-#         # Paired-end files without primer sequences
-#         fwd="results/trimmed/{run}/{sample}_R1.fastq.gz",
-#         rev="results/trimmed/{run}/{sample}_R2.fastq.gz"
-#     output:
-#         filt="results/dada2/filtered_trim_pe/{run}/{sample}_R1.fastq.gz",
-#         filt_rev="results/dada2/filtered_trim_pe/{run}/{sample}_R2.fastq.gz",
-#         stats="results/dada2/filtered_trim_pe/{run}/{sample}.tsv"
-#     params:
-#         # Set the maximum expected errors tolerated in filtered reads
-#         maxEE=2,
-#         # Set the number of kept bases in forward and reverse reads
-#         truncLen=[240,200]
-#     log:
-#         "logs/dada2/filter-trim-pe/{run}/{sample}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/filter-trim"
-#
+
+rule dada2_filter_trim_pe:
+    input:
+        # Paired-end files without primer sequences
+        fwd="results/trimmed/{run}/{sample}_R1.fastq.gz",
+        rev="results/trimmed/{run}/{sample}_R2.fastq.gz"
+    output:
+        filt="results/dada2/filtered_trim_pe/{run}/{sample}_R1.fastq.gz",
+        filt_rev="results/dada2/filtered_trim_pe/{run}/{sample}_R2.fastq.gz",
+        stats="results/dada2/filtered_trim_pe/{run}/{sample}.tsv"
+    params:
+        # Set the maximum expected errors tolerated in filtered reads
+        maxEE=2,
+        # Set the number of kept bases in forward and reverse reads
+        truncLen=[240,200]
+    log:
+        "logs/dada2/filter-trim-pe/{run}/{sample}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/filter-trim"
+
 # rule dada2_learn_errors:
 #     input:
 #     # Quality filtered and trimmed forward FASTQ files (potentially compressed)
