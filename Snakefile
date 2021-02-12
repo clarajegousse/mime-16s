@@ -25,8 +25,9 @@ rule all:
         # expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
         # expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION),
         expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION),
-        # expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
-        # expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
+        expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
+        expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN),
+        expand("results/dada2/final/{run}/ASVs_taxonomy.tsv", run = RUN)
 
 rule cutadapt:
     input:
