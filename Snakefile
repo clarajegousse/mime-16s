@@ -140,19 +140,19 @@ rule dada2_merge_pairs:
     wrapper:
         "0.70.0/bio/dada2/merge-pairs"
 
-# rule dada2_make_table_pe:
-#     input:
-#         expand("results/dada2/merged/{{run}}/{sample}.RDS", sample = SAMPLES)
-#     output:
-#         "results/dada2/seqtab/{run}/seqtab-pe.RDS"
-#     params:
-#         names = SAMPLES, # Sample names instead of paths
-#         orderBy = "nsamples" # Change the ordering of samples
-#     log:
-#         "logs/dada2/make-table/{run}/make-table-pe.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/make-table"
+rule dada2_make_table_pe:
+    input:
+        expand("results/dada2/merged/{{run}}/{sample}.RDS", sample = SAMPLES)
+    output:
+        "results/dada2/seqtab/{run}/seqtab-pe.RDS"
+    params:
+        names = SAMPLES, # Sample names instead of paths
+        orderBy = "nsamples" # Change the ordering of samples
+    log:
+        "logs/dada2/make-table/{run}/make-table-pe.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/make-table"
 # #
 # # rule export_seqtab_to_fasta:
 # #     input:
