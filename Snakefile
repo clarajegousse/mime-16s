@@ -32,8 +32,8 @@ rule cutadapt:
         fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
         rev = "data/miseq/{run}/{sample}_R2.fastq.gz",
     output:
-        fwd = "results/trimmed/{run}/{sample}.1.fastq.gz",
-        rev = "results/trimmed/{run}/{sample}.2.fastq.gz",
+        fwd = "results/trimmed/{run}/{sample}_R1.fastq.gz",
+        rev = "results/trimmed/{run}/{sample}_R2.fastq.gz",
         report = "results/reports/cutadapt/{run}/{sample}-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
@@ -57,17 +57,17 @@ rule cutadapt:
           {input.fwd} {input.rev} \
           2> {output.report}"
 
-# rule dada2_quality_profile_pe:
-#     input:
-#         # FASTQ file without primer sequences
-#         expand("results/trimmed/20190508_0074/{{sample}}.{orientation}.fastq.gz", orientation = [1,2])
-#     output:
-#         "results/dada2/quality-profile/20190508_0074/{sample}-quality-profile.png"
-#     log:
-#         "logs/dada2/quality-profile/20190508_0074/{sample}-quality-profile-pe.log"
-#     wrapper:
-#         "0.70.0/bio/dada2/quality-profile"
-#
+rule dada2_quality_profile_pe:
+    input:
+        # FASTQ file without primer sequences
+        expand("results/trimmed/20190508_0074/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
+    output:
+        "results/dada2/quality-profile/20190508_0074/{sample}-quality-profile.png"
+    log:
+        "logs/dada2/quality-profile/20190508_0074/{sample}-quality-profile-pe.log"
+    wrapper:
+        "0.70.0/bio/dada2/quality-profile"
+
 # rule dada2_filter_trim_pe:
 #     input:
 #         # Paired-end files without primer sequences
