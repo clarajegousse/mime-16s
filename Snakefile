@@ -13,12 +13,6 @@ SampleTable = pd.read_table(config['sampletable'], index_col = 0)
 
 SAMPLES = list(SampleTable.index)
 
-PAIRED_END= ('R2' in SampleTable.columns)
-FRACTIONS= ['R1']
-if PAIRED_END: FRACTIONS+= ['R2']
-
-
-"output/fastqc/{sample}" + config["R1"] + "_fastqc.html", sample=SAMPLES
 
 #SAMPLES = config["SAMPLES"]
 
