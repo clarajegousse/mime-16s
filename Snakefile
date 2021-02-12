@@ -15,6 +15,10 @@ SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
 
+rule all:
+    expand("results/trimmed/{run}/{sample}_{orientation}.fastq.gz",
+    run = RUN, sample = SAMPLES, orientation = ORIENTATION)
+
 rule cutadapt:
     input:
         fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
@@ -47,8 +51,7 @@ rule cutadapt:
 
 rule dada2_quality_profile_pe:
     input:
-        expand("results/trimmed/{run}/{sample}_{orientation}.fastq.gz",
-        run = RUN, sample = SAMPLES, orientation = ORIENTATION)
+        "results/trimmed/{run}/{sample}_{orientation}.fastq.gz",
     output:
         "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
     log:
