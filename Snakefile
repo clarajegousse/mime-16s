@@ -215,7 +215,7 @@ rule extract_dada2_results:
 
 rule kraken2:
     input:
-        fasta ="results/dada2/final/{run}/ASVs.fa",
+        fasta ="results/dada2/final/{run}-ASVs.fa",
         db = "/users/work/cat3/db/kraken2/silva"
     output:
         report = "results/kraken2/20190508_0074/{run}-report.txt",
