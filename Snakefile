@@ -28,7 +28,7 @@ rule all:
         expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN),
         expand("results/dada2/final/{run}-ASVs.fa", run = RUN),
-        expand("results/kraken2/20190508_0074/{run}-report.txt", run = RUN)
+        #expand("results/kraken2/20190508_0074/{run}-report.txt", run = RUN)
 
 rule cutadapt:
     input:
@@ -213,13 +213,13 @@ rule extract_dada2_results:
     shell:
         "./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts}"
 
-rule kraken2:
-    input:
-        fasta ="results/dada2/final/{run}/ASVs.fa",
-        db = "/users/work/cat3/db/kraken2/silva"
-    output:
-        report = "results/kraken2/20190508_0074/{run}-report.txt",
-        stdout = "results/kraken2/20190508_0074/{run}-kraken2-stdout.txt",
-        stderr = "results/kraken2/20190508_0074/{run}-kraken2-stderr.txt"
-    shell:
-        "kraken2 --db {input.db} --threads 4 --report {output.report} {input.fasta} 1> {output.stdout} 2> {output.stderr}"
+# rule kraken2:
+#     input:
+#         fasta ="results/dada2/final/{run}/ASVs.fa",
+#         db = "/users/work/cat3/db/kraken2/silva"
+#     output:
+#         report = "results/kraken2/20190508_0074/{run}-report.txt",
+#         stdout = "results/kraken2/20190508_0074/{run}-kraken2-stdout.txt",
+#         stderr = "results/kraken2/20190508_0074/{run}-kraken2-stderr.txt"
+#     shell:
+#         "kraken2 --db {input.db} --threads 4 --report {output.report} {input.fasta} 1> {output.stdout} 2> {output.stderr}"
