@@ -9,11 +9,11 @@ import pandas as pd
 #
 configfile: "config.yaml"
 
-SampleTable = pd.read_csv(config['sampletable'], sep = ",", header = 0, index_col = 0)
+SampleTable = pd.read_csv(config['SAMPLETABLE'], sep = ",", header = 0, index_col = 0)
 
-print(SampleTable)
 SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
+RUN = config["RUN"]
 
 #SAMPLES = config["SAMPLES"]
 
@@ -22,7 +22,7 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand("results/reports/cutadapt/20190508_0074/{sample}-qc-report.txt",
+        expand("results/reports/cutadapt/{RUN}/{sample}-qc-report.txt",
         sample = SAMPLES),
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
         # "results/dada2/taxa/20190508_0074/taxa.RDS"
