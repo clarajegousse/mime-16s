@@ -143,7 +143,7 @@ rule dada2_merge_pairs:
 
 rule dada2_make_table_pe:
     input:
-        "results/dada2/merged/{run}/{sample}.RDS"
+        "results/dada2/merged/{run}/{{sample}}.RDS"
     output:
         "results/dada2/seqtab/{run}/seqtab-pe.RDS"
     params:
