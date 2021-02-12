@@ -222,5 +222,5 @@ rule extract_dada2_results:
         asv_seq = "results/dada2/final/{run}/ASVs.fa",
         asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv"
     shell:
-        "mkdir results/dada2/final/{run}/ \
+        "mkdir results/dada2/final/{{run}} \
          ./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts}"
