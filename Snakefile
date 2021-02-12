@@ -127,14 +127,14 @@ rule dada2_sample_inference:
 
 rule dada2_merge_pairs:
     input:
-      dadaF="results/dada2/denoised/{{run}}/{sample}_R1.RDS",# Inferred composition
-      dadaR="results/dada2/denoised/{{run}}/{sample}_R2.RDS",
-      derepF="results/dada2/uniques/{{run}}/{sample}_R1.RDS",# Dereplicated sequences
-      derepR="results/dada2/uniques/{{run}}/{sample}_R2.RDS"
+      dadaF="results/dada2/denoised/{run}/{sample}_R1.RDS",# Inferred composition
+      dadaR="results/dada2/denoised/{run}/{sample}_R2.RDS",
+      derepF="results/dada2/uniques/{run}/{sample}_R1.RDS",# Dereplicated sequences
+      derepR="results/dada2/uniques/{run}/{sample}_R2.RDS"
     output:
-        "results/dada2/merged/{{run}}/{sample}.RDS"
+        "results/dada2/merged/{run}/{sample}.RDS"
     log:
-        "logs/dada2/merge-pairs/{{run}}/{sample}.log"
+        "logs/dada2/merge-pairs/{run}/{sample}.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/merge-pairs"
