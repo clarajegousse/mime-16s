@@ -17,8 +17,14 @@ RUN = config["RUN"]
 
 rule all:
     input:
-        expand("results/trimmed/{run}/{sample}_.fastq.gz", run = RUN, sample = SAMPLES),
-        expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES)
+        # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
+        # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
+        # rerun with all inputs uncommented.
+        expand("results/dada2/trimmed/{run}/{sample}_R2.fastq.gz", run = RUN, sample = SAMPLES),
+
+        #expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
+        #expand("results/dada2/seqtab/{run}/seqtab-pe.RDS", run = RUN),
+        #expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
 
 rule cutadapt:
     input:
@@ -49,16 +55,16 @@ rule cutadapt:
          -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
           2> {output.report}"
-
-rule dada2_quality_profile_pe:
-    input:
-        "results/trimmed/{run}/{sample}_{orientation}.fastq.gz",
-    output:
-        "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
-    log:
-        "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
-    wrapper:
-        "0.70.0/bio/dada2/quality-profile"
+#
+# rule dada2_quality_profile_pe:
+#     input:
+#         expand("results/trimmed/{{run}}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
+#     output:
+#         "results/dada2/quality-profile/{run}/{sample}-quality-profile.png"
+#     log:
+#         "logs/dada2/quality-profile/{run}/{sample}-quality-profile-pe.log"
+#     wrapper:
+#         "0.70.0/bio/dada2/quality-profile"
 #
 # rule dada2_filter_trim_pe:
 #     input:
