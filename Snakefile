@@ -29,12 +29,12 @@ rule all:
 
 rule cutadapt:
     input:
-        fwd = "data/miseq/20190508_0074/{sample}_R1.fastq.gz",
-        rev = "data/miseq/20190508_0074/{sample}_R2.fastq.gz",
+        fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
+        rev = "data/miseq/{run}/{sample}_R2.fastq.gz",
     output:
-        fwd = "results/trimmed/20190508_0074/{sample}.1.fastq.gz",
-        rev = "results/trimmed/20190508_0074/{sample}.2.fastq.gz",
-        report = "results/reports/cutadapt/20190508_0074/{sample}-qc-report.txt"
+        fwd = "results/trimmed/{run}/{sample}.1.fastq.gz",
+        rev = "results/trimmed/{run}/{sample}.2.fastq.gz",
+        report = "results/reports/cutadapt/{run}/{sample}-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
         # https://earthmicrobiome.org/protocols-and-standards/16s/
@@ -48,7 +48,7 @@ rule cutadapt:
         maximum_length = 280
         #quality_cutoff = 20
     log:
-        "logs/cutadapt/20190508_0074/{sample}.log"
+        "logs/cutadapt/{run}/{sample}.log"
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
          -m {params.minimum_length} -M {params.maximum_length} \
