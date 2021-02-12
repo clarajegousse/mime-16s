@@ -27,7 +27,7 @@ rule all:
         expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION),
         expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN),
-        #expand("results/dada2/final/{run}/ASVs_taxonomy.tsv", run = RUN)
+        expand("results/dada2/final/{run}/ASVs_taxonomy.tsv", run = RUN)
 
 rule cutadapt:
     input:
@@ -214,12 +214,12 @@ rule dada2_assign_taxonomy:
         "0.70.0/bio/dada2/assign-taxonomy"
 
 
-# rule export_seqtab_to_fasta:
-#     input:
-#         "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS"
-#     output:
-#         asv_seq = "results/dada2/final/{run}/ASVs.fa",
-#         asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv",
-#         asv_tax = "results/dada2/final/{run}/ASVs_taxonomy.tsv"
-#     shell:
-#         "./scripts/export_seqtab_to_fasta.R {input} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
+rule export_seqtab_to_fasta:
+    input:
+        "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS"
+    output:
+        asv_seq = "results/dada2/final/{run}/ASVs.fa",
+        asv_counts = "results/dada2/final/{run}/ASVs_counts.tsv",
+        asv_tax = "results/dada2/final/{run}/ASVs_taxonomy.tsv"
+    shell:
+        "./scripts/extract_dada2)results.R {input} {output.asv_seq} {output.asv_counts} {output.asv_tax}"
