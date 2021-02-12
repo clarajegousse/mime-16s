@@ -23,7 +23,7 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        expand("results/reports/cutadapt/20190508_0074/{sample}_{orientation}-qc-report.txt",
+        expand("results/reports/cutadapt/20190508_0074/{sample}-qc-report.txt",
         sample = SAMPLES, orientation = ORIENTATION),
         #expand("results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt", sample = SAMPLES)
         # "results/dada2/taxa/20190508_0074/taxa.RDS"
@@ -35,7 +35,7 @@ rule cutadapt:
     output:
         fwd = "results/trimmed/20190508_0074/{sample}.1.fastq.gz",
         rev = "results/trimmed/20190508_0074/{sample}.2.fastq.gz",
-        report = "results/reports/cutadapt/20190508_0074/{sample}_{orientation}-qc-report.txt"
+        report = "results/reports/cutadapt/20190508_0074/{sample}-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
         # https://earthmicrobiome.org/protocols-and-standards/16s/
