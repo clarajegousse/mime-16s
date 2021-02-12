@@ -24,6 +24,7 @@ rule all:
         expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
         expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
         expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION)
+        expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION)
 rule cutadapt:
     input:
         fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
@@ -99,31 +100,31 @@ rule dada2_learn_errors:
     wrapper:
         "0.70.0/bio/dada2/learn-errors"
 
-# rule dada2_dereplicate_fastq:
-#     input:
-#     # Quality filtered FASTQ file
-#         "results/dada2/filtered_trim_pe/{run}/{fastq}.fastq.gz"
-#     output:
-#     # Dereplicated sequences stored as `derep-class` object in a RDS file
-#         "results/dada2/uniques/{run}/{fastq}.RDS"
-#     log:
-#         "logs/dada2/dereplicate-fastq/{run}/{fastq}.log"
-#     wrapper:
-#         "0.70.0/bio/dada2/dereplicate-fastq"
-#
-# rule dada2_sample_inference:
-#     input:
-#     # Dereplicated (aka unique) sequences of the sample
-#         derep="results/dada2/uniques/{run}/{sample}_{orientation}.RDS",
-#         err="results/dada2/learn-errors/{run}/model_{orientation}.RDS" # Error model
-#     output:
-#         "results/dada2/denoised/{run}/{sample}.{orientation}.RDS" # Inferred sample composition
-#     log:
-#         "logs/dada2/sample-inference/{run}/{sample}.{orientation}.log"
-#     threads: 1 # set desired number of threads here
-#     wrapper:
-#         "0.70.0/bio/dada2/sample-inference"
-#
+rule dada2_dereplicate_fastq:
+    input:
+    # Quality filtered FASTQ file
+        "results/dada2/filtered_trim_pe/{run}/{fastq}.fastq.gz"
+    output:
+    # Dereplicated sequences stored as `derep-class` object in a RDS file
+        "results/dada2/uniques/{run}/{fastq}.RDS"
+    log:
+        "logs/dada2/dereplicate-fastq/{run}/{fastq}.log"
+    wrapper:
+        "0.70.0/bio/dada2/dereplicate-fastq"
+
+rule dada2_sample_inference:
+    input:
+    # Dereplicated (aka unique) sequences of the sample
+        derep="results/dada2/uniques/{run}/{sample}_{orientation}.RDS",
+        err="results/dada2/learn-errors/{run}/model_{orientation}.RDS" # Error model
+    output:
+        "results/dada2/denoised/{run}/{sample}_{orientation}.RDS" # Inferred sample composition
+    log:
+        "logs/dada2/sample-inference/{run}/{sample}_{orientation}.log"
+    threads: 1 # set desired number of threads here
+    wrapper:
+        "0.70.0/bio/dada2/sample-inference"
+
 # rule dada2_merge_pairs:
 #     input:
 #       dadaF="results/dada2/denoised/{run}/{sample}_R1.RDS",# Inferred composition
