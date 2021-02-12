@@ -115,12 +115,12 @@ rule dada2_dereplicate_fastq:
 rule dada2_sample_inference:
     input:
     # Dereplicated (aka unique) sequences of the sample
-        derep="results/dada2/uniques/{{run}}/{sample}.{orientation}.RDS",
-        err="results/dada2/learn-errors/{{run}}/model_{orientation}.RDS" # Error model
+        derep="results/dada2/uniques/{run}/{sample}.{orientation}.RDS",
+        err="results/dada2/learn-errors/{run}/model_{orientation}.RDS" # Error model
     output:
-        "results/dada2/denoised/{{run}}/{sample}.{orientation}.RDS" # Inferred sample composition
+        "results/dada2/denoised/{run}/{sample}.{orientation}.RDS" # Inferred sample composition
     log:
-        "logs/dada2/sample-inference/{{run}}/{sample}.{orientation}.log"
+        "logs/dada2/sample-inference/{run}/{sample}.{orientation}.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/sample-inference"
