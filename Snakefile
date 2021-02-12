@@ -206,12 +206,12 @@ rule dada2_assign_taxonomy:
 rule extract_dada2_results:
     input:
         seqtab = "results/dada2/seqtab/{run}/seqtab.nochimeras.RDS",
-        taxo = "results/dada2/taxa/{run}/taxa.RDS"
+        #taxo = "results/dada2/taxa/{run}/taxa.RDS"
     output:
         asv_seq = "results/dada2/final/{run}-ASVs.fa",
         asv_counts = "results/dada2/final/{run}-ASVs_counts.tsv"
     shell:
-        "./scripts/extract_dada2_results.R {input.seqtab} {input.taxo} {output.asv_seq} {output.asv_counts}"
+        "./scripts/extract_dada2_results.R {input.seqtab} {output.asv_seq} {output.asv_counts}"
 
 # rule kraken2:
 #     input:
