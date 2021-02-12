@@ -23,8 +23,7 @@ rule all:
         expand("results/dada2/filtered_trim_pe/{run}/{sample}_R2.fastq.gz", run = RUN, sample = SAMPLES),
         expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         expand("results/dada2/seqtab/{run}/seqtab-pe.RDS", run = RUN),
-
-        #expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
+        expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
 
 rule cutadapt:
     input:
