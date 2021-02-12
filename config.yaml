@@ -1,4 +1,4 @@
 
 RUNS: "20190508_0074"
 
-sampletable: "samples.tsv"
+sampletable: "/users/work/cat3/projects/mime-16s/samples.tsv"
