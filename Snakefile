@@ -6,7 +6,7 @@
 # import pandas as pd
 # from snakemake.utils import validate
 #
-# configfile: "config.yaml"
+configfile: "config.yaml"
 # validate(config, "config.yaml")
 #
 # samples = pd.read_table(config["SAMPLES"])
