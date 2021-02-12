@@ -22,6 +22,8 @@ rule all:
         # rerun with all inputs uncommented.
         expand("results/dada2/filtered_trim_pe/{run}/{sample}_R2.fastq.gz", run = RUN, sample = SAMPLES),
         expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
+        expand("results/dada2/seqtab/{run}/seqtab-pe.RDS", run = RUN),
+
         #expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN)
 
 rule cutadapt:
@@ -141,14 +143,14 @@ rule dada2_merge_pairs:
 
 rule dada2_make_table_pe:
     input:
-        "results/dada2/merged/{{run}}/{{sample}}.RDS"
+        "results/dada2/merged/{run}/{sample}.RDS"
     output:
-        "results/dada2/seqtab/{{run}}/seqtab-pe.RDS"
+        "results/dada2/seqtab/{run}/seqtab-pe.RDS"
     params:
         names = SAMPLES, # Sample names instead of paths
         orderBy = "nsamples" # Change the ordering of samples
     log:
-        "logs/dada2/make-table/{{run}}/make-table-pe.log"
+        "logs/dada2/make-table/{run}/make-table-pe.log"
     threads: 1 # set desired number of threads here
     wrapper:
         "0.70.0/bio/dada2/make-table"
