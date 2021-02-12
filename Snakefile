@@ -10,7 +10,7 @@ import pandas as pd
 configfile: "config.yaml"
 
 SampleTable = pd.read_table(config['sampletable'],index_col=0)
-SAMPLES = list(SampleTable.index)
+SAMPLES = list(SampleTable[1])
 print(SAMPLES)
 
 #SAMPLES = config["SAMPLES"]
