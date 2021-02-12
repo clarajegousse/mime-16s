@@ -16,7 +16,7 @@ ORIENTATION = config["ORIENTATION"]
 run = config["RUN"]
 
 rule all:
-    output:
+    input:
         expand("results/trimmed/{{run}}/{sample}_.fastq.gz", sample = SAMPLES)
 
 rule cutadapt:
