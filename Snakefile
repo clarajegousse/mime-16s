@@ -1,5 +1,5 @@
 
-# snakemake --cluster qsub -j 32 -R dada2_learn_errors --latency-wait 60
+# snakemake --cluster qsub -j 32 -R dada2_learn_errors --latency-wait 100
 
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
