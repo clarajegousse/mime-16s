@@ -28,7 +28,7 @@ rule all:
         expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN),
         expand("results/dada2/final/{run}-ASVs.fa", run = RUN),
-        expand("results/kraken2/20190508_0074/{sample}-report.txt", run = RUN)
+        expand("results/kraken2/{run}/{sample}-report.txt", run = RUN, sample = SAMPLES)
 
 rule cutadapt:
     input:
