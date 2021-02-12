@@ -169,6 +169,17 @@ rule export_seqtab_to_fasta:
     shell:
         "./scripts/export_seqtab_to_fasta.R {input} {output}"
 
+rule kraken2:
+    input:
+        fasta ="results/dada2/merged/{run}/{sample}-seqtab-merged.fa",
+        db = "/users/work/cat3/db/kraken2/silva"
+    output:
+        report = "results/kraken2/20190508_0074/{sample}-report.txt",
+        stdout = "results/kraken2/20190508_0074/{sample}-kraken2-stdout.txt",
+        stderr = "results/kraken2/20190508_0074/{sample}-kraken2-stderr.txt"
+    shell:
+        "kraken2 --db {input.db} --threads 4 --report {output.report} {input.fasta} 1> {output.stdout} 2> {output.stderr}"
+
 rule dada2_remove_chimeras:
     input:
         "results/dada2/seqtab/{run}/seqtab-pe.RDS" # Sequence table
@@ -212,14 +223,3 @@ rule extract_dada2_results:
         asv_counts = "results/dada2/final/{run}-ASVs_counts.tsv"
     shell:
         "./scripts/extract_dada2_results.R {input.seqtab} {output.asv_seq} {output.asv_counts}"
-
-rule kraken2:
-    input:
-        fasta ="results/dada2/final/{run}-ASVs.fa",
-        db = "/users/work/cat3/db/kraken2/silva"
-    output:
-        report = "results/kraken2/20190508_0074/{run}-report.txt",
-        stdout = "results/kraken2/20190508_0074/{run}-kraken2-stdout.txt",
-        stderr = "results/kraken2/20190508_0074/{run}-kraken2-stderr.txt"
-    shell:
-        "kraken2 --db {input.db} --threads 4 --report {output.report} {input.fasta} 1> {output.stdout} 2> {output.stderr}"
