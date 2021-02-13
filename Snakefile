@@ -1,5 +1,5 @@
 
-# snakemake --cluster qsub -j 32 -R dada2_learn_errors --latency-wait 100
+# snakemake --cluster qsub -j 12 --latency-wait 100
 
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
@@ -20,10 +20,10 @@ rule all:
         # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
-        # expand("results/reports/cutadapt/{run}/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
-        # expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
-        # expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
-        # expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION),
+        expand("results/reports/cutadapt/{run}/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
+        expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
+        expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
+        expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION),
         expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION),
         expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN),
