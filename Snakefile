@@ -1,5 +1,5 @@
 
-# snakemake --cluster qsub -j 12 --latency-wait 100
+# snakemake --cluster qsub -j 12 --latency-wait 100 -R dada2_assign_taxonomy
 
 # Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
 # to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
@@ -27,8 +27,8 @@ rule all:
         expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION),
         expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
         expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN),
-        expand("results/dada2/final/{run}-ASVs.fa", run = RUN),
-        expand("results/kraken2/{run}/{sample}-report.txt", run = RUN, sample = SAMPLES)
+        #expand("results/dada2/final/{run}-ASVs.fa", run = RUN),
+        #expand("results/kraken2/{run}/{sample}-report.txt", run = RUN, sample = SAMPLES)
 
 rule cutadapt:
     input:
