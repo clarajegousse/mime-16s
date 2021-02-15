@@ -11,9 +11,9 @@ parser <- ArgumentParser()
 # by default ArgumentParser will add an help option
 parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
     help="Print extra output [default]")
-parser$add_argument("-i", "--input_path", type="string", action="store_true", default=FALSE,
+parser$add_argument("-i", "--input_path", type="character", action="store_true", default=FALSE,
   help="input path [default: none]")
-parser$add_argument("-o", "--output_path", type="string", action="store_true", default=FALSE,
+parser$add_argument("-o", "--output_path", type="character", action="store_true", default=FALSE,
   help="output path [default: none]")
 parser$add_argument("-f", "--trunclenfwd", type="integer", action="store_true", default=250,
   help="truncLen forward [default %(default)s]")
