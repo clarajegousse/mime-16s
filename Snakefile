@@ -76,7 +76,7 @@ rule dada2_filter:
         maxEE = 2,
         truncQ = 11
     log:
-        "logs/dada2/{run}/dada2-filter.log"
+        directory(expand("logs/dada2/{run}/dada2-filter.log", run = RUN))
     shell:
         #r"""./scripts/dada2-filter.r --input_path {input.path} \
         #--output_path {output.path} \
