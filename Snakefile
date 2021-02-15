@@ -1,5 +1,5 @@
 
-# snakemake --cluster qsub -j 12 --latency-wait 100 -R dada2_assign_taxonomy
+# snakemake --cluster qsub -j 12 --latency-wait 60 --rerun-incomplete
 
 import pandas as pd
 
@@ -61,8 +61,7 @@ rule cutadapt:
 
 rule dada2_filter:
     input:
-        path = expand("results/{run}/cutadapt/", run = RUN),
-        report = "results/{run}/cutadapt/{sample}-qc-report.txt"
+        path = expand("results/{run}/cutadapt/", run = RUN)
     output:
         path = directory(expand("results/{run}/dada2-filter", run = RUN))
     params:
