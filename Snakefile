@@ -70,14 +70,14 @@ rule dada2_filter:
     input:
         path = "results/{run}/cutadapt/"
     output:
-        path = directory(expand("results/{run}/dada2-filter", run = RUN))
+        path = directory("results/{run}/dada2-filter", run = RUN)
     params:
         trunc_len_fwd = 240,
         trunc_len_rev = 200,
         maxEE = 2,
         truncQ = 11
     log:
-        directory(expand("logs/dada2/{run}/dada2-filter.log", run = RUN))
+        directory("logs/dada2/{run}/dada2-filter.log", run = RUN)
     shell:
         #r"""./scripts/dada2-filter.r --input_path {input.path} \
         #--output_path {output.path} \
