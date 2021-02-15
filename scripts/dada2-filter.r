@@ -8,5 +8,5 @@ filtpath <- file.path(path, "filtered") # Filtered files go into the filtered/ s
 fns <- list.files(path, pattern="fastq.gz") # CHANGE if different file extensions
 # Filtering
 filterAndTrim(file.path(path,fns), file.path(filtpath,fns),
-              truncLen=c(240, 200), maxEE=2, truncQ=10, rm.phix=TRUE,
+              truncLen=240, maxEE=2, truncQ=10, rm.phix=TRUE,
               compress=TRUE, verbose=TRUE, multithread=TRUE)
