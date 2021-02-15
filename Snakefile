@@ -69,10 +69,14 @@ rule dada2_filter:
     output:
         path = "results/dada2/filtered/{run}/"
     params:
-        truncLen = [240,200],
+        trunc_len_fwd = 240,
+        trunc_len_rev = 200,
         maxEE = 2,
+        truncQ = 11
+    log:
+        "logs/dada2-filter/{run}/{sample}.log"
     shell:
-        "./scripts/dada2-filter.R input_path output_path trunc_len maxee truncq"
+        "./scripts/dada2-filter.R {input.path} {output.path} {params.trunc_len_fwd} {params.trunc_len_rev} {params.maxEE} {params.truncQ}"
 
 
 
