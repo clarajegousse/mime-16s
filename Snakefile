@@ -78,7 +78,7 @@ rule dada2_filter:
     log:
         "logs/dada2/{run}/dada2-filter.log"
     shell:
-        "./scripts/dada2-filter.r {input.path} {output.path} {params.trunc_len_fwd} {params.trunc_len_rev} {params.maxEE} {params.truncQ}"
+        "/users/home/cat3/projects/mime-16s/scripts/dada2-filter.r {input.path} {output.path} {params.trunc_len_fwd} {params.trunc_len_rev} {params.maxEE} {params.truncQ}"
 
 
 
