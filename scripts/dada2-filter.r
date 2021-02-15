@@ -15,7 +15,7 @@ library(dada2); packageVersion("dada2")
 input.path <- args[1]
 output.path <- args[2]
 tunc.len.fwd <- as.numeric(args[3])
-trunc.len.rew <- as.numeric(args[4])
+trunc.len.rev <- as.numeric(args[4])
 maxee <- as.numeric(args[5])
 truncq <- as.numeric(args[6])
 
