@@ -20,8 +20,8 @@ p <- arg_parser("Round a floating point number")
 p <- arg_parser("Run DADA2 filter")
 
 # Add command line arguments
-p <- add_argument(p, "--input_path", help="Input path", default=FALSE)
-p <- add_argument(p, "--output_path", help="Output path", default=FALSE)
+p <- add_argument(p, "--input_path", help="Input path", type = "character")
+p <- add_argument(p, "--output_path", help="Output path", type = "character")
 p <- add_argument(p, "--trunc_len_fwd", help="number of decimal places",  type="numeric", default=250)
 p <- add_argument(p, "--trunc_len_rev", help="number of decimal places",  type="numeric", default=200)
 p <- add_argument(p, "--maxee", help="MaxEE",  type="numeric", default=2)
