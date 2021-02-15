@@ -66,5 +66,5 @@ filterAndTrim(fwd = file.path(pathF, fastqFs),
   rev = file.path(pathR, fastqRs),
   filt.rev = file.path(filtpathR, fastqRs),
   truncLen = c(argv$trunc_len_fwd, argv$trunc_len_rev),
-  maxEE = argv$maxee, truncQ = argv$truncq
+  maxEE = argv$maxee, truncQ = argv$truncq,
   compress = TRUE, verbose = TRUE, multithread = TRUE)
