@@ -68,7 +68,7 @@ rule cutadapt:
 
 rule dada2_filter:
     input:
-        path = "results/{{run}}/cutadapt/"
+        path = "results/{run}/cutadapt/"
     output:
         path = directory(expand("results/{run}/dada2-filter", run = RUN))
     params:
