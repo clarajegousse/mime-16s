@@ -21,7 +21,7 @@ rule all:
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
         expand("results/{run}/cutadapt/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
-        directory(expand("logs/dada2/{run}/dada2-filter.log", run = RUN)),
+        expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
 
         #expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
         #expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
@@ -67,9 +67,9 @@ rule cutadapt:
 
 rule dada2_filter:
     input:
-        path = "results/{run}/cutadapt/"
+        path = directory(expand("results/{run}/cutadapt/", run = RUN))
     output:
-        path = "results/{run}/dada2-filter"
+        path = directory(expand("results/{run}/dada2-filter", run = RUN))
     params:
         trunc_len_fwd = 240,
         trunc_len_rev = 200,
