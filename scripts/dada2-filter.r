@@ -5,9 +5,6 @@
 library(argparser, quietly=TRUE)
 
 # Create a parser
-p <- arg_parser("Round a floating point number")
-
-# Create a parser
 p <- arg_parser("Run DADA2 filter")
 
 # Add command line arguments
