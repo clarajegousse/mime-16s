@@ -18,5 +18,5 @@ output.path <- args[2]
 fns <- list.files(input.path, pattern="fastq.gz") # CHANGE if different file extensions
 # Filtering
 filterAndTrim(file.path(input.path, fns), file.path(output.path, fns),
-              truncLen = 240, maxEE = 2, truncQ = 10, rm.phix = TRUE,
+              truncLen = c(240, 200), maxEE = 2, truncQ = 10, rm.phix = TRUE,
               compress = TRUE, verbose = TRUE, multithread = TRUE)
