@@ -61,5 +61,5 @@ rm(derepF); rm(derepR)
 # Construct sequence table and remove chimeras
 seqtab <- makeSequenceTable(mergers
 
-output.filname <- paste(argv$input_path, "/seqtab.rds", sep = "", collapse = NULL)
+output.filname <- paste(argv$output_path, "seqtab.rds", sep = "", collapse = NULL)
 saveRDS(seqtab, output.filname) # CHANGE ME to where you want sequence table saved
