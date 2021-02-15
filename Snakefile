@@ -22,6 +22,7 @@ rule all:
         # rerun with all inputs uncommented.
         expand("results/{run}/cutadapt/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
         expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
+        expand("logs/dada2/{run}/dada2-inference.log", run = RUN)
 
         #expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
         #expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
