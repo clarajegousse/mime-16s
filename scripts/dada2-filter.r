@@ -15,9 +15,9 @@ library(dada2); packageVersion("dada2")
 input.path <- args[1]
 output.path <- args[2]
 tunc.len.fwd <- as.numeric(args[3])
-#trunc.len.rev <- as.numeric(args[4])
-#maxee <- as.numeric(args[5])
-#truncq <- as.numeric(args[6])
+trunc.len.rev <- as.numeric(args[4])
+maxee <- as.numeric(args[5])
+truncq <- as.numeric(args[6])
 
 # File parsing
 pathF <- input.path
@@ -35,5 +35,6 @@ filterAndTrim(fwd = file.path(pathF, fastqFs),
   filt = file.path(filtpathF, fastqFs),
   rev = file.path(pathR, fastqRs),
   filt.rev = file.path(filtpathR, fastqRs),
-  truncLen = c(tunc.len.fwd,200),
+  truncLen = c(tunc.len.fwd, trunc.len.rev),
+  maxEE = maxee, truncQ = truncq,
   compress = TRUE, verbose = TRUE, multithread = TRUE)
