@@ -91,6 +91,18 @@ rule dada2_filter:
         --rev_trunc_len {params.trunc_len_rev} \
         --maxee {params.maxEE} --truncq {params.truncQ}"
 
+rule dada2_inference:
+    input:
+        path = expand("results/{run}/dada2-filter", run = RUN)
+    output:
+        path = directory(expand("results/{run}/dada2-inference", run = RUN))
+    log:
+        directory(expand("logs/dada2/{run}/dada2-inference.log", run = RUN))
+    shell:
+        "./scripts/dada2-inference.r \
+        --input_path {input.path} \
+        --output_path {output.path}"
+
 
 
 # rule dada2_quality_profile_pe:
