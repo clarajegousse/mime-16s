@@ -46,6 +46,9 @@ library(dada2); packageVersion("dada2")
 # maxee <- as.numeric(args[5])
 # truncq <- as.numeric(args[6])
 
+print(argv)
+
+
 # File parsing
 pathF <- argv$input_path
 pathR <- argv$input_path
