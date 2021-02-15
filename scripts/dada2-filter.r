@@ -17,23 +17,13 @@ p <- add_argument(p, "--truncq", help="truncQ",  type="numeric", default=11)
 
 # Parse the command line arguments
 argv <- parse_args(p)
-print(argv)
+# print(argv)
 
 # ----- LIBRARY -----
 
 library(dada2); packageVersion("dada2")
 
 # ----- FILE PATHS -----
-
-# input.path <- "/users/home/cat3/projects/mime-16s/results/20190508_0074/cutadapt"
-# output.path <- "/users/home/cat3/projects/mime-16s/results/20190508_0074/dada2-filter"
-
-# input.path <- args[1]
-# output.path <- args[2]
-# trunc.len.fwd <- as.numeric(args[3])
-# trunc.len.rev <- as.numeric(args[4])
-# maxee <- as.numeric(args[5])
-# truncq <- as.numeric(args[6])
 
 # File parsing
 pathF <- argv$input_path
