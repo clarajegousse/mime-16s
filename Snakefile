@@ -21,6 +21,8 @@ rule all:
         # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
         # rerun with all inputs uncommented.
         expand("results/{run}/cutadapt/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
+        expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
+
         #expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
         #expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
         #expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION),
@@ -74,7 +76,7 @@ rule dada2_filter:
         maxEE = 2,
         truncQ = 11
     log:
-        "logs/dada2-filter/{run}/{sample}.log"
+        "logs/dada2/{run}/dada2-filter.log"
     shell:
         "./scripts/dada2-filter.R {input.path} {output.path} {params.trunc_len_fwd} {params.trunc_len_rev} {params.maxEE} {params.truncQ}"
 
