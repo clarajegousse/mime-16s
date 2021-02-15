@@ -67,9 +67,9 @@ rule cutadapt:
 
 rule dada2_filter:
     input:
-        path = "results/trimmed/{run}/"
+        path = "results/{run}/cutadapt/"
     output:
-        path = "results/dada2/filtered/{run}/"
+        path = "results/{run}/dada2-filter"
     params:
         trunc_len_fwd = 240,
         trunc_len_rev = 200,
