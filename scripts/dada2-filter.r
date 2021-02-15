@@ -14,10 +14,10 @@ library(dada2); packageVersion("dada2")
 
 input.path <- args[1]
 output.path <- args[2]
-tunc.len.fwd <- as.numeric(args[3])
-trunc.len.rev <- as.numeric(args[4])
-maxee <- as.numeric(args[5])
-truncq <- as.numeric(args[6])
+#tunc.len.fwd <- as.numeric(args[3])
+#trunc.len.rev <- as.numeric(args[4])
+#maxee <- as.numeric(args[5])
+#truncq <- as.numeric(args[6])
 
 # File parsing
 pathF <- input.path
@@ -34,6 +34,6 @@ if(length(fastqFs) != length(fastqRs)) stop("Forward and reverse files do not ma
 # Filtering: THESE PARAMETERS ARENT OPTIMAL FOR ALL DATASETS
 filterAndTrim(fwd=file.path(pathF, fastqFs), filt=file.path(filtpathF, fastqFs),
               rev=file.path(pathR, fastqRs), filt.rev=file.path(filtpathR, fastqRs),
-              truncLen=c(tunc.len.fwd,tunc.len.rev),
-              maxEE=maxee, truncQ=truncq, maxN=0, rm.phix=TRUE,
+              truncLen=c(240,200),
+              maxEE=2, truncQ=11, maxN=0, rm.phix=TRUE,
               compress=TRUE, verbose=TRUE, multithread=TRUE)
