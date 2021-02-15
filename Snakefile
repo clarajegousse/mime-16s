@@ -1,10 +1,6 @@
 
 # snakemake --cluster qsub -j 12 --latency-wait 100 -R dada2_assign_taxonomy
 
-# Make sure that you set the `truncLen=` option in the rule `dada2_filter_and_trim_pe` according
-# to the results of the quality profile checks (after rule `dada2_quality_profile_pe` has finished on all samples).
-# If in doubt, check https://benjjneb.github.io/dada2/tutorial.html#inspect-read-quality-profiles
-
 import pandas as pd
 
 configfile: "config.yaml"
@@ -17,9 +13,6 @@ RUN = config["RUN"]
 
 rule all:
     input:
-        # In a first run of this meta-wrapper, comment out all other inputs and only keep this one.
-        # Looking at the resulting plot, adjust the `truncLen` in rule `dada2_filter_trim_pe` and then
-        # rerun with all inputs uncommented.
         expand("results/{run}/cutadapt/{sample}-qc-report.txt", run = RUN, sample = SAMPLES),
         expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
         expand("logs/dada2/{run}/dada2-inference.log", run = RUN)
@@ -68,7 +61,8 @@ rule cutadapt:
 
 rule dada2_filter:
     input:
-        path = expand("results/{run}/cutadapt/", run = RUN)
+        path = expand("results/{run}/cutadapt/", run = RUN),
+        report = "results/{run}/cutadapt/{sample}-qc-report.txt"
     output:
         path = directory(expand("results/{run}/dada2-filter", run = RUN))
     params:
