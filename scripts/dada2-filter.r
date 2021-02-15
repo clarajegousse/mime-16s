@@ -10,8 +10,8 @@ p <- arg_parser("Run DADA2 filter")
 # Add command line arguments
 p <- add_argument(p, "--input_path", help="Input path", type = "character")
 p <- add_argument(p, "--output_path", help="Output path", type = "character")
-p <- add_argument(p, "--fwd_trunc_len", help="number of decimal places",  type="numeric", default=250)
-p <- add_argument(p, "--rev_trunc_len", help="number of decimal places",  type="numeric", default=200)
+p <- add_argument(p, "--fwd_trunc_len", help="fwd_trunc_len",  type="numeric", default=250)
+p <- add_argument(p, "--rev_trunc_len", help="rev_trunc_len",  type="numeric", default=200)
 p <- add_argument(p, "--maxee", help="MaxEE",  type="numeric", default=2)
 p <- add_argument(p, "--truncq", help="truncQ",  type="numeric", default=11)
 
