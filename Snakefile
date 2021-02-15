@@ -78,7 +78,7 @@ rule dada2_filter:
     log:
         "logs/dada2/{run}/dada2-filter.log"
     shell:
-        "Rscript ./scripts/dada2-filter.r {input.path} {output.path} {params.trunc_len_fwd} {params.trunc_len_rev} {params.maxEE} {params.truncQ}"
+        "Rscript --vanilla -e ./scripts/dada2-filter.r {input.path} {output.path} {params.trunc_len_fwd} {params.trunc_len_rev} {params.maxEE} {params.truncQ}"
 
 
 
