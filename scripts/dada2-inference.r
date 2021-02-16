@@ -36,30 +36,30 @@ if(!identical(sample.names, sample.namesR)) stop("Forward and reverse files do n
 names(filtFs) <- sample.names
 names(filtRs) <- sample.names
 
-# set.seed(100)
-#
-# # Learn forward error rates
-# errF <- learnErrors(filtFs, nbases=1e8, multithread=TRUE)
-#
-# # Learn reverse error rates
-# errR <- learnErrors(filtRs, nbases=1e8, multithread=TRUE)
-#
-# # Sample inference and merger of paired-end reads
-# mergers <- vector("list", length(sample.names))
-# names(mergers) <- sample.names
-#
-# for(sam in sample.names) {
-#   cat("Processing:", sam, "\n")
-#     derepF <- derepFastq(filtFs[[sam]])
-#     ddF <- dada(derepF, err=errF, multithread=TRUE)
-#     derepR <- derepFastq(filtRs[[sam]])
-#     ddR <- dada(derepR, err=errR, multithread=TRUE)
-#     merger <- mergePairs(ddF, derepF, ddR, derepR)
-#     mergers[[sam]] <- merger
-# }
-# rm(derepF); rm(derepR)
-# # Construct sequence table and remove chimeras
-# seqtab <- makeSequenceTable(mergers
+set.seed(100)
+
+# Learn forward error rates
+errF <- learnErrors(filtFs, nbases=1e8, multithread=TRUE)
+
+# Learn reverse error rates
+errR <- learnErrors(filtRs, nbases=1e8, multithread=TRUE)
+
+# Sample inference and merger of paired-end reads
+mergers <- vector("list", length(sample.names))
+names(mergers) <- sample.names
+
+for(sam in sample.names) {
+  cat("Processing:", sam, "\n")
+    derepF <- derepFastq(filtFs[[sam]])
+    ddF <- dada(derepF, err=errF, multithread=TRUE)
+    derepR <- derepFastq(filtRs[[sam]])
+    ddR <- dada(derepR, err=errR, multithread=TRUE)
+    merger <- mergePairs(ddF, derepF, ddR, derepR)
+    mergers[[sam]] <- merger
+}
+rm(derepF); rm(derepR)
+# Construct sequence table and remove chimeras
+seqtab <- makeSequenceTable(mergers)
 
 output.filename <- paste(argv$output_path, "seqtab.rds", sep = "", collapse = NULL)
 print(output.filename)
