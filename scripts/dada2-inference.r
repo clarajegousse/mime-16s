@@ -58,6 +58,7 @@ for(sam in sample.names) {
     mergers[[sam]] <- merger
 }
 rm(derepF); rm(derepR)
+
 # Construct sequence table and remove chimeras
 seqtab <- makeSequenceTable(mergers)
 
