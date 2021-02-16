@@ -28,7 +28,7 @@ seqtab <- readRDS(seqtab.filename)
 
 # Remove chimeras
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE)
-sum(seqtab.nochim)/sum(seqtab)
+# sum(seqtab.nochim)/sum(seqtab)
 
 # Assign taxonomy
 tax <- assignTaxonomy(seqtab.nochim, "/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz", multithread=TRUE)
