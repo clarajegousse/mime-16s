@@ -110,7 +110,6 @@ rule dada2_merge_chimera_taxo:
         --input_path {input.path} \
         --output_path {output.path}"
 
-
 # rule dada2_quality_profile_pe:
 #     input:
 #         expand("results/trimmed/{{run}}/{{sample}}_{orientation}.fastq.gz", orientation = ORIENTATION)
