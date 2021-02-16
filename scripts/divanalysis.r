@@ -2,7 +2,6 @@
 
 # import colours to remain consistent between all plots
 source("/Users/Clara/Projects/colors/colors.R")
-source("/Users/Clara/Projects/colors/colors.R")
 source("/Users/Clara/Projects/colors/colors2.R")
 
 # ----- LIBRARIES -----
