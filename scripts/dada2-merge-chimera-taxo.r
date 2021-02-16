@@ -35,5 +35,6 @@ tax <- assignTaxonomy(seqtab.nochim, "/users/work/cat3/db/dada2/silva_nr99_v138_
 
 # Write to disk
 ifelse(!dir.exists(file.path(argv$output_path)), dir.create(file.path(argv$output_path)), FALSE)
-saveRDS(seqtab.nochim, paste(argv$output_path, "seqtab_final.rds", sep = "", collpase = TRUE)) # CHANGE ME to where you want sequence table saved
-saveRDS(tax, paste(argv$output_path, "tax_final.rds", sep = "", collapse = NULL))
+
+saveRDS(seqtab.nochim, paste(argv$output_path, "/seqtab_final.rds", sep = "", collpase = TRUE)) # CHANGE ME to where you want sequence table saved
+saveRDS(tax, paste(argv$output_path, "/tax_final.rds", sep = "", collapse = NULL))
