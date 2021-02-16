@@ -100,7 +100,7 @@ rule dada2_inference:
 
 rule dada2_merge_chimera_taxo:
     input:
-        seqtab = expand("results/{run}/dada2-inference/", run = RUN)
+        path = expand("results/{run}/dada2-inference/", run = RUN)
     output:
         path = directory(expand("results/{run}/dada2-merge-chimera-taxo/", run = RUN))
     log:
