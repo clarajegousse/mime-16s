@@ -14,22 +14,7 @@ library(grid)
 library(reshape2)
 library(phyloseq)
 
-# ----- LOAD DATA -----
-
-seqtab.filename <- "~/Projects/mime-16s/results/20190508_0074/dada2-merge-chimera-taxo/seqtab_final.rds"
-seqtab <- readRDS(seqtab.filename)
-
-taxa.filename <- "~/Projects/mime-16s/results/20190508_0074/dada2-merge-chimera-taxo/tax_final.rds"
-tax_info <- readRDS(taxa.filename)
-
-# -----
-
-ps <- phyloseq(tax_table(tax_info),
-               otu_table(seqtab, taxa_are_rows = TRUE))
-
-
-# ----- METADATA -----
-# Generate the metadata table from file names
+# ----- LOAD METADATA -----
 
 metadata <- read.csv("/Users/Clara/Projects/mime/data/all-metadata.csv",
                      sep = ";", dec = ".",
