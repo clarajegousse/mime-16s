@@ -63,5 +63,5 @@ rm(derepF); rm(derepR)
 seqtab <- makeSequenceTable(mergers)
 
 ifelse(!dir.exists(file.path(argv$output_path)), dir.create(file.path(argv$output_path)), FALSE)
-output.filename <- paste(argv$output_path, "seqtab.rds", sep = "", collapse = NULL)
+output.filename <- paste(argv$output_path, "/seqtab.rds", sep = "", collapse = NULL)
 saveRDS(seqtab, output.filename) # CHANGE ME to where you want sequence table saved
