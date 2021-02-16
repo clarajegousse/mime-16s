@@ -1,5 +1,5 @@
 
-# snakemake --cluster qsub -j 12 --latency-wait 60 --rerun-incomplete
+# snakemake --cluster qsub -j 12 --latency-wait 60 --rerun-incomplete --printshellcmds
 
 import pandas as pd
 
@@ -87,16 +87,15 @@ rule dada2_filter:
 
 rule dada2_inference:
     input:
-        path = expand("results/{run}/dada2-filter", run = RUN)
+        path = expand("results/{run}/dada2-filter/", run = RUN)
     output:
-        path = directory(expand("results/{run}/dada2-inference", run = RUN))
+        path = directory(expand("results/{run}/dada2-inference/", run = RUN))
     log:
         directory(expand("logs/dada2/{run}/dada2-inference.log", run = RUN))
     shell:
         "./scripts/dada2-inference.r \
         --input_path {input.path} \
         --output_path {output.path}"
-
 
 
 # rule dada2_quality_profile_pe:
