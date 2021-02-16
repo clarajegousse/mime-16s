@@ -97,6 +97,18 @@ rule dada2_inference:
         --input_path {input.path} \
         --output_path {output.path}"
 
+rule dada2_merge_chimera_taxo:
+    input:
+        seqtab = expand("results/{run}/dada2-inference/", run = RUN)
+    output:
+        path = directory(expand("results/{run}/dada2-merge-chimera-taxo/", run = RUN))
+    log:
+        directory(expand("logs/dada2/{run}/dada2-merge-chimera-taxo.log", run = RUN))
+    shell:
+        "./scripts/dada2-merge-chimera-taxo.r \
+        --input_path {input.path} \
+        --output_path {output.path}"
+
 
 # rule dada2_quality_profile_pe:
 #     input:
