@@ -17,18 +17,6 @@ mytheme = theme_pubr()  +
   font("legend.title",size = 12, face = "bold") +
   font("legend.text",size = 10) 
 
-transect.color = scale_color_manual(values = c("FX" = Amethyst, 
-                                               "IH" = Aqua,
-                                               "KG" = Grass,
-                                               "KR" = Bittersweet,
-                                               "LA" = Pumpkin, 
-                                               "LB" = Orange,
-                                               "LN" = Sunflower, 
-                                               "MS" = Mint, 
-                                               "SB" = Grapefruit,
-                                               "SI" = Jeans, 
-                                               "SK" = Lavender))
-
 # ----- LIBRARIES -----
 
 library(ggplot2)
@@ -36,143 +24,15 @@ library(ggpubr)
 library(RColorBrewer)
 library(vegan)
 library(dplyr)
-library(scales)
+library(scasles)
 library(grid)
 library(dada2)
 library(reshape2)
 library(phyloseq)
 
-# ----- LOAD METADATA -----
+# ----- LOAD PHYLOSEQ OBJ -----
 
-metadata <- read.csv("/Users/Clara/Projects/mime/data/all-metadata.csv",
-                     sep = ";", dec = ".",
-                     na.strings = c("NA", ""), strip.white = TRUE,
-                     encoding = "utf-8")
-
-# watch out for duplicates!
-metadata$smp.num[duplicated(metadata$smp.num)]
-metadata <- metadata[!duplicated(metadata$smp.num), ]
-rownames(metadata) <- metadata$smp.num
-
-# ----- LOAD DATA -----
-
-# run 20190508_0074
-
-seqtab.filename <- "~/Projects/mime-16s/results/20190508_0074/dada2-merge-chimera-taxo/seqtab_final.rds"
-seqtab <- readRDS(seqtab.filename)
-
-taxa.filename <- "~/Projects/mime-16s/results/20190508_0074/dada2-merge-chimera-taxo/tax_final.rds"
-tax_info <- readRDS(taxa.filename)
-
-# extract info fron sample names
-samples.out <- rownames(seqtab)
-stn <- sapply(strsplit(samples.out, "-"), `[`, 1)
-smp.num <- paste0(sapply(strsplit(samples.out, "-"), `[`, 1), "-", sapply(strsplit(samples.out, "-"), `[`, 2))
-smp.num <- substr(smp.num, 1,9)
-primer <- sapply(strsplit(samples.out, "-"), `[`, 3)
-samdf <- data.frame(stn=stn, smp.num=smp.num, primer=primer)
-rownames(samdf) <- samples.out
-
-# build sample info dataframe
-samdf <- left_join(samdf, metadata, copy = FALSE, stringsAsFactors = FALSE)
-samdf$transect <- substr(samdf$stn, 1, 2)
-samdf[samdf$transect == "Mo",]$transect <- "MOCK"
-samdf[samdf$transect == "MOCK",]$stn.num <- "MK000"
-levels(samdf$stn.name) <- c(levels(samdf$stn.name),"Mock community")
-samdf[samdf$stn.num == "MK000",]$stn.name <- "Mock community"
-samdf$date <- as.Date(paste(samdf$year, samdf$month, samdf$day, sep = "-"))
-rownames(samdf) <- samples.out
-
-# Issues with PCR replicates?
-samdf[is.na(samdf$cruise) == TRUE,]
-
-# ---- BUILD PHYLOSEQ OBJECT -----
-
-ps <- phyloseq(otu_table(seqtab, taxa_are_rows=FALSE),
-               sample_data(samdf),
-               tax_table(tax_info))
-
-ps74 <- ps
-
-# run 20190915_0082
-
-seqtab.filename <- "~/Projects/mime-16s/results/20190915_0082/dada2-merge-chimera-taxo/seqtab_final.rds"
-seqtab <- readRDS(seqtab.filename)
-
-taxa.filename <- "~/Projects/mime-16s/results/20190915_0082/dada2-merge-chimera-taxo/tax_final.rds"
-tax_info <- readRDS(taxa.filename)
-
-# extract info fron sample names
-samples.out <- rownames(seqtab)
-stn <- sapply(strsplit(samples.out, "-"), `[`, 1)
-smp.num <- paste0(sapply(strsplit(samples.out, "-"), `[`, 1), "-", sapply(strsplit(samples.out, "-"), `[`, 2))
-smp.num <- substr(smp.num, 1,9)
-primer <- sapply(strsplit(samples.out, "-"), `[`, 3)
-samdf <- data.frame(stn=stn, smp.num=smp.num, primer=primer)
-rownames(samdf) <- samples.out
-
-# build sample info dataframe
-samdf <- left_join(samdf, metadata, copy = FALSE, stringsAsFactors = FALSE)
-samdf$transect <- substr(samdf$stn, 1, 2)
-samdf[samdf$transect == "Mo",]$transect <- "MOCK"
-samdf[samdf$transect == "MOCK",]$stn.num <- "MK000"
-levels(samdf$stn.name) <- c(levels(samdf$stn.name),"Mock community")
-samdf[samdf$stn.num == "MK000",]$stn.name <- "Mock community"
-samdf$date <- as.Date(paste(samdf$year, samdf$month, samdf$day, sep = "-"))
-rownames(samdf) <- samples.out
-
-# Issues with PCR replicates?
-samdf[is.na(samdf$cruise) == TRUE,]
-
-# ---- BUILD PHYLOSEQ OBJECT -----
-
-ps <- phyloseq(otu_table(seqtab, taxa_are_rows=FALSE),
-               sample_data(samdf),
-               tax_table(tax_info))
-
-ps82 <- ps
-
-# run 20191002_0084
-
-seqtab.filename <- "~/Projects/mime-16s/results/20191002_0084/dada2-merge-chimera-taxo/seqtab_final.rds"
-seqtab <- readRDS(seqtab.filename)
-
-taxa.filename <- "~/Projects/mime-16s/results/20191002_0084/dada2-merge-chimera-taxo/tax_final.rds"
-tax_info <- readRDS(taxa.filename)
-
-# extract info fron sample names
-samples.out <- rownames(seqtab)
-stn <- sapply(strsplit(samples.out, "-"), `[`, 1)
-smp.num <- paste0(sapply(strsplit(samples.out, "-"), `[`, 1), "-", sapply(strsplit(samples.out, "-"), `[`, 2))
-smp.num <- substr(smp.num, 1,9)
-primer <- sapply(strsplit(samples.out, "-"), `[`, 3)
-samdf <- data.frame(stn=stn, smp.num=smp.num, primer=primer)
-rownames(samdf) <- samples.out
-
-# build sample info dataframe
-samdf <- left_join(samdf, metadata, copy = FALSE, stringsAsFactors = FALSE)
-samdf$transect <- substr(samdf$stn, 1, 2)
-samdf[samdf$transect == "Mo",]$transect <- "MOCK"
-samdf[samdf$transect == "MOCK",]$stn.num <- "MK000"
-levels(samdf$stn.name) <- c(levels(samdf$stn.name),"Mock community")
-samdf[samdf$stn.num == "MK000",]$stn.name <- "Mock community"
-samdf$date <- as.Date(paste(samdf$year, samdf$month, samdf$day, sep = "-"))
-rownames(samdf) <- samples.out
-
-# Issues with PCR replicates?
-samdf[is.na(samdf$cruise) == TRUE,]
-
-# ---- BUILD PHYLOSEQ OBJECT -----
-
-ps <- phyloseq(otu_table(seqtab, taxa_are_rows=FALSE),
-               sample_data(samdf),
-               tax_table(tax_info))
-
-ps84 <- ps
-
-# ----- MERGE PHYLOSEQ OBJ -----
-
-ps <- merge_phyloseq(ps74, ps82, ps84)
+ps <- readRDS("/Users/Clara/Projects/mime-16s/global-ps.rds")
 
 dna <- Biostrings::DNAStringSet(taxa_names(ps))
 names(dna) <- taxa_names(ps)
@@ -180,27 +40,71 @@ ps <- merge_phyloseq(ps, dna)
 taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
 ps
 
+# ----- REMOVE THE MOCK -----
+
 ps <- ps %>%
   subset_samples(stn.num != "MK000") %>%
   prune_taxa(taxa_sums(.) > 0, .)
 
-# ----- SELECT PROKARYOTES -----
+# ----- SELECT PROKARYOTES ONLY -----
 
-ps <- subset_taxa(ps, Kingdom %in% c("Archaea", "Bacteria"))
+# because these were assigned with Silva
+ps0 <- subset_taxa(ps, Kingdom %in% c("Archaea", "Bacteria"))
+
+# ----- PREVALENCE FILTERING -----
+
+# Define prevalence of each taxa
+# (in how many samples did each taxa appear at least once)
+prev0 = apply(X = otu_table(ps0),
+              MARGIN = ifelse(taxa_are_rows(ps0), yes = 1, no = 2),
+              FUN = function(x){sum(x > 0)})
+prevdf = data.frame(Prevalence = prev0,
+                    TotalAbundance = taxa_sums(ps0),
+                    tax_table(ps0))
+keepPhyla = table(prevdf$Phylum)[(table(prevdf$Phylum) > 5)]
+prevdf1 = subset(prevdf, Phylum %in% names(keepPhyla))
+# Define prevalence threshold as 1% of total samples
+prevalenceThreshold = 0.01 * nsamples(ps0)
+prevalenceThreshold
+
+# Execute prevalence filter, using `prune_taxa()` function
+ps1 = prune_taxa((prev0 > prevalenceThreshold), ps0)
+ps1
+
+# Filter entries with unidentified Phylum.
+ps2 = subset_taxa(ps1, Phylum %in% names(keepPhyla))
+ps2
+
+ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
+  geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
+  geom_point(size = 2, alpha = 0.7) +
+  scale_y_log10() + scale_x_log10() +
+  xlab("Total Abundance") +
+  facet_wrap(~Phylum) + theme_pubr() + 
+  theme(legend.position = "right",
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+# ----- AGGLOMERATE CLOSELY RELATED TAXA -----
+
+# Taxonomic agglomeration
+# How many genera are present after filtering?
+taxGlomRank = "Genus"
+length(get_taxa_unique(ps2, taxonomic.rank = taxGlomRank))
+
+ps3 = tax_glom(ps2, taxrank = taxGlomRank)
 
 # ------- SUBSET SPECIFIC SAMPLES ----
 
 # here let's select only the surface samples
 
-ps1 <- subset_samples(ps, depth =="0")
-ps1 
-
+ps4 <- subset_samples(ps, depth =="0")
+ps4 
 
 # ----- SSUBSET SPECIFIC GROUP -----
 
 # let's look at the gammaproteobacteria
 
-ps.gamma <- subset_taxa(ps1, Class %in% c("Gammaproteobacteria"))
+ps.gamma <- subset_taxa(ps4, Class %in% c("Gammaproteobacteria"))
 ps.gamma
 
 # Normalize number of reads in each sample using median sequencing depth.
@@ -212,7 +116,7 @@ ps.gamma = transform_sample_counts(ps.gamma, standf)
 
 # set the colours
 nb.cols <- length(unique(tax_table(ps.gamma)[,"Order"])) + 1
-mycolors <- colorRampPalette(flatUI)(nb.cols)
+mycolors <- colorRampPalette(intensePalette)(nb.cols)
 
 plot_bar(ps.gamma, x="Sample", fill = "Order") +
   scale_fill_manual(values=rev(mycolors)) + theme_pubr() +
@@ -266,8 +170,7 @@ plot_richness(ps.gamma, measures=c("Chao1", "Shannon")) +
 
 plot_richness(ps.gamma, measures=c("Chao1", "Shannon"), x = "cruise", color="transect") +
   mytheme + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-                  legend.position="right") + transect.color
-
+                  legend.position="right") 
 
 # ----- Ordination -----
 
@@ -279,11 +182,15 @@ ps.gamma.ord <- ordinate(ps.gamma, "NMDS", "bray")
 plot_ordination(ps.gamma, ps.gamma.ord, type="taxa", color="Order", shape= "year", 
                 title="ASVs")
 
+# set the colours
+nb.cols <- length(unique(sample_data(ps)$transect)) + 1
+transect.color <- colorRampPalette(intensePalette)(nb.cols)
+
 plot_ordination(ps.gamma, ps.gamma.ord, "samples", color="transect") + 
   geom_point(size=5) + geom_path() + # scale_colour_hue(guide = FALSE) + 
   guides(color=guide_legend(ncol=3)) +
-  transect.color +
-  mytheme + theme(legend.position = c(0.8, 0.2))
+  scale_color_manual(values = transect.color) +
+  mytheme + theme(legend.position = c(0.8, 0.15))
   
 # plot_ordination(ps.gamma, ps.gamma.ord, "samples", axes=c(1, 3),
 #                color="transect") + geom_line() + geom_point(size=5)
@@ -306,3 +213,5 @@ plot_net(ps.gamma, distance = "(A+B-2*J)/(A+B)", type = "taxa",
 
 plot_net(ps.gamma.abund, distance = "(A+B-2*J)/(A+B)", type = "taxa", 
          maxdist = 0.8, color="Order", point_label="Genus") 
+
+# -----

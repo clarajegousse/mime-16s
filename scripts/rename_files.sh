@@ -1,4 +1,4 @@
-cd /users/home/cat3/projects/mime-16s/data/miseq/20200228_0094
+cd /users/home/cat3/projects/mime-16s/data/miseq/20200331_0098
 
 echo "Sample, R1, R2" > samples.csv
 for i in `ls *R1*.fastq.gz`; do
@@ -15,5 +15,4 @@ for i in `ls *R1*.fastq.gz`; do
   rev_new_filename=$(echo $samplename"_R2.fastq.gz" )
 
   echo "$samplename, $fwd_new_filename, $rev_new_filename" >> samples.csv
-
 done
