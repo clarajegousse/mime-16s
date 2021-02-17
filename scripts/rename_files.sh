@@ -1,4 +1,4 @@
-cd /users/home/cat3/projects/mime-16s/data/miseq/20200331_0098
+cd /users/home/cat3/projects/mime-16s/data/miseq/20200407_0100
 
 echo "Sample, R1, R2" > samples.csv
 for i in `ls *R1*.fastq.gz`; do
