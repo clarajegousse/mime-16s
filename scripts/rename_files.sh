@@ -4,7 +4,7 @@ echo "Sample, R1, R2" > samples.csv
 for i in `ls *R1*.fastq.gz`; do
 
   fwd_filename=$(echo $i)
-  rev_filnemae=$(echo $i | sed 's/R1/R2/')
+  rev_filename=$(echo $i | sed 's/R1/R2/')
 
   samplename=$(echo $i | cut -f 1 -d "_")
 
