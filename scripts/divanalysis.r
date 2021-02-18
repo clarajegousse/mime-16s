@@ -75,12 +75,16 @@ ps1
 ps2 = subset_taxa(ps1, Phylum %in% names(keepPhyla))
 ps2
 
+nb.cols <- length(unique(tax_table(ps2)[,2])) + 1
+phylum.color <- colorRampPalette(intensePalette)(nb.cols)
+
 ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
   geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
   geom_point(size = 2, alpha = 0.7) +
   scale_y_log10() + scale_x_log10() +
   xlab("Total Abundance") +
   facet_wrap(~Phylum) + theme_pubr() + 
+  scale_color_manual(values = phylum.color) +
   theme(legend.position = "right",
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
@@ -97,7 +101,7 @@ ps3 = tax_glom(ps2, taxrank = taxGlomRank)
 
 # here let's select only the surface samples
 
-ps4 <- subset_samples(ps, depth =="0")
+ps4 <- subset_samples(ps2, depth =="0")
 ps4 
 
 # ----- SSUBSET SPECIFIC GROUP -----
@@ -128,7 +132,7 @@ plot_bar(ps.gamma, x="Sample", fill = "Order") +
         text=element_text(family="Muli")) +
   font("xylab",size = 20, face = "bold") +
   font("xy", size=12, face = "bold") +
-  font("xy.text", size = 12) +
+  font("xy.text", size = 9) +
   font("legend.title",size = 12, face = "bold") +
   font("legend.text",size = 10) 
 
@@ -176,9 +180,6 @@ plot_richness(ps.gamma, measures=c("Chao1", "Shannon"), x = "cruise", color="tra
 
 ps.gamma.ord <- ordinate(ps.gamma, "NMDS", "bray")
 
-#ps.gamma.ord <- ordinate(ps.gamma, "PCoA", "bray")
-#plot_scree(ps.gamma.ord, "Scree plot for Bray/PCoA")
-
 plot_ordination(ps.gamma, ps.gamma.ord, type="taxa", color="Order", shape= "year", 
                 title="ASVs")
 
@@ -190,7 +191,13 @@ plot_ordination(ps.gamma, ps.gamma.ord, "samples", color="transect") +
   geom_point(size=5) + geom_path() + # scale_colour_hue(guide = FALSE) + 
   guides(color=guide_legend(ncol=3)) +
   scale_color_manual(values = transect.color) +
-  mytheme + theme(legend.position = c(0.8, 0.15))
+  mytheme + theme(legend.position = "right")
+
+plot_ordination(ps.gamma, ps.gamma.ord, "samples", color="region",  label = "transect") + 
+  geom_point(size=7, alpha=0.2) + geom_path() + # scale_colour_hue(guide = FALSE) + 
+  guides(color=guide_legend(ncol=1)) +
+  scale_color_manual(values = c(Jeans, Grapefruit)) +
+  mytheme + theme(legend.position = "right") + facet_wrap(~cruise)
   
 # plot_ordination(ps.gamma, ps.gamma.ord, "samples", axes=c(1, 3),
 #                color="transect") + geom_line() + geom_point(size=5)
