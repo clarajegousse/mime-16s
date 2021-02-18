@@ -1,0 +1,10 @@
+# MIME (Microbes in the Icelandic Marine Environment)
+
+## Description 
+
+The aim of the MIME project is to gain baseline knowledge and obtain an overview of the microbial diversity of the Icelandic waters using amplicon sequencing. This will be done by collecting samples at annual sampling stations over a seven-year period. By this, MIME will establish a baseline of the actual situation of the microbial marine ecosystem in Icelandic waters and give some answers to who the microorganisms are and when they occur.
+
+## Institute
+
+Matís
+https://matisiceland.org
