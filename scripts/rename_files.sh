@@ -1,4 +1,4 @@
-RUN_NUM=20201104_0112
+RUN_NUM=20191016_0085
 
 cd /users/home/cat3/projects/mime-16s/data/miseq/$RUN_NUM
 
@@ -20,4 +20,4 @@ for i in `ls *R1*.fastq.gz`; do
 done
 
 cd /users/home/cat3/projects/mime-16s
-mkdir -p /users/home/cat3/projects/mime-16s/$RUN_NUM/cutadapt
+mkdir -p /users/home/cat3/projects/mime-16s/results/$RUN_NUM/cutadapt
