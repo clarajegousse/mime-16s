@@ -1,4 +1,6 @@
-cd /users/home/cat3/projects/mime-16s/data/miseq/20201112_0114
+RUN_NUM=20201104_0112
+
+cd /users/home/cat3/projects/mime-16s/data/miseq/$RUN_NUM
 
 echo "Sample, R1, R2" > samples.csv
 for i in `ls *R1*.fastq.gz`; do
@@ -18,4 +20,4 @@ for i in `ls *R1*.fastq.gz`; do
 done
 
 cd /users/home/cat3/projects/mime-16s
-mkdir -p /users/home/cat3/projects/mime-16s/20200416_0101/cutadapt
+mkdir -p /users/home/cat3/projects/mime-16s/$RUN_NUM/cutadapt
