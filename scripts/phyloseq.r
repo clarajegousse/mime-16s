@@ -22,7 +22,8 @@ rownames(metadata) <- metadata$smp.num
 
 # run 20190508_0074
 
-miseq.runs <- c("20190508_0074", 
+miseq.runs.emp <- c("20190503_0073",
+                "20190508_0074", 
                 "20190915_0082", 
                 "20191002_0084", 
                 "20200228_0094",
@@ -30,7 +31,7 @@ miseq.runs <- c("20190508_0074",
                 "20201112_0114")
 
 i = 1
-for(run in miseq.runs){
+for(run in miseq.runs.emp){
   print(run)
   
   seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/seqtab_final.rds", sep = "")
