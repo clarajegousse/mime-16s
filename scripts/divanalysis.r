@@ -75,7 +75,7 @@ ps1
 ps2 = subset_taxa(ps1, Phylum %in% names(keepPhyla))
 ps2
 
-nb.cols <- length(unique(tax_table(ps2)[,2])) + 1
+nb.cols <- length(unique(tax_table(ps2)[,3])) + 2
 phylum.color <- colorRampPalette(intensePalette)(nb.cols)
 
 ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
@@ -221,4 +221,53 @@ plot_net(ps.gamma, distance = "(A+B-2*J)/(A+B)", type = "taxa",
 plot_net(ps.gamma.abund, distance = "(A+B-2*J)/(A+B)", type = "taxa", 
          maxdist = 0.8, color="Order", point_label="Genus") 
 
-# -----
+# ----- MAP ----
+
+xlim <- c(-30, -10) 
+ylim <- c(70, 62)
+library(marmap)
+
+
+depth <- getNOAA.bathy(lon1 = xlim[1], lon2 = xlim[2],
+                       lat1 = ylim[1], lat2 = ylim[2],
+                       resolution = 1)
+
+# turn the object into a data.frame
+df.depth <- fortify(depth)
+
+ggplot() +
+  theme_bw() +
+  geom_raster(data=df.depth[df.depth$z <= 0,], aes(x, y, fill = z)) +
+  coord_quickmap(expand = FALSE)
+
+iceland <- map_data("world", region = "Iceland")
+
+ps.thio <- subset_taxa(ps4, Family %in% c("Thioglobaceae"))
+
+# Normalize number of reads in each sample using median sequencing depth.
+total = median(sample_sums(ps.thio))
+standf = function(x, t=total) round(t * (x / sum(x)))
+ps.thio = transform_sample_counts(ps.thio, standf)
+
+df.thio <- as.data.frame(otu_table(ps.thio))
+
+mdf.thio <- melt(as.matrix(df.thio))
+colnames(mdf.thio) <- c("Sample", "ASV", "Abundance") 
+mdf.thio.meta <- merge(mdf.thio, sample_data(ps.thio))
+summary(mdf.thio.meta)
+
+ggplot() +
+  theme_bw() +
+  geom_contour(data = depth, aes(x, y, z = z),
+               breaks=c(-25, -50, -100, -200, -400),
+               colour="black", size=0.1) +
+  geom_path(data = iceland, aes(long, lat), size=0.1) +
+  geom_point(data = mdf.thio.meta, aes(x = lon, 
+                 y = lat, 
+                 size = Abundance),
+             color = "blue") +
+  geom_text(data = mdf.thio.meta, aes(x = lon, 
+                                      y = lat, 
+                                      label = Abundance)) +
+labs(x = NULL, y = NULL) 
+
