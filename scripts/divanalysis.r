@@ -250,11 +250,32 @@ standf = function(x, t=total) round(t * (x / sum(x)))
 ps.thio = transform_sample_counts(ps.thio, standf)
 
 df.thio <- as.data.frame(otu_table(ps.thio))
+head(df.thio)
 
-mdf.thio <- melt(as.matrix(df.thio))
-colnames(mdf.thio) <- c("Sample", "ASV", "Abundance") 
-mdf.thio.meta <- merge(mdf.thio, sample_data(ps.thio))
-summary(mdf.thio.meta)
+df.thio$sample <-rownames(df.thio)
+df.thio$stn <- substr(rownames(df.thio), 1,5)
+
+df.thio$lat <- sample_data(ps.thio)[sample_data(ps.thio)$stn == df.thio$stn,]$lat
+df.thio$lon <- sample_data(ps.thio)[sample_data(ps.thio)$stn == df.thio$stn,]$lon
+df.thio$cruise <- sample_data(ps.thio)[sample_data(ps.thio)$stn == df.thio$stn,]$cruise
+
+mdf.thio <- melt(df.thio, id=c("sample", "stn","lat", "lon", "cruise"))
+head(mdf.thio)
+
+as.factor(mdf.thio$cruise)
+as.factor(mdf.thio$cruise, levels = c("B8-2010", 
+                                      "B4-2011",
+                                      "B5-2012", 
+                                      "B3-2013", 
+                                      "B4-2014", 
+                                      "B4-2015",
+                                      "B9-2016", 
+                                      "B11-2017", 
+                                      "B3-2018",
+                                      "B7-2018"))
+
+xlim <- c(-30, -10) 
+ylim <- c(62, 70)
 
 ggplot() +
   theme_bw() +
@@ -262,12 +283,12 @@ ggplot() +
                breaks=c(-25, -50, -100, -200, -400),
                colour="black", size=0.1) +
   geom_path(data = iceland, aes(long, lat), size=0.1) +
-  geom_point(data = mdf.thio.meta, aes(x = lon, 
-                 y = lat, 
-                 size = Abundance),
-             color = "blue") +
-  geom_text(data = mdf.thio.meta, aes(x = lon, 
-                                      y = lat, 
-                                      label = Abundance)) +
+  geom_point(data = mdf.thio, aes(x = lon, 
+               y = lat, 
+               size = value, color = variable),
+             alpha = 0.5) +
+  #facet_grid(variable~cruise) + theme(aspect.ratio=1) +
+  facet_grid(cruise) + theme(aspect.ratio=1) +
+  coord_quickmap(xlim = xlim, ylim = ylim, expand = FALSE) +
 labs(x = NULL, y = NULL) 
 

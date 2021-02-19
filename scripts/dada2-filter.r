@@ -29,8 +29,15 @@ library(dada2); packageVersion("dada2")
 pathF <- argv$input_path
 pathR <- argv$input_path
 
+# pathF <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/cutadapt"
+pathR <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/cutadapt"
+
 filtpathF <- file.path(argv$output_path)
 filtpathR <- file.path(argv$output_path)
+
+# filtpathF <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/dada2-filter"
+# filtpathR <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/dada2-filter"
+
 
 fastqFs <- sort(list.files(pathF, pattern="R1.fastq.gz"))
 fastqRs <- sort(list.files(pathR, pattern="R2.fastq.gz"))
@@ -44,3 +51,12 @@ filterAndTrim(fwd = file.path(pathF, fastqFs),
   truncLen = c(argv$fwd_trunc_len, argv$rev_trunc_len),
   maxEE = argv$maxee, truncQ = argv$truncq,
   compress = TRUE, verbose = TRUE, multithread = TRUE)
+
+
+# filterAndTrim(fwd = file.path(pathF, fastqFs),
+#     filt = file.path(filtpathF, fastqFs),
+#     rev = file.path(pathR, fastqRs),
+#     filt.rev = file.path(filtpathR, fastqRs),
+#     truncLen = c(240,200),
+#     #maxEE = 2, truncQ = 2,
+#     compress = TRUE, verbose = TRUE, multithread = TRUE)
