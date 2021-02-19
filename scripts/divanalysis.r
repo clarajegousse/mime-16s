@@ -63,8 +63,8 @@ prevdf = data.frame(Prevalence = prev0,
                     tax_table(ps0))
 keepPhyla = table(prevdf$Phylum)[(table(prevdf$Phylum) > 5)]
 prevdf1 = subset(prevdf, Phylum %in% names(keepPhyla))
-# Define prevalence threshold as 1% of total samples
-prevalenceThreshold = 0.01 * nsamples(ps0)
+# Define prevalence threshold as 5% of total samples
+prevalenceThreshold = 0.05 * nsamples(ps0)
 prevalenceThreshold
 
 # Execute prevalence filter, using `prune_taxa()` function
