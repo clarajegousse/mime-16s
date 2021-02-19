@@ -29,14 +29,14 @@ library(dada2); packageVersion("dada2")
 pathF <- argv$input_path
 pathR <- argv$input_path
 
-# pathF <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/cutadapt"
-pathR <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/cutadapt"
+# pathF <- "/users/home/cat3/projects/mime-16s/results/20200421_0102/cutadapt"
+# pathR <- "/users/home/cat3/projects/mime-16s/results/20200421_0102/cutadapt"
 
 filtpathF <- file.path(argv$output_path)
 filtpathR <- file.path(argv$output_path)
 
-# filtpathF <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/dada2-filter"
-# filtpathR <- "/users/home/cat3/projects/mime-16s/results/20200416_0101/dada2-filter"
+# filtpathF <- "/users/home/cat3/projects/mime-16s/results/20200421_0102/dada2-filter"
+# filtpathR <- "/users/home/cat3/projects/mime-16s/results/20200421_0102/dada2-filter"
 
 
 fastqFs <- sort(list.files(pathF, pattern="R1.fastq.gz"))
@@ -58,5 +58,5 @@ filterAndTrim(fwd = file.path(pathF, fastqFs),
 #     rev = file.path(pathR, fastqRs),
 #     filt.rev = file.path(filtpathR, fastqRs),
 #     truncLen = c(240,200),
-#     #maxEE = 2, truncQ = 2,
+#     maxEE = 2, truncQ = 11,
 #     compress = TRUE, verbose = TRUE, multithread = TRUE)

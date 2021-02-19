@@ -40,6 +40,8 @@ ps <- merge_phyloseq(ps, dna)
 taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
 ps
 
+sample_data(ps)$cruise <- factor(sample_data(ps)$cruise, levels =c("B8-2010", "B4-2011", "B5-2012", "B3-2013", "B4-2014", "B4-2015","B9-2016", "B11-2017", "B3-2018", "B7-2018"))
+
 # ----- REMOVE THE MOCK -----
 
 ps <- ps %>%
@@ -104,7 +106,7 @@ ps3 = tax_glom(ps2, taxrank = taxGlomRank)
 ps4 <- subset_samples(ps2, depth =="0")
 ps4 
 
-# ----- SSUBSET SPECIFIC GROUP -----
+# ----- SUBSET SPECIFIC GROUP -----
 
 # let's look at the gammaproteobacteria
 
@@ -223,25 +225,21 @@ plot_net(ps.gamma.abund, distance = "(A+B-2*J)/(A+B)", type = "taxa",
 
 # ----- MAP ----
 
-xlim <- c(-30, -10) 
-ylim <- c(70, 62)
 library(marmap)
 
+xlim <- c(-30, -10) 
+ylim <- c(70, 62)
 
+# get bathymetry data from NOAA
 depth <- getNOAA.bathy(lon1 = xlim[1], lon2 = xlim[2],
                        lat1 = ylim[1], lat2 = ylim[2],
                        resolution = 1)
 
 # turn the object into a data.frame
 df.depth <- fortify(depth)
-
-ggplot() +
-  theme_bw() +
-  geom_raster(data=df.depth[df.depth$z <= 0,], aes(x, y, fill = z)) +
-  coord_quickmap(expand = FALSE)
-
 iceland <- map_data("world", region = "Iceland")
 
+# select specific taxonomic group
 ps.thio <- subset_taxa(ps4, Family %in% c("Thioglobaceae"))
 
 # Normalize number of reads in each sample using median sequencing depth.
@@ -262,17 +260,7 @@ df.thio$cruise <- sample_data(ps.thio)[sample_data(ps.thio)$stn == df.thio$stn,]
 mdf.thio <- melt(df.thio, id=c("sample", "stn","lat", "lon", "cruise"))
 head(mdf.thio)
 
-as.factor(mdf.thio$cruise)
-as.factor(mdf.thio$cruise, levels = c("B8-2010", 
-                                      "B4-2011",
-                                      "B5-2012", 
-                                      "B3-2013", 
-                                      "B4-2014", 
-                                      "B4-2015",
-                                      "B9-2016", 
-                                      "B11-2017", 
-                                      "B3-2018",
-                                      "B7-2018"))
+mdf.thio$cruise <- factor(mdf.thio$cruise, levels =c("B8-2010", "B4-2011", "B5-2012", "B3-2013", "B4-2014", "B4-2015","B9-2016", "B11-2017", "B3-2018", "B7-2018"))
 
 xlim <- c(-30, -10) 
 ylim <- c(62, 70)
@@ -287,8 +275,8 @@ ggplot() +
                y = lat, 
                size = value, color = variable),
              alpha = 0.5) +
-  #facet_grid(variable~cruise) + theme(aspect.ratio=1) +
-  facet_grid(cruise) + theme(aspect.ratio=1) +
+  facet_grid(variable~cruise) + theme(aspect.ratio=1) +
+  # facet_grid(~cruise) + theme(aspect.ratio=1) +
   coord_quickmap(xlim = xlim, ylim = ylim, expand = FALSE) +
 labs(x = NULL, y = NULL) 
 
