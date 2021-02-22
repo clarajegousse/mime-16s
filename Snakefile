@@ -37,13 +37,20 @@ rule cutadapt:
         report = "results/{run}/cutadapt/{sample}-qc-report.txt"
     params:
         # https://cutadapt.readthedocs.io/en/stable/guide.html#adapter-types
+
+        # EMP PRIMERS -----
         # https://earthmicrobiome.org/protocols-and-standards/16s/
         # Updated sequences: 515F (Parada)–806R (Apprill), forward-barcoded:
         # FWD:GTGYCAGCMGCCGCGGTAA; REV:GGACTACNVGGGTWTCTAAT
         # echo 'GGACTACNVGGGTWTCTAAT' | rev
-        adapter_a = "^GTGYCAGCMGCCGCGGTAA...AATGGCGCCGMCGACYGTG",
-        adapter_A = "^GGACTACNVGGGTWTCTAAT...TAATCTWTGGGVNCATCAGG",
+        # adapter_a = "^GTGYCAGCMGCCGCGGTAA...AATGGCGCCGMCGACYGTG",
+        # adapter_A = "^GGACTACNVGGGTWTCTAAT...TAATCTWTGGGVNCATCAGG",
         # https://cutadapt.readthedocs.io/en/stable/guide.html#
+
+        # ARCHAEAL PRIMERS: Arch349F//Arch519R
+        adapter_a = "^TCGTCGGCAGCGTCAGATGTGTATAAGAGACAGGYGCASCAGKCGMGAAW...WAAGMGCKGACSACGYGGACAGAGAATATGTGTAGACTGCGACGGCTGCT",
+        adapter_A = "^GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAGTTACCGCGGCKGCTG...GTCGKCGGCGCCATTGACAGAGAATATGTGTAGAGGCTCGGGTGCTCTG",
+
         minimum_length = 150,
         maximum_length = 280
         #quality_cutoff = 20
