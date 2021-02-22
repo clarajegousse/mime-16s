@@ -38,7 +38,7 @@ rule cutadapt:
     params:
         adapter_a = "^TCGTCGGCAGCGTCAGATGTGTATAAGAGACAGGYGCASCAGKCGMGAAW...WAAGMGCKGACSACGYGGACAGAGAATATGTGTAGACTGCGACGGCTGCT",
         adapter_A = "^GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAGTTACCGCGGCKGCTG...GTCGKCGGCGCCATTGACAGAGAATATGTGTAGAGGCTCGGGTGCTCTG",
-        minimum_length = 150,
+        minimum_length = 50,
         maximum_length = 280
     log:
         "logs/cutadapt/{run}/{sample}.log"
