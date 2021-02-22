@@ -59,11 +59,11 @@ rule dada2_filter:
     output:
         path = directory(expand("results/{run}/dada2-filter", run = RUN))
     params:
-        trunc_len_fwd = 240,
-        trunc_len_rev = 200,
+        trunc_len_fwd = 135,
+        trunc_len_rev = 135,
         maxEE = 2,
         truncQ = 11,
-        trimLeft = 30
+        trimLeft = 35
     log:
         directory(expand("logs/dada2/{run}/dada2-filter.log", run = RUN))
     shell:
