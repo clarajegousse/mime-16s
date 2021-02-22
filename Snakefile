@@ -61,7 +61,7 @@ rule dada2_filter:
     params:
         trunc_len_fwd = 135,
         trunc_len_rev = 135,
-        maxEE = 2,
+        maxEE = 'Inf',
         truncQ = 11,
         trimLeft = 35
     log:
