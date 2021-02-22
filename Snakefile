@@ -62,7 +62,8 @@ rule dada2_filter:
         trunc_len_fwd = 240,
         trunc_len_rev = 200,
         maxEE = 2,
-        truncQ = 11
+        truncQ = 11,
+        trimLeft = 30
     log:
         directory(expand("logs/dada2/{run}/dada2-filter.log", run = RUN))
     shell:
@@ -77,7 +78,7 @@ rule dada2_filter:
         --output_path {output.path} \
         --fwd_trunc_len {params.trunc_len_fwd} \
         --rev_trunc_len {params.trunc_len_rev} \
-        --maxee {params.maxEE} --truncq {params.truncQ}"
+        --maxee {params.maxEE} --truncq {params.truncQ}  --trimleft {params.trimLeft}"
 
 rule dada2_inference:
     input:

@@ -14,6 +14,8 @@ p <- add_argument(p, "--fwd_trunc_len", help="fwd_trunc_len",  type="numeric", d
 p <- add_argument(p, "--rev_trunc_len", help="rev_trunc_len",  type="numeric", default=200)
 p <- add_argument(p, "--maxee", help="MaxEE",  type="numeric", default=2)
 p <- add_argument(p, "--truncq", help="truncQ",  type="numeric", default=11)
+p <- add_argument(p, "--trimleft", help="trimleft",  type="numeric", default=0)
+
 
 # Parse the command line arguments
 argv <- parse_args(p)
@@ -49,7 +51,7 @@ filterAndTrim(fwd = file.path(pathF, fastqFs),
   rev = file.path(pathR, fastqRs),
   filt.rev = file.path(filtpathR, fastqRs),
   truncLen = c(argv$fwd_trunc_len, argv$rev_trunc_len),
-  maxEE = argv$maxee, truncQ = argv$truncq,
+  maxEE = argv$maxee, truncQ = argv$truncq, trimLeft = argv$trimleft,
   compress = TRUE, verbose = TRUE, multithread = TRUE)
 
 
