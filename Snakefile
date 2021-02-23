@@ -10,7 +10,7 @@ SAMPLES = list(SampleTable.index)
 
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
-PRIMERS = config["EMP"]
+PRIMERS = config["ARK"]
 print(PRIMERS[1])
 
 rule all:
@@ -38,8 +38,8 @@ rule cutadapt:
         rev = "results/{run}/cutadapt/{sample}_R2.fastq.gz",
         report = "results/{run}/cutadapt/{sample}-qc-report.txt"
     params:
-        adapter_a = "^ACGGGGYGCAGCAGGCGCGA...AGCGCGGACGACGYGGGGCA",
-        adapter_A = "^AGCGCGGACGACGYGGGGCA...ACGGGGYGCAGCAGGCGCGA",
+        adapter_a = PRIMERS[1],
+        adapter_A = PRIMERS[2],
         minimum_length = 90,
         maximum_length = 280
     log:
