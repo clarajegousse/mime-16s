@@ -36,9 +36,9 @@ rule cutadapt:
         rev = "results/{run}/cutadapt/{sample}_R2.fastq.gz",
         report = "results/{run}/cutadapt/{sample}-qc-report.txt"
     params:
-        adapter_a = "^TCGTCGGCAGCGTCAGATGTGTATAAGAGACAGGYGCASCAGKCGMGAAW...WAAGMGCKGACSACGYGGACAGAGAATATGTGTAGACTGCGACGGCTGCT",
-        adapter_A = "^GTCTCGTGGGCTCGGAGATGTGTATAAGAGACAGTTACCGCGGCKGCTG...GTCGKCGGCGCCATTGACAGAGAATATGTGTAGAGGCTCGGGTGCTCTG",
-        minimum_length = 50,
+        adapter_a = "^ACGGGGYGCAGCAGGCGCGA...AGCGCGGACGACGYGGGGCA",
+        adapter_A = "^AGCGCGGACGACGYGGGGCA...ACGGGGYGCAGCAGGCGCGA",
+        minimum_length = 90,
         maximum_length = 280
     log:
         "logs/cutadapt/{run}/{sample}.log"

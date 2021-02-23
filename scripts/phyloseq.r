@@ -32,8 +32,10 @@ miseq.runs.emp <- c("20190503_0073",
                 "20201104_0112",
                 "20201112_0114")
 
+miseq.runs.ark <- c("20200306_0095")
+
 i = 1
-for(run in miseq.runs.emp){
+for(run in miseq.runs.ark){
   print(run)
   
   seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/seqtab_final.rds", sep = "")
