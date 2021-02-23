@@ -38,8 +38,8 @@ rule cutadapt:
         rev = "results/{run}/cutadapt/{sample}_R2.fastq.gz",
         report = "results/{run}/cutadapt/{sample}-qc-report.txt"
     params:
-        adapter_a = PRIMERS[1],
-        adapter_A = PRIMERS[2],
+        adapter_a = PRIMERS[0],
+        adapter_A = PRIMERS[1],
         minimum_length = 90,
         maximum_length = 280
     log:
