@@ -11,7 +11,7 @@ SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
 PRIMERS = config["ARK"]
-print(PRIMERS[1])
+print(PRIMERS[0])
 
 rule all:
     input:
