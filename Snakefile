@@ -10,7 +10,7 @@ SAMPLES = list(SampleTable.index)
 
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
-PRIMERS = config["PRIMERS"]["344F"]
+PRIMERS = config["PRIMERS"]
 print(PRIMERS)
 
 rule all:
