@@ -45,7 +45,6 @@ rule cutadapt:
     shell:
         "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
          -m {params.minimum_length} -M {params.maximum_length} \
-         --discard-untrimmed \
          -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
           2> {output.report}"

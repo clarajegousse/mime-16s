@@ -29,6 +29,21 @@ library(grid)
 library(dada2)
 library(reshape2)
 library(phyloseq)
+library(marmap)
+
+# ----- MAP OF ICELAND -----
+
+xlim <- c(-30, -10) 
+ylim <- c(70, 62)
+
+# get bathymetry data from NOAA
+depth <- getNOAA.bathy(lon1 = xlim[1], lon2 = xlim[2],
+                       lat1 = ylim[1], lat2 = ylim[2],
+                       resolution = 5)
+
+# turn the object into a data.frame
+df.depth <- fortify(depth)
+iceland <- map_data("world", region = "Iceland")
 
 # ----- LOAD PHYLOSEQ OBJ -----
 
