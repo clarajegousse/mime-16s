@@ -11,7 +11,7 @@ SampleTable = pd.read_csv(config['SAMPLETABLE'], sep = ",", header = 0, index_co
 SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
-PRIMERS = config["EMP"]
+PRIMERS = config["PRIMERS"]
 MAXLEN = config["MAXLEN"]
 MINLEN = config["MINLEN"]
 FWDTRUNCLEN = config["FWDTRUNCLEN"]
