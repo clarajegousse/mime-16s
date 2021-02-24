@@ -62,17 +62,13 @@ map <- ggplot() +
 
 # ----- LOAD PHYLOSEQ OBJ -----
 
-ps <- readRDS("/Users/Clara/Projects/mime-16s/global-ps.rds")
+ps <- readRDS("/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
 
 dna <- Biostrings::DNAStringSet(taxa_names(ps))
 names(dna) <- taxa_names(ps)
 ps <- merge_phyloseq(ps, dna)
 taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
 ps
-
-sample_data(ps)$cruise <- factor(sample_data(ps)$cruise, levels =c("B8-2010", "B4-2011", "B5-2012", "B3-2013", "B4-2014", "B4-2015","B9-2016", "B11-2017", "B3-2018", "B7-2018"))
-sample_data(ps)$run <- factor(sample_data(ps)$run)
-sample_data(ps)$iscar.id <- substr(rownames(sample_data(ps)), 1,9)
 
 df.sample.data <- as.data.frame(sample_data(ps))
 
@@ -84,7 +80,6 @@ ggplot(data = df.sample.data , aes(cruise)) +
   labs(title ="Sample counts per cruise for each MiSeq run",
        subtitle = "with EMP primers",
        caption = "*NA are samples labeled 'Rename' that cannot be associated with sampling metadata.")
-
 
 nb.cols <- length(levels(df.sample.data$cruise)) + 1
 cruise.color <- colorRampPalette(intensePalette)(nb.cols)
@@ -106,6 +101,25 @@ map +
   labs(x = NULL, y = NULL) + guides(size=FALSE) +
   labs(title ="Number of samples counts per cruise",
        subtitle = "with EMP primers")
+
+ggplot(data = df.sample.data , aes(depth)) +
+  geom_bar(fill = DarkGrey) + facet_wrap(~ transect, nrow = 11) + 
+  mytheme +
+  labs(title ="Sample counts per cruise for each MiSeq run",
+       subtitle = "with EMP primers",
+       caption = "*NA are samples labeled 'Rename' that cannot be associated with sampling metadata.")
+
+nb.cols <- length(levels(df.sample.data$cruise)) + 1
+cruise.color <- colorRampPalette(intensePalette)(nb.cols)
+
+
+df.sample.data$stn.index <- substr(df.sample.data$stn, 5,5)
+
+ggplot(data = df.sample.data) +
+  geom_point( aes(x = df.sample.data$stn.index, 
+                  y = df.sample.data$depth,
+                  color = cruise)) +
+  facet_wrap(~ transect, ncol = 1)
 
 
 # ----- REMOVE THE MOCK -----

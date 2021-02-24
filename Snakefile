@@ -11,7 +11,6 @@ SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
 PRIMERS = config["ARK"]
-print(PRIMERS[0])
 
 rule all:
     input:
@@ -19,15 +18,6 @@ rule all:
         expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
         expand("logs/dada2/{run}/dada2-inference.log", run = RUN),
         expand("logs/dada2/{run}/dada2-merge-chimera-taxo.log", run = RUN)
-
-        #expand("results/dada2/quality-profile/{run}/{sample}-quality-profile.png", run = RUN, sample = SAMPLES),
-        #expand("results/dada2/filtered_trim_pe/{run}/{sample}.tsv", run = RUN, sample = SAMPLES),
-        #expand("reports/dada2/learn-errors/{run}/errors_{orientation}.png", run = RUN, orientation = ORIENTATION),
-        #expand("results/dada2/denoised/{run}/{sample}_{orientation}.RDS", run = RUN, sample = SAMPLES, orientation = ORIENTATION),
-        #expand("results/dada2/merged/{run}/{sample}.RDS", run = RUN, sample = SAMPLES),
-        #expand("results/dada2/taxa/{run}/taxa.RDS", run = RUN),
-        #expand("results/dada2/final/{run}-ASVs.fa", run = RUN),
-        #expand("results/kraken2/{run}/{sample}-report.txt", run = RUN, sample = SAMPLES)
 
 rule cutadapt:
     input:
@@ -40,8 +30,8 @@ rule cutadapt:
     params:
         adapter_a = PRIMERS[0],
         adapter_A = PRIMERS[1],
-        minimum_length = 90,
-        maximum_length = 280
+        minimum_length = 150,
+        maximum_length = 190
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
