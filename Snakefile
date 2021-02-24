@@ -10,7 +10,7 @@ SAMPLES = list(SampleTable.index)
 
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
-PRIMERS = config["ARK2"]
+PRIMERS = config["EMP"]
 
 rule all:
     input:
@@ -36,7 +36,7 @@ rule trimmomatic_pe:
         "trimmomatic PE {input.fwd} {input.rev} \
         {output.fwd} {output.fwd_unpaired} \
         {output.rev} {output.rev_unpaired} \
-        CROP:170 2> {output.report}"
+        CROP:300 2> {output.report}"
 
 rule cutadapt:
     input:
@@ -49,8 +49,8 @@ rule cutadapt:
     params:
         adapter_a = PRIMERS[0],
         adapter_A = PRIMERS[1],
-        minimum_length = 50,
-        maximum_length = 170
+        minimum_length = 270,
+        maximum_length = 300
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
