@@ -58,7 +58,7 @@ rule cutadapt:
          -m {params.minimum_length} -M {params.maximum_length} \
          -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
-          2> {output.report}"
+          > {output.report}"
 
           # quick and dirty way to check the average number of reads written
           # cat snakejob.cutadapt.*.sh.o* | grep "Pairs written" | cut -f 3 -d "(" | sed 's/%)//' | awk '{ total += $1 } END { print total/NR }'
