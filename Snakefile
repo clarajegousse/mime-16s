@@ -11,7 +11,7 @@ SAMPLES = list(SampleTable.index)
 
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
-PRIMERS = config["ARK2"]
+PRIMERS = config["EMP"]
 
 rule all:
     input:
@@ -19,7 +19,6 @@ rule all:
         expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
         expand("logs/dada2/{run}/dada2-inference.log", run = RUN),
         expand("logs/dada2/{run}/dada2-merge-chimera-taxo.log", run = RUN)
-
 
 rule trimmomatic_pe:
     input:
@@ -37,7 +36,7 @@ rule trimmomatic_pe:
         "trimmomatic PE {input.fwd} {input.rev} \
         {output.fwd} {output.fwd_unpaired} \
         {output.rev} {output.rev_unpaired} \
-        CROP:170 2> {output.report}"
+        CROP:300 2> {output.report}"
 
 rule cutadapt:
     input:
@@ -50,19 +49,19 @@ rule cutadapt:
     params:
         adapter_a = PRIMERS[0],
         adapter_A = PRIMERS[1],
-        minimum_length = 110,
-        maximum_length = 170
+        minimum_length = 220,
+        maximum_length = 290
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
         "cutadapt -b {params.adapter_a} -B {params.adapter_A} \
-         -m {params.minimum_length} -M {params.maximum_length} \
+         -m {params.minimum_length} -M {params.maximum_length} --discard-untrimmed \
          -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
           > {output.report}"
 
           # quick and dirty way to check the average number of reads written
-          # cat snakejob.cutadapt.*.sh.o* | grep "Pairs written" | cut -f 3 -d "(" | sed 's/%)//' | awk '{ total += $1 } END { print total/NR }'
+          # cat results/20200306_0095/cutadapt/* | grep "Pairs written" | cut -f 3 -d "(" | sed 's/%)//' | awk '{ total += $1 } END { print total/NR }'
 
 rule dada2_filter:
     input:
