@@ -50,8 +50,8 @@ rule cutadapt:
     params:
         adapter_a = PRIMERS[0],
         adapter_A = PRIMERS[1],
-        minimum_length = 270,
-        maximum_length = 300
+        minimum_length = 215,
+        maximum_length = 290
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
