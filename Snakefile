@@ -4,14 +4,18 @@
 
 import pandas as pd
 
-configfile: "config.yaml"
+configfile: "config-emp.yaml"
 
 SampleTable = pd.read_csv(config['SAMPLETABLE'], sep = ",", header = 0, index_col = 0)
-SAMPLES = list(SampleTable.index)
 
+SAMPLES = list(SampleTable.index)
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
 PRIMERS = config["EMP"]
+MAXLEN = config["MAXLEN"]
+MINLEN = config["MINLEN"]
+FWDTRUNCLEN = config["FWDTRUNCLEN"]
+REVTRUNCLEN = config["REVTRUNCLEN"]
 
 rule all:
     input:
@@ -30,13 +34,15 @@ rule trimmomatic_pe:
         fwd_unpaired = "results/{run}/trimmomatic/{sample}_unpaired_R1.fastq.gz",
         rev_unpaired = "results/{run}/trimmomatic/{sample}_unpaired_R2.fastq.gz",
         report = "results/{run}/trimmomatic/{sample}-qc-report.txt"
+    params:
+        crop = MAXLEN
     log:
         "logs/trimmomatic/{run}/{sample}.log"
     shell:
         "trimmomatic PE {input.fwd} {input.rev} \
         {output.fwd} {output.fwd_unpaired} \
         {output.rev} {output.rev_unpaired} \
-        CROP:300 2> {output.report}"
+        CROP:{params.crop} 2> {output.report}"
 
 rule cutadapt:
     input:
@@ -47,15 +53,16 @@ rule cutadapt:
         rev = "results/{run}/cutadapt/{sample}_R2.fastq.gz",
         report = "results/{run}/cutadapt/{sample}-qc-report.txt"
     params:
-        adapter_a = PRIMERS[0],
-        adapter_A = PRIMERS[1],
-        minimum_length = 220,
-        maximum_length = 290
+        fwd_adapter = PRIMERS[0],
+        rev_adapter = PRIMERS[1],
+        minimum_length = MINLEN,
+        maximum_length = MAXLEN
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
-        "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
-         -m {params.minimum_length} -M {params.maximum_length} --discard-untrimmed \
+        "cutadapt {params.fwd_adapter} {params.rev_adapter} \
+         -m {params.minimum_length} -M {params.maximum_length} \
+         --discard-untrimmed \
          -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
           > {output.report}"
@@ -69,26 +76,19 @@ rule dada2_filter:
     output:
         path = directory(expand("results/{run}/dada2-filter", run = RUN))
     params:
-        trunc_len_fwd = 135,
-        trunc_len_rev = 135,
-        maxEE = 'Inf',
-        truncQ = 11,
-        trimLeft = 35
+        trunc_len_fwd = FWDTRUNCLEN,
+        trunc_len_rev = REVTRUNCLEN,
+        maxEE = 2,
+        truncQ = 11
     log:
         directory(expand("logs/dada2/{run}/dada2-filter.log", run = RUN))
     shell:
-        #r"""./scripts/dada2-filter.r --input_path {input.path} \
-        #--output_path {output.path} \
-        #--trunc_len_fwd {params.trunc_len_fwd} \
-        #--trunc_len_rev {params.trunc_len_rev} \
-        #--maxee {params.maxEE} \
-        #--truncq {params.truncQ}"""
         "./scripts/dada2-filter.r \
         --input_path {input.path} \
         --output_path {output.path} \
         --fwd_trunc_len {params.trunc_len_fwd} \
         --rev_trunc_len {params.trunc_len_rev} \
-        --maxee {params.maxEE} --truncq {params.truncQ}  --trimleft {params.trimLeft}"
+        --maxee {params.maxEE} --truncq {params.truncQ}"
 
 rule dada2_inference:
     input:
