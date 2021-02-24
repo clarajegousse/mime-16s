@@ -10,7 +10,7 @@ SAMPLES = list(SampleTable.index)
 
 ORIENTATION = config["ORIENTATION"]
 RUN = config["RUN"]
-PRIMERS = config["ARK"]
+PRIMERS = config["ARK2"]
 
 rule all:
     input:
