@@ -54,7 +54,7 @@ rule cutadapt:
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
-        "cutadapt -b {params.adapter_a} -B {params.adapter_A} \
+        "cutadapt -a {params.adapter_a} -A {params.adapter_A} \
          -m {params.minimum_length} -M {params.maximum_length} --discard-untrimmed \
          -o {output.fwd} -p {output.rev} \
           {input.fwd} {input.rev} \
