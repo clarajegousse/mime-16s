@@ -36,7 +36,7 @@ rule trimmomatic_pe:
         "trimmomatic PE {input.fwd} {input.rev} \
         {output.fwd} {output.fwd_unpaired} \
         {output.rev} {output.rev_unpaired} \
-        CROP:170"
+        CROP:170 2> {output.report}"
 
 rule cutadapt:
     input:
