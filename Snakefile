@@ -19,19 +19,38 @@ rule all:
         expand("logs/dada2/{run}/dada2-inference.log", run = RUN),
         expand("logs/dada2/{run}/dada2-merge-chimera-taxo.log", run = RUN)
 
-rule cutadapt:
+
+rule trimmomatic_pe:
     input:
         fwd = "data/miseq/{run}/{sample}_R1.fastq.gz",
         rev = "data/miseq/{run}/{sample}_R2.fastq.gz",
+    output:
+        fwd = "results/{run}/trimmomatic/{sample}_R1.fastq.gz",
+        rev = "results/{run}/trimmomatic/{sample}_R2.fastq.gz",
+        fwd_unpaired = "results/{run}/trimmomatic/{sample}_unpaired_R1.fastq.gz",
+        rev_unpaired = "results/{run}/trimmomatic/{sample}_unpaired_R2.fastq.gz",
+        report = "results/{run}/trimmomatic/{sample}-qc-report.txt"
+    log:
+        "logs/trimmomatic/{run}/{sample}.log"
+    shell:
+        "trimmomatic PE {input.fwd} {input.rev} \
+        {output.fwd} {output.fwd_unpaired} \
+        {output.rev} {output.rev_unpaired} \
+        CROP:170"
+
+rule cutadapt:
+    input:
+        fwd = "results/{run}/trimmomatic/{sample}_R1.fastq.gz",
+        rev = "results/{run}/trimmomatic/{sample}_R2.fastq.gz",
     output:
         fwd = "results/{run}/cutadapt/{sample}_R1.fastq.gz",
         rev = "results/{run}/cutadapt/{sample}_R2.fastq.gz",
         report = "results/{run}/cutadapt/{sample}-qc-report.txt"
     params:
-        adapter_a = PRIMERS[1],
-        adapter_A = PRIMERS[0],
+        adapter_a = PRIMERS[0],
+        adapter_A = PRIMERS[1],
         minimum_length = 50,
-        maximum_length = 150
+        maximum_length = 170
     log:
         "logs/cutadapt/{run}/{sample}.log"
     shell:
