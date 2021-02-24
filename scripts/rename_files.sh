@@ -1,4 +1,4 @@
-RUN_NUM=20200306_0095
+RUN_NUM=20200318_0097
 
 cd /users/home/cat3/projects/mime-16s/data/miseq/$RUN_NUM
 
