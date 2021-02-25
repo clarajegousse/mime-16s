@@ -69,7 +69,7 @@ rule cutadapt:
           > {output.report}"
 
           # quick and dirty way to check the average number of reads written
-          # cat results/20200318_0097/cutadapt/* | grep "Pairs written" | cut -f 3 -d "(" | sed 's/%)//' | awk '{ total += $1 } END { print total/NR }'
+          # cat results/20200306_0095/cutadapt/* | grep "Pairs written" | cut -f 3 -d "(" | sed 's/%)//' | awk '{ total += $1 } END { print total/NR }'
 
 rule dada2_filter:
     input:
