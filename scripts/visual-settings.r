@@ -50,6 +50,12 @@ Sulfur <- "#F6BB42" # Surfur
 Iron <- "#E9573F" # Bittersweet
 Titanium <- "#AAB2BD" # MediumGrey
 
+# ----- PALETTES -----
+
+Palette1 <- c(Grapefruit, Bittersweet, Sunflower, Orange,
+  Sunflower, Grass, Mint, Aqua, Jeans, Lavender, Rose,
+  LightGrey, MediumGrey, DarkGrey, Chocolate)
+
 # ----- FUNCTIONS -----
 
 # to define colours scales
