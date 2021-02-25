@@ -5,6 +5,7 @@
 
 library(phyloseq)
 library(dada2)
+library(dplyr) # for left_join
 
 # ----- LOAD METADATA -----
 
@@ -113,10 +114,12 @@ saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
 # ----- ARCHAEA -----
 
 miseq.runs.ark <- c("20200306_0095",
-                    "20200318_0097")
+                    "20200318_0097"
+                    )
 
 i = 1
 for(run in miseq.runs.ark){
+  run <- "20200306_0095"
   print(run)
   
   seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/seqtab_final.rds", sep = "")
@@ -165,14 +168,14 @@ sample_data(ps)[sample_data(ps)$transect == "MOCK",]$stn.num <- "MK000"
 sample_data(ps)[sample_data(ps)$transect == "MOCK",]$stn.name <- "Mock community"
 sample_data(ps)$date <- as.Date(paste(sample_data(ps)$year, sample_data(ps)$month, sample_data(ps)$day, sep = "-"))
 
-# Issues with PCR replicates?
+# Issues with PCR replicatess?
 sample_data(ps)[is.na(sample_data(ps)$cruise) == TRUE,]
 
 sample_data(ps)$primer <- "ARK"
 
 # make a categorial variable for north and south
 sample_data(ps)$region <- NA
-sample_data(ps)[sample_data(ps)$transect %in% c("LB", "FX", "SB", "IH", "SK"),]$region <- "South"
+sample_data(ps)[sample_data(ps)$transect %in% c("LB", "FX", "SB", "IH", "SK", "RS"),]$region <- "South"
 sample_data(ps)[sample_data(ps)$transect %in% c("KG", "HB", "SI", "MS", "LN", "LA", "KR"),]$region <- "North"
 
 # variable as factor
@@ -186,6 +189,7 @@ sample_data(ps)$iscar.nb <- substr(rownames(sample_data(ps)), 1, 9)
 ps <- subset_samples(ps, transect != "Re" |
                        transect != "Ne" |
                        transect != "Po" |
-                       transect != "Co")
+                       transect != "Co" |
+                       transect != "Ba")
 
 saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-ark.rds")

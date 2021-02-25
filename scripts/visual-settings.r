@@ -59,21 +59,60 @@ Palette1 <- c(Grapefruit, Bittersweet, Sunflower, Orange,
 # ----- FUNCTIONS -----
 
 # to define colours scales
-
-tax_fill_scale <- function(ps, rank) {
+tax_color_scale <- function(ps, rank) {
   if(rank == "Kingdom"){
     k.colours <- c(Rose, Lavender, Mint, LightGrey)
     names(k.colours) <- levels(get_taxa_unique(ps, taxonomic.rank = "Kingdom"))
-    k.fill.scale <- scale_fill_manual(name = "Kingdom", values = k.colours)
-    return(k.fill.scale)
+    k.color.scale <- scale_color_manual(name = "Kingdom", values = k.colours)
+    return(k.color.scale)
+  } else if (length(get_taxa_unique(ps)) == 1 & get_taxa_unique(ps) == "Archaea" & rank == "Phylum") {
+    p.colours <- c(DarkGrey, Jeans, Aqua, Grass, MediumGrey, Grapefruit, Sunflower, Mint, Orange)
+    names(p.colours) <- levels(get_taxa_unique(ps, taxonomic.rank = rank))
+    p.colours.scale <- scale_color_manual(name = rank, values = p.colours)
+    return(p.colours.scale)
   } else {
     nb.cols <- 1 + length(get_taxa_unique(ps, taxonomic.rank = rank))
     tax.colours <- colorRampPalette(Palette1, bias = 2)(nb.cols)
     names(tax.colours) <- levels(get_taxa_unique(ps, taxonomic.rank = rank))
-    tax.fill.scale <- scale_fill_manual(name = rank, values = tax.colours)
-    return(tax.fill.scale)
+    tax.color.scale <- scale_color_manual(name = rank, values = tax.colours)
+    return(tax.color.scale)
   }
 }
+
+# Archaeal Phyla
+# Aenigmatarchaeota <- DarkGrey
+# Altarchaeota
+# Asgardarchaeota <- Jeans
+# Hadarchaeota (6)
+# Halobacteriota (992)
+# Huberarchaeota
+# Hydrothermarchaeota <- Aqua
+# Iainarchaeota (20)
+# Methanobacteriota (337)
+# Micrarchaeota (43)
+# Nanoarchaeota (207)
+# Nanohaloarchaeota (12)
+# Thermoplasmatota (770)
+# Thermoproteota (579)
+# Undinarchaeota (5)
+# EX4484-52 (3)
+# PWEA01 (6)
+# QMZS01 (2)
+
+  tax_fill_scale <- function(ps, rank) {
+    if(rank == "Kingdom"){
+      k.colours <- c(Rose, Lavender, Mint, LightGrey)
+      names(k.colours) <- levels(get_taxa_unique(ps, taxonomic.rank = "Kingdom"))
+      k.fill.scale <- scale_fill_manual(name = "Kingdom", values = k.colours)
+      return(k.fill.scale)
+    } else {
+      nb.cols <- 1 + length(get_taxa_unique(ps, taxonomic.rank = rank))
+      tax.colours <- colorRampPalette(Palette1, bias = 2)(nb.cols)
+      names(tax.colours) <- levels(get_taxa_unique(ps, taxonomic.rank = rank))
+      tax.fill.scale <- scale_fill_manual(name = rank, values = tax.colours)
+      return(tax.fill.scale)
+    }
+  }
 
 # ----- GGPLOT THEME -----
 

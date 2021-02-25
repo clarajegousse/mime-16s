@@ -4,7 +4,7 @@
 
 import pandas as pd
 
-configfile: "config-ark.yaml"
+configfile: "config-emp.yaml"
 
 SampleTable = pd.read_csv(config['SAMPLETABLE'], sep = ",", header = 0, index_col = 0)
 
