@@ -23,15 +23,18 @@ rownames(metadata) <- metadata$smp.num
 
 # run 20190508_0074
 
-miseq.runs.emp <- c("20190503_0073",
-                "20190508_0074", 
-                "20190915_0082", 
-                "20191002_0084",
-                "20191016_0085",
-                "20200228_0094",
-                "20200421_0102",
-                "20201104_0112",
-                "20201112_0114")
+miseq.runs.emp <- c(#"20190503_0073",
+                #"20190508_0074", 
+                #"20190915_0082", 
+                #"20191002_0084",
+                #"20191016_0085",
+                #"20200228_0094",
+                "20200331_0098",
+                "20200407_0100"
+                #"20200421_0102",
+                #"20201104_0112",
+                #"20201112_0114"
+                )
 
 i = 1
 for(run in miseq.runs.emp){
@@ -91,7 +94,7 @@ sample_data(ps)$primer <- "EMP"
 
 # make a categorial variable for north and south
 sample_data(ps)$region <- NA
-sample_data(ps)[sample_data(ps)$transect %in% c("LB", "FX", "SB", "IH", "SK"),]$region <- "South"
+sample_data(ps)[sample_data(ps)$transect %in% c("LB", "FX", "SB", "IH", "SK", "RS"),]$region <- "South"
 sample_data(ps)[sample_data(ps)$transect %in% c("KG", "HB", "SI", "MS", "LN", "LA", "KR"),]$region <- "North"
 
 # variable as factor
@@ -119,7 +122,6 @@ miseq.runs.ark <- c("20200306_0095",
 
 i = 1
 for(run in miseq.runs.ark){
-  run <- "20200306_0095"
   print(run)
   
   seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/seqtab_final.rds", sep = "")
