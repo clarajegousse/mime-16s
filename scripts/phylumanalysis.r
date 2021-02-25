@@ -152,14 +152,14 @@ ps3 = transform_sample_counts(ps3, standf)
 
 # set the colours
 nb.cols <- length(unique(tax_table(ps3)[,"Phylum"])) + 1
-mycolors <- colorRampPalette(intensePalette)(nb.cols)
+mycolors <- colorRampPalette(Palette)(nb.cols)
 
-plot_bar(ps3, x="cruise", fill = "Kingdom") +
+plot_bar(ps3, x="cruise", fill = "Phylum") +
   geom_bar(aes(color=Phylum, fill=Phylum), stat="identity", position="stack") +
   scale_fill_manual(values=rev(mycolors)) +
   scale_color_manual(values=rev(mycolors)) + theme_pubr() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-        legend.position="right",
+        legend.position="none",
         axis.line = element_line(size=0,color="red"),
         axis.ticks = element_line(size=.5,color="black"),
         axis.ticks.length=unit(0.2,"cm"),

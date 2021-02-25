@@ -77,9 +77,9 @@ tax_fill_scale <- function(ps, rank) {
 
 # ----- GGPLOT THEME -----
 
-clean_theme <- theme_pubr() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-        legend.position="none",
+clean_theme = theme_pubr() +
+  theme(panel.border = element_rect(colour = "black", fill=NA, size=.8),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
         axis.line = element_line(size=0,color="red"),
         axis.ticks = element_line(size=.5,color="black"),
         axis.ticks.length=unit(0.2,"cm"),
