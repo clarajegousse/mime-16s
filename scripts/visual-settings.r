@@ -56,6 +56,12 @@ Palette1 <- c(Grapefruit, Bittersweet, Sunflower, Orange,
   Sunflower, Grass, Mint, Aqua, Jeans, Lavender, Rose,
   LightGrey, MediumGrey, DarkGrey, Chocolate)
 
+ark.phyla <- c("Aenigmarchaeota", "Asgardarchaeota", "Crenarchaeota", "Euryarchaeota",
+                 "Halobacterota", "Hydrothermarchaeota", "Micrarchaeota", "Nanoarchaeota",
+                 "Thermoplasmatota")
+ark.phyla.palette <- c(DarkGrey, Grass, Aqua, Mint, Rose, Jeans, Orange, LightGrey, Bittersweet)
+names( ark.phyla.palette) <- ark.phyla
+
 # ----- FUNCTIONS -----
 
 # to define colours scales
