@@ -67,7 +67,7 @@ tax_fill_scale <- function(ps, rank) {
     k.fill.scale <- scale_fill_manual(name = "Kingdom", values = k.colours)
     return(k.fill.scale)
   } else {
-    nb.cols <- 1 + length(get_taxa_unique(ps0, taxonomic.rank = rank))
+    nb.cols <- 1 + length(get_taxa_unique(ps, taxonomic.rank = rank))
     tax.colours <- colorRampPalette(Palette1, bias = 2)(nb.cols)
     names(tax.colours) <- levels(get_taxa_unique(ps.ark, taxonomic.rank = rank))
     tax.fill.scale <- scale_fill_manual(name = rank, values = tax.colours)

@@ -112,7 +112,8 @@ saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
 
 # ----- ARCHAEA -----
 
-miseq.runs.ark <- c("20200306_0095")
+miseq.runs.ark <- c("20200306_0095",
+                    "20200318_0097")
 
 i = 1
 for(run in miseq.runs.ark){
