@@ -29,8 +29,8 @@ miseq.runs.emp <- c(#"20190503_0073",
                 #"20191002_0084",
                 #"20191016_0085",
                 #"20200228_0094",
-                "20200331_0098",
-                "20200407_0100"
+                #"20200331_0098",
+                #"20200407_0100"
                 #"20200421_0102",
                 #"20201104_0112",
                 #"20201112_0114"
@@ -116,16 +116,19 @@ saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
 
 # ----- ARCHAEA -----
 
-miseq.runs.ark <- c("20200306_0095",
-                    "20200318_0097"
+miseq.runs.ark <- c(#"20200306_0095",
+                    #"20200318_0097"
+                    "20200421_0102",
+                    "20200429_0103",
+                    "20200506_0104"
                     )
 
 i = 1
 for(run in miseq.runs.ark){
   print(run)
   
-  seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/seqtab_final.rds", sep = "")
-  taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/tax_final.rds", sep = "")
+  seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/seqtab_final.rds", sep = "")
+  taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/tax_final.rds", sep = "")
   
   seqtab <- readRDS(seqtab.filename)
   tax_info <- readRDS(taxa.filename)
@@ -188,10 +191,11 @@ sample_data(ps)$iscar.nb <- substr(rownames(sample_data(ps)), 1, 9)
 
 # ------- CLEANUP DATASET ----
 
-ps <- subset_samples(ps, transect != "Re" |
-                       transect != "Ne" |
-                       transect != "Po" |
-                       transect != "Co" |
-                       transect != "Ba")
+# ps <- subset_samples(ps, transect != "Re" |
+#                       transect != "Ne" |
+#                       transect != "Po" |
+#                       transect != "Co" |
+#                       transect != "Ba")
 
 saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-ark.rds")
+
