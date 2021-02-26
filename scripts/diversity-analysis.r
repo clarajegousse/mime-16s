@@ -1,22 +1,5 @@
 # divanalysis.r
 
-# import colours to remain consistent between all plots
-source("/Users/Clara/Projects/colors/colors.R")
-source("/Users/Clara/Projects/colors/colors2.R")
-
-mytheme = theme_pubr()  +
-  theme(aspect.ratio=1,
-        panel.border = element_rect(colour = "black", fill=NA, size=.8),
-        axis.line = element_line(size=0,color="red"),
-        axis.ticks = element_line(size=.5,color="black"),
-        axis.ticks.length=unit(0.2,"cm"),
-        text=element_text(family="Muli")) +
-  font("xylab",size = 20, face = "bold") +
-  font("xy", size=12, face = "bold") +
-  font("xy.text", size = 12) +
-  font("legend.title",size = 12, face = "bold") +
-  font("legend.text",size = 10)
-
 # ----- LIBRARIES -----
 
 library(ggplot2)
@@ -30,6 +13,11 @@ library(dada2)
 library(reshape2)
 library(phyloseq)
 library(marmap)
+
+# ----- PRELIMINARY SETTINGS -----
+
+# import colours to remain consistent between all plots
+source_url("https://raw.githubusercontent.com/clarajegousse/mime-16s/main/scripts/visual-settings.r")
 
 # ----- MAP OF ICELAND -----
 
@@ -47,15 +35,13 @@ iceland <- map_data("world", region = "Iceland")
 
 # ----- LOAD PHYLOSEQ OBJ -----
 
-ps <- readRDS("/Users/Clara/Projects/mime-16s/global-ps.rds")
+ps <- readRDS("/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
 
 dna <- Biostrings::DNAStringSet(taxa_names(ps))
 names(dna) <- taxa_names(ps)
 ps <- merge_phyloseq(ps, dna)
 taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
 ps
-
-sample_data(ps)$cruise <- factor(sample_data(ps)$cruise, levels =c("B8-2010", "B4-2011", "B5-2012", "B3-2013", "B4-2014", "B4-2015","B9-2016", "B11-2017", "B3-2018", "B7-2018"))
 
 # ----- REMOVE THE MOCK -----
 
@@ -80,6 +66,7 @@ prevdf = data.frame(Prevalence = prev0,
                     tax_table(ps0))
 keepPhyla = table(prevdf$Phylum)[(table(prevdf$Phylum) > 5)]
 prevdf1 = subset(prevdf, Phylum %in% names(keepPhyla))
+
 # Define prevalence threshold as 5% of total samples
 prevalenceThreshold = 0.05 * nsamples(ps0)
 prevalenceThreshold
@@ -93,7 +80,7 @@ ps2 = subset_taxa(ps1, Phylum %in% names(keepPhyla))
 ps2
 
 nb.cols <- length(unique(tax_table(ps2)[,3])) + 5
-phylum.color <- colorRampPalette(intensePalette)(nb.cols)
+phylum.color <- colorRampPalette(Palette1)(nb.cols)
 
 ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
   geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
@@ -123,55 +110,44 @@ ps4
 
 # ----- SUBSET SPECIFIC GROUP -----
 
-# let's look at the gammaproteobacteria
-
-ps.gamma <- subset_taxa(ps4, Class %in% c("Gammaproteobacteria"))
-ps.gamma
+ps5 <- subset_taxa(ps4, Class %in% c("Nitrososphaeria"))
+ps5
 
 # Normalize number of reads in each sample using median sequencing depth.
-total = median(sample_sums(ps.gamma))
+total = median(sample_sums(ps5))
 standf = function(x, t=total) round(t * (x / sum(x)))
-ps.gamma = transform_sample_counts(ps.gamma, standf)
+ps6 = transform_sample_counts(ps5, standf)
 
 # Basic bar graph based on Order
 
 # set the colours
-nb.cols <- length(unique(tax_table(ps.gamma)[,"Order"])) + 1
-mycolors <- colorRampPalette(intensePalette)(nb.cols)
+nb.cols <- length(unique(tax_table(ps6)[,"Order"])) + 1
+mycolors <- colorRampPalette(Palette1)(nb.cols)
 
-plot_bar(ps.gamma, x="Sample", fill = "Order") +
-  scale_fill_manual(values=rev(mycolors)) + theme_pubr() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
-        legend.position="right",
-        axis.line = element_line(size=0,color="red"),
-        axis.ticks = element_line(size=.5,color="black"),
-        axis.ticks.length=unit(0.2,"cm"),
-        text=element_text(family="Muli")) +
-  font("xylab",size = 20, face = "bold") +
-  font("xy", size=12, face = "bold") +
-  font("xy.text", size = 9) +
-  font("legend.title",size = 12, face = "bold") +
-  font("legend.text",size = 10)
+plot_bar(ps6, x="Sample", fill = "Order") +
+  scale_fill_manual(values=rev(mycolors)) + 
+  clean_theme
 
 # ----- HEATMAP -----
 
 # very cluttered heatmap
-plot_heatmap(ps.gamma, method = "NMDS", distance = "bray")
+plot_heatmap(ps6, method = "NMDS", distance = "bray")
 
 # For example one can only take ASVs that represent at least 20% of reads in at least one sample
 # Remember we normalized all the sampples to median number of reads (total).
 # We are left with only 6 ASVs which makes the reading much more easy.
 
-ps.gamma.abund <- filter_taxa(ps.gamma, function(x) sum(x > total*0.20) > 0, TRUE)
-ps.gamma.abund
-otu_table(ps.gamma.abund)[1:8, 1:5]
+ps7 <- filter_taxa(ps6, function(x) sum(x > total*0.20) > 0, TRUE)
+ps7
+otu_table(ps7)[1:8, 1:5]
 
-plot_heatmap(ps.gamma.abund, method = "NMDS", distance = "bray")
+plot_heatmap(ps7, method = "NMDS", distance = "bray")
 
-plot_heatmap(ps.gamma.abund, method = "MDS", distance = "(A+B-2*J)/(A+B-J)",
+plot_heatmap(ps7, method = "MDS", distance = "(A+B-2*J)/(A+B-J)",
              taxa.label = "Order", taxa.order = "Order",
              trans=NULL, low="white", high=Jeans, na.value="white") +
-  theme_pubr() + mytheme + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+    clean_theme +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
                                  legend.position="right")
 
 dist_methods <- unlist(distanceMethodList)
@@ -185,12 +161,14 @@ print(dist_methods)
 
 # ---- Alpha diversity ----
 
-plot_richness(ps.gamma, measures=c("Chao1", "Shannon")) +
-  mytheme + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+plot_richness(ps5, measures=c("Chao1", "Shannon")) +
+  clean_theme + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
                 legend.position="right")
 
 plot_richness(ps.gamma, measures=c("Chao1", "Shannon"), x = "cruise", color="transect") +
-  mytheme + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+  clean_theme + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
                   legend.position="right")
 
 # ----- Ordination -----
@@ -335,20 +313,3 @@ wireframe(unclass(depth2), shade = TRUE, aspect = c(1/2, 0.1))
 
 
 
-df <- mtcars %>%
-  rownames_to_column() %>%
-  as_data_frame() %>%
-  mutate(am = ifelse(am == 0, "Automatic", "Manual")) %>%
-  mutate(am = as.factor(am))
-df
-
-p <- plot_ly(
-  df, x = ~wt, y = ~hp, z = ~qsec,
-  color = ~am, colors = c('#BF382A', '#0C4B8E')
-) %>%
-  add_markers() %>%
-  layout(
-    scene = list(xaxis = list(title = 'Weight'),
-                 yaxis = list(title = 'Gross horsepower'),
-                 zaxis = list(title = '1/4 mile time'))
-  )

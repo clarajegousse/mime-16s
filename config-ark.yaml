@@ -1,7 +1,7 @@
 RUN:
-  "20200318_0097"
+  "20200429_0103"
 SAMPLETABLE:
-  "/users/home/cat3/projects/mime-16s/data/miseq/20200318_0097/samples.csv"
+  "/users/home/cat3/projects/mime-16s/data/miseq/20200429_0103/samples.csv"
 ORIENTATION:
   - "R1"
   - "R2"
