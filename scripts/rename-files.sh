@@ -1,5 +1,8 @@
 MIME_DIR=/users/home/cat3/projects/mime-16s
-RUN_NUM=20200416_0101
+RUN_NUM=20200515_0106
+
+cd $MIME_DIR
+cp -r ../mime/data/miseq/$RUN_NUM data/miseq/
 
 cd $MIME_DIR/data/miseq/$RUN_NUM
 
