@@ -1,5 +1,5 @@
 MIME_DIR=/users/home/cat3/projects/mime-16s
-RUN_NUM=20200526_0107
+RUN_NUM=20200318_0097
 
 cd $MIME_DIR
 cp -r ../mime/data/miseq/$RUN_NUM data/miseq/
@@ -10,9 +10,7 @@ echo "Sample, R1, R2" > samples.csv
 for i in `ls *R1*.fastq.gz`; do
 
   fwd_filename=$(echo $i)
-
   rev_filename=$(echo $i | sed 's/R1/R2/')
-
   sample_name=$(echo $i | cut -f 1 -d "_" | sed 's/-Archaea/-ARK/')
   #echo $sample_name
 
