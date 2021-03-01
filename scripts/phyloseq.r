@@ -116,8 +116,8 @@ saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
 
 # ----- ARCHAEA -----
 
-miseq.runs.ark <- c(#"20200306_0095",
-                    #"20200318_0097"
+miseq.runs.ark <- c("20200306_0095",
+                    "20200318_0097",
                     "20200421_0102",
                     "20200429_0103",
                     "20200506_0104"
@@ -166,6 +166,7 @@ for(run in miseq.runs.ark){
   i = i + 1
 }
 
+
 sample_data(ps)$transect <- substr(sample_data(ps)$stn, 1, 2)
 sample_data(ps)[sample_data(ps)$transect == "Mo",]$transect <- "MOCK"
 sample_data(ps)$transect <- as.factor(sample_data(ps)$transect)
@@ -188,6 +189,10 @@ sample_data(ps)$cruise <- factor(sample_data(ps)$cruise, levels =c("B8-2010", "B
 sample_data(ps)$run <- factor(sample_data(ps)$run)
 
 sample_data(ps)$iscar.nb <- substr(rownames(sample_data(ps)), 1, 9)
+
+# pelagic zone
+sample_data(ps)$zone <- cut(sample_data(ps)$depth, breaks = c(-Inf, 0, 200, 1000, Inf), labels = c("surface", "photic", "aphotic", "bathypelgic"))
+
 
 # ------- CLEANUP DATASET ----
 

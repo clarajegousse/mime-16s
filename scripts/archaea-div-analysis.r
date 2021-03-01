@@ -13,6 +13,7 @@ library(dada2)
 library(reshape2)
 library(phyloseq)
 library(marmap)
+library(devtools)
 
 # ----- PRELIMINARY SETTINGS -----
 
@@ -32,7 +33,7 @@ ps
 # ----- SELECT PROKARYOTES ONLY -----
 
 # because these were assigned with Silva
-ps0 <- subset_taxa(ps, Kingdom %in% c("Archaea", "Bacteria"))
+ps0 <- subset_taxa(ps, Kingdom %in% c("Archaea"))
 
 # ----- PREVALENCE FILTERING -----
 
@@ -59,16 +60,14 @@ ps1
 ps2 = subset_taxa(ps1, Phylum %in% names(keepPhyla))
 ps2
 
-nb.cols <- length(unique(tax_table(ps2)[,3]))+5
-phylum.color <- colorRampPalette(Palette1)(30)
-
 ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
   geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
   geom_point(size = 2, alpha = 0.7) +
   scale_y_log10() + scale_x_log10() +
   xlab("Total Abundance") +
   facet_wrap(~Phylum) + theme_pubr() +
-  scale_color_manual(values = phylum.color) +
+  #scale_color_manual(values = phylum.color) +
+  tax_color_scale(ps0, "Phylum") +
   theme(legend.position = "right",
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
@@ -100,12 +99,8 @@ ps6 = transform_sample_counts(ps5, standf)
 
 # Basic bar graph based on Order
 
-# set the colours
-nb.cols <- length(unique(tax_table(ps6)[,"Order"])) + 1
-mycolors <- colorRampPalette(Palette1)(nb.cols)
-
 plot_bar(ps6, x="Sample", fill = "Order") +
-  scale_fill_manual(values=rev(mycolors)) + 
+  tax_fill_scale(ps6, "Order") + 
   clean_theme
 
 # ----- HEATMAP -----
