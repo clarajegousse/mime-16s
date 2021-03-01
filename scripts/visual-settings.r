@@ -113,7 +113,7 @@ tax_color_scale <- function(ps, rank) {
       return(k.fill.scale)
     } else {
       nb.cols <- 1 + length(get_taxa_unique(ps, taxonomic.rank = rank))
-      tax.colours <- colorRampPalette(Palette1, bias = 2)(nb.cols)
+      tax.colours <- colorRampPalette(Palette1, bias = 1)(nb.cols)
       names(tax.colours) <- levels(get_taxa_unique(ps, taxonomic.rank = rank))
       tax.fill.scale <- scale_fill_manual(name = rank, values = tax.colours)
       return(tax.fill.scale)
