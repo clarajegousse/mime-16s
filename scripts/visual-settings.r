@@ -134,3 +134,15 @@ clean_theme = theme_pubr() +
   font("xy.text", size = 9) +
   font("legend.title",size = 12, face = "bold") +
   font("legend.text",size = 10)
+
+
+plot_bar2 <-  function (physeq, x, y, fill = NULL, title = NULL, facet_grid = NULL)
+{
+  mdf = psmelt(physeq)
+  p <- ggplot(mdf, aes_string(x = x, y = y, fill = fill)) +
+  geom_bar(stat = "identity", position = "stack") + clean_theme +
+  tax_fill_scale(physeq, fill) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        panel.grid.major.x = element_line(size = .1, colour = DarkGrey, linetype = 3))
+  return(p)
+}
