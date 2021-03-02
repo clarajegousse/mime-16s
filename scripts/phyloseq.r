@@ -27,13 +27,13 @@ miseq.runs.emp <- c("20190503_0073",
                 "20190508_0074",
                 "20190915_0082", 
                 #"20191002_0084",
-                #"20191016_0085",
+                "20191016_0085",
                 #"20200228_0094",
-                #"20200331_0098",
+                "20200331_0098",
                 "20200407_0100",
-                #"20200421_0102",
-                "20201104_0112"
-                #"20201112_0114"
+                "20200421_0102",
+                "20201104_0112",
+                "20201112_0114"
                 )
 
 i = 1
@@ -79,12 +79,31 @@ for(run in miseq.runs.emp){
   i = i + 1
 }
 
+# Create new variable for each transect
 sample_data(ps)$transect <- substr(sample_data(ps)$stn, 1, 2)
+
+# set dates
+sample_data(ps)$date <- as.Date(paste(sample_data(ps)$year, 
+                                      sample_data(ps)$month, 
+                                      sample_data(ps)$day, sep = "-"))
+
+# ----- LABEL CONTROLS ----
+
+# positive control = mock
 sample_data(ps)[sample_data(ps)$transect == "Mo",]$transect <- "MOCK"
-sample_data(ps)$transect <- as.factor(sample_data(ps)$transect)
 sample_data(ps)[sample_data(ps)$transect == "MOCK",]$stn.num <- "MK000"
 sample_data(ps)[sample_data(ps)$transect == "MOCK",]$stn.name <- "Mock community"
-sample_data(ps)$date <- as.Date(paste(sample_data(ps)$year, sample_data(ps)$month, sample_data(ps)$day, sep = "-"))
+
+#  controls
+sample_data(ps)[sample_data(ps)$transect == "Co",]$transect <- "CTRL"
+sample_data(ps)[sample_data(ps)$transect == "CTRL",]$stn.num <- "CTRL"
+sample_data(ps)[sample_data(ps)$transect == "CTRL",]$stn.name <- "Control"
+sample_data(ps)[sample_data(ps)$transect == "CTRL",]$stn.num <- "CTRL"
+sample_data(ps)[sample_data(ps)$transect == "CTRL",]$smp.num <- 
+  substr(rownames(sample_data(ps)[sample_data(ps)$transect == "CTRL",]), 8, 14)
+
+ 
+sample_data(ps)$transect <- as.factor(sample_data(ps)$transect)
 
 # Issues with PCR replicates?
 sample_data(ps)[is.na(sample_data(ps)$cruise) == TRUE,]
@@ -94,8 +113,9 @@ sample_data(ps)$primer <- "EMP"
 
 # make a categorial variable for north and south
 sample_data(ps)$region <- NA
-sample_data(ps)[sample_data(ps)$transect %in% c("LB", "FX", "SB", "IH", "SK", "RS"),]$region <- "South"
-sample_data(ps)[sample_data(ps)$transect %in% c("KG", "HB", "SI", "MS", "LN", "LA", "KR"),]$region <- "North"
+sample_data(ps)[sample_data(ps)$transect %in% c("LB", "FX", "SB", "IH", "SK", "RS", "HD"),]$region <- "South"
+sample_data(ps)[sample_data(ps)$transect %in% c("KG", "HB", "SI", "MS", "LN", "LA", "KR", "EY", "MI"),]$region <- "North"
+sample_data(ps)[is.na(sample_data(ps)$region) == TRUE,]
 
 # variable as factor
 sample_data(ps)$cruise <- factor(sample_data(ps)$cruise, levels =c("B8-2010", "B4-2011", "B5-2012", "B3-2013", "B4-2014", "B4-2015","B9-2016", "B11-2017", "B3-2018", "B7-2018"))
@@ -106,12 +126,6 @@ sample_data(ps)$iscar.nb <- substr(rownames(sample_data(ps)), 1, 9)
 # pelagic zone
 sample_data(ps)$zone <- cut(sample_data(ps)$depth, breaks = c(-Inf, 0, 200, 1000, Inf), labels = c("surface", "photic", "aphotic", "bathypelgic"))
 
-# ------- CLEANUP DATASET ----
-
-ps <- subset_samples(ps, transect != "Re" |
-                       transect != "Ne" |
-                       transect != "Po" |
-                       transect != "Co")
 # ----- SAVE EMP PS -----
 
 saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
