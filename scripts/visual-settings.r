@@ -124,11 +124,11 @@ tax_color_scale <- function(ps, rank) {
 
 clean_theme = theme_pubr() +
   theme(panel.border = element_rect(colour = "black", fill=NA, size=.8),
+        #text = element_text(family = "Muli"),
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
         axis.line = element_line(size=0,color="red"),
         axis.ticks = element_line(size=.5,color="black"),
-        axis.ticks.length=unit(0.2,"cm"),
-        text=element_text(family="Muli")) +
+        axis.ticks.length = unit(0.2,"cm")) +
   font("xylab",size = 20, face = "bold") +
   font("xy", size=12, face = "bold") +
   font("xy.text", size = 9) +
