@@ -52,7 +52,7 @@ Titanium <- "#AAB2BD" # MediumGrey
 
 # ----- PALETTES -----
 
-Palette1 <- c(Grapefruit, Bittersweet, Sunflower, Orange,
+Palette1 <- c(Grapefruit, Bittersweet, Orange,
   Sunflower, Grass, Mint, Aqua, Jeans, Lavender, Rose,
   LightGrey, MediumGrey, DarkGrey, Chocolate)
 
