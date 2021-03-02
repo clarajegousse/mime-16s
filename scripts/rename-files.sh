@@ -1,5 +1,5 @@
 MIME_DIR=/users/home/cat3/projects/mime-16s
-RUN_NUM=20201112_0114
+RUN_NUM=20200228_0094
 
 cd $MIME_DIR
 cp -r ../mime/data/miseq/$RUN_NUM data/miseq/
@@ -29,5 +29,5 @@ done
 cd $MIME_DIR
 mkdir -p /users/home/cat3/projects/mime-16s/results/$RUN_NUM/cutadapt
 
-# git stash; git pull; chmod +x $MIME_DIR/scripts/*
-# rm -f snakejob.*
+git stash; git pull; chmod +x $MIME_DIR/scripts/*
+rm -f snakejob.*

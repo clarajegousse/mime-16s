@@ -23,16 +23,16 @@ rownames(metadata) <- metadata$smp.num
 
 # run 20190508_0074
 
-miseq.runs.emp <- c(#"20190503_0073",
-                #"20190508_0074", 
-                #"20190915_0082", 
+miseq.runs.emp <- c("20190503_0073",
+                "20190508_0074",
+                "20190915_0082", 
                 #"20191002_0084",
                 #"20191016_0085",
                 #"20200228_0094",
                 #"20200331_0098",
-                #"20200407_0100"
+                "20200407_0100",
                 #"20200421_0102",
-                #"20201104_0112",
+                "20201104_0112"
                 #"20201112_0114"
                 )
 
@@ -40,8 +40,8 @@ i = 1
 for(run in miseq.runs.emp){
   print(run)
   
-  seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/seqtab_final.rds", sep = "")
-  taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/tax_final.rds", sep = "")
+  seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/seqtab_final.rds", sep = "")
+  taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/tax_final.rds", sep = "")
 
   seqtab <- readRDS(seqtab.filename)
   tax_info <- readRDS(taxa.filename)
@@ -103,13 +103,15 @@ sample_data(ps)$run <- factor(sample_data(ps)$run)
 
 sample_data(ps)$iscar.nb <- substr(rownames(sample_data(ps)), 1, 9)
 
+# pelagic zone
+sample_data(ps)$zone <- cut(sample_data(ps)$depth, breaks = c(-Inf, 0, 200, 1000, Inf), labels = c("surface", "photic", "aphotic", "bathypelgic"))
+
 # ------- CLEANUP DATASET ----
 
 ps <- subset_samples(ps, transect != "Re" |
                        transect != "Ne" |
                        transect != "Po" |
                        transect != "Co")
-
 # ----- SAVE EMP PS -----
 
 saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp.rds")

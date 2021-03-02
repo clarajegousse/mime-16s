@@ -49,6 +49,13 @@ ps <- ps %>%
   subset_samples(stn.num != "MK000") %>%
   prune_taxa(taxa_sums(.) > 0, .)
 
+# ----- REMOVE SAMPLES WITH VERY FEW READS -----
+
+good.samples <- rownames(as.data.frame(sample_sums(ps)[sample_sums(ps) > 500 ]))
+
+ps <- ps %>%
+  subset_samples( rownames(sample_data(ps)) %in% good.samples) 
+
 # ----- SELECT PROKARYOTES ONLY -----
 
 # because these were assigned with Silva
@@ -79,7 +86,7 @@ ps1
 ps2 = subset_taxa(ps1, Phylum %in% names(keepPhyla))
 ps2
 
-nb.cols <- length(unique(tax_table(ps2)[,3])) + 5
+nb.cols <- 5 + length(get_taxa_unique(ps2, taxonomic.rank = "Phylum"))
 phylum.color <- colorRampPalette(Palette1)(nb.cols)
 
 ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
@@ -99,24 +106,31 @@ ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
 taxGlomRank = "Genus"
 length(get_taxa_unique(ps2, taxonomic.rank = taxGlomRank))
 
-ps3 = tax_glom(ps2, taxrank = taxGlomRank)
+ps3 = tax_glom(ps2, taxrank = taxGlomRank, NArm = TRUE)
 
 # ------- SUBSET SPECIFIC SAMPLES ----
 
 # here let's select only the surface samples
 
 ps4 <- subset_samples(ps2, depth =="0")
-ps4
+ps4 <- ps3
 
 # ----- SUBSET SPECIFIC GROUP -----
 
-ps5 <- subset_taxa(ps4, Class %in% c("Nitrososphaeria"))
+ps5 <- subset_taxa(ps4, Class %in% c("Gammaproteobacteria"))
 ps5
 
 # Normalize number of reads in each sample using median sequencing depth.
 total = median(sample_sums(ps5))
-standf = function(x, t=total) round(t * (x / sum(x)))
+standf = function(x, t=total) round(t * (x / sum(x, na.rm = TRUE)))
 ps6 = transform_sample_counts(ps5, standf)
+
+plot_bar(ps6, fill = "Order")
+
+sum(is.na(otu_table(ps6)))
+psmelt(ps5) %>%
+  filter(is.na(Abundance))
+
 
 # Basic bar graph based on Order
 
@@ -128,10 +142,11 @@ plot_bar(ps6, x="Sample", fill = "Order") +
   scale_fill_manual(values=rev(mycolors)) + 
   clean_theme
 
+
 # ----- HEATMAP -----
 
 # very cluttered heatmap
-plot_heatmap(ps6, method = "NMDS", distance = "bray")
+plot_heatmap(ps6, method = "NMDS", distance = "bray", na.value = "white")
 
 # For example one can only take ASVs that represent at least 20% of reads in at least one sample
 # Remember we normalized all the sampples to median number of reads (total).
@@ -173,9 +188,9 @@ plot_richness(ps.gamma, measures=c("Chao1", "Shannon"), x = "cruise", color="tra
 
 # ----- Ordination -----
 
-ps.gamma.ord <- ordinate(ps.gamma, "NMDS", "bray")
+ps.gamma.ord <- ordinate(ps6, "NMDS", "bray")
 
-plot_ordination(ps.gamma, ps.gamma.ord, type="taxa", color="Order", shape= "year",
+plot_ordination(ps6, ps.gamma.ord, type="taxa", color="Order", shape= "year",
                 title="ASVs")
 
 # set the colours
