@@ -23,9 +23,11 @@ Import variables and functions for consistent plots.
 source_url("https://raw.githubusercontent.com/clarajegousse/mime-16s/main/scripts/visual-settings.r")
 ```
 
-```{r, echo=FALSE}
-# ----- LOAD PHYLOSEQ OBJ -----
+# Read Phyloseq Object
 
+Import the phyloseq object containing all 1397 samples amplified with the EMP primers with metadata from Hafro. 
+
+```{r, echo=FALSE}
 ps <- readRDS("/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
 
 dna <- Biostrings::DNAStringSet(taxa_names(ps))
@@ -34,14 +36,32 @@ ps <- merge_phyloseq(ps, dna)
 taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
 ps
 
-# ---- FILTER OUT LOW READ SAMPLES -----
+```
 
+All metadata including measures from Hafro.
+```{r}
+sample_variables(ps)
+```
+
+```{r}
+rank_names(ps)
+```
+
+Number of taxa
+```{r}
+ntaxa(ps)
+```
+
+
+# Summarize sequencing depths 
+
+
+```{r, message=FALSE}
 # number of reads per samples
 reads <- as.data.frame(sample_sums(ps))
 colnames(reads) <- c("total")
 reads$run <- sample_data(ps)$run
 reads$sample <- rownames(reads)
-
 
 gghistogram(reads, x = "total",
             add = "mean", rug = TRUE,
@@ -55,18 +75,11 @@ gghistogram(reads, x = "total",
        subtitle = "All samples from all 11 MiSeq runs", 
        caption = paste0("MiSeq runs (n = ", length(unique(reads$run)), ")\n",
                         "Samples (n = ", dim(reads)[1], ")"))
-ggsave(
-  "sfig01a.pdf",
-  plot = last_plot(),
-  device = "pdf",
-  path = "~/Projects/mime/articles/article02/fig/",
-  scale = 1,
-  width = 26,
-  height = 14,
-  units = "cm",
-  dpi = 300)
+```
 
+Sequencing depth for each run
 
+```{r}
 gghistogram(reads, x = "total",
             add = "mean", rug = TRUE,
             color = "run", fill = "run",
@@ -81,34 +94,36 @@ gghistogram(reads, x = "total",
        subtitle = "Samples amplified with EMP primers for each MiSeq run", 
        caption = paste0("MiSeq runs (n = ", length(unique(reads$run)), ")\n",
                         "Samples (n = ", dim(reads)[1], ")"))
-ggsave(
-  "sfig01b.pdf",
-  plot = last_plot(),
-  device = "pdf",
-  path = "~/Projects/mime/articles/article02/fig/",
-  scale = 1,
-  width = 26,
-  height = 14,
-  units = "cm",
-  dpi = 300)
+```
 
-keep.samples <- reads[reads$total >= 2000,]$sample
-low.samples <- reads[reads$total < 2000,]$sample
+```{r}
+
+# define the minimum number of reads per sample
+min.reads <- 2000
+smp.keeper <- reads[reads$total >= min.reads,]$sample
 
 ps0 <- ps %>%
-  subset_samples(rownames(sample_data(ps)) %in% keep.samples)
-ps0 # 1181 samples
+  subset_samples(rownames(sample_data(ps)) %in% smp.keeper)
+ps0 
+```
 
 
-# ----- SELECT PROKARYOTES ONLY -----
+# Filter taxa
 
+EMP primers are meant to amplify prokaryotes and now we want to focus on Bacteria only.
+
+```{r}
 # because these were assigned with Silva
 ps0 <- subset_taxa(ps0, Kingdom %in% c("Bacteria"))
+```
 
-# ----- PREVALENCE FILTERING -----
+## Prevalence filtering
 
-# Define prevalence of each taxa
-# (in how many samples did each taxa appear at least once)
+Define prevalence of each taxa (in how many samples did each taxa appear at least once).
+
+
+```{r}
+#Define prevalence of each taxa
 prev0 = apply(X = otu_table(ps0),
               MARGIN = ifelse(taxa_are_rows(ps0), yes = 1, no = 2),
               FUN = function(x){sum(x > 0)})
@@ -140,48 +155,61 @@ ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
   tax_color_scale(ps0, "Phylum") +
   theme(legend.position = "right",
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
 
-# ----- AGGLOMERATE CLOSELY RELATED TAXA -----
 
-# Taxonomic agglomeration
-# How many genera are present after filtering?
+## Agglomerate taxa at the Genus level
+
+```{r}
 taxGlomRank = "Genus"
 length(get_taxa_unique(ps2, taxonomic.rank = taxGlomRank))
 
 ps3 = tax_glom(ps2, taxrank = taxGlomRank)
+```
 
-# ------- SUBSET SPECIFIC SAMPLES ----
+## Filter specific samples
 
-# here let's select only the surface samples
+Remove samples that were not sampled during specific cruises and samples collected during cruise B8-2010 as they were processed differently than samples collected later. 
 
+```{r}
 ps4 <- subset_samples(ps3, depth =="0" & is.na(cruise) == FALSE & cruise != "B8-2010")
 ps4
+```
 
-# ----- SUBSET SPECIFIC GROUP -----
+## Focus on Gammaproteobacteria
 
+```{r}
 ps5 <- subset_taxa(ps4, Class %in% c("Gammaproteobacteria"))
 ps5
+```
 
+
+# Normalisation
+
+```{r}
 # Normalize number of reads in each sample using median sequencing depth.
 total = median(sample_sums(ps5))
 standf = function(x, t=total) round(t * (x / sum(x)))
 ps6 = transform_sample_counts(ps5, standf)
-
-# Basic bar graph based on Order
-
-plot_bar2(ps6, x="transect", fill = "Order", y = "Abundance") +
-  facet_grid(~cruise)
+```
 
 
-# ----- HEATMAP -----
+# Bar plots
 
-# very cluttered heatmap
+```{r}
+plot_bar2(ps6, x="smp.num", fill = "Order", y = "Abundance") +
+  facet_grid(~year)
+```
+
+# Heatmap
+
+```{r}
 plot_heatmap(ps6, method = "NMDS", distance = "bray")
+```
 
-# For example one can only take ASVs that represent at least 20% of reads in at least one sample
-# Remember we normalized all the sampples to median number of reads (total).
-# We are left with only 6 ASVs which makes the reading much more easy.
+For example one can only take ASVs that represent at least 20% of reads in at least one sample:
 
+```{r}
 ps7 <- filter_taxa(ps6, function(x) sum(x > total*0.20) > 0, TRUE)
 ps7
 otu_table(ps7)[1:8, 1:5]
@@ -192,7 +220,11 @@ plot_heatmap(ps7, method = "MDS", distance = "(A+B-2*J)/(A+B-J)",
   clean_theme +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
         legend.position="right")
+```
 
+## Other distances
+
+```{r}
 dist_methods <- unlist(distanceMethodList)
 print(dist_methods)
 
@@ -201,29 +233,38 @@ print(dist_methods)
 # (A+B-2*J)/(A+B) “minimum” Bray-Curtis
 # (A+B-2*J)/(A+B) “binary” Sørensen
 # (A+B-2*J)/(A+B-J) “binary” Jaccard
+```
 
-# ---- Alpha diversity ----
 
+```{r}
 plot_richness(ps5, measures=c("Chao1", "Shannon")) +
   clean_theme + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
         legend.position="right")
+```
+
+
+```{r}
 
 plot_richness(ps5, measures=c("Chao1", "Shannon"), x = "cruise", color="transect") +
   clean_theme + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
         legend.position="right")
+```
 
-# ----- Ordination -----
 
+# Ordination
+
+```{r}
 ps.gamma <- subset_samples(ps5, cruise == "B5-2012" | cruise == "B3-2013" )
 
 ps.gamma.ord <- ordinate(ps.gamma, "NMDS", "bray")
 
 plot_ordination(ps.gamma, ps.gamma.ord, type="taxa", color="Order", shape= "year",
                 title="ASVs")
+```
 
-# set the colours
+```{r}
 nb.cols <- length(unique(sample_data(ps)$transect)) + 1
 transect.color <- colorRampPalette(Palette1)(nb.cols)
 
@@ -231,36 +272,30 @@ plot_ordination(ps.gamma, ps.gamma.ord, "samples", color="region",  label = "tra
   geom_point(size=7, alpha=0.2) + geom_path() + # scale_colour_hue(guide = FALSE) +
   guides(color=guide_legend(ncol=1)) +
   scale_color_manual(values = c(Jeans, Grapefruit)) +
-  clean_theme + theme(legend.position = "right") #+ facet_wrap(~cruise)
-
-# plot_ordination(ps.gamma, ps.gamma.ord, "samples", axes=c(1, 3),
-#                color="transect") + geom_line() + geom_point(size=5)
-
-plot_ordination(ps.gamma, ps.gamma.ord, type="taxa", color="Order",
-                title="ASVs", label="Class") +
-  facet_wrap(~Order, 3) + scale_colour_hue(guide = FALSE)
+  clean_theme + theme(legend.position = "right")
+```
 
 
-plot_ordination(ps.gamma, ps.gamma.ord, type="samples", color="transect",
-                shape="cruise", title="Samples") + geom_point(size=3)
+# Iceland Map
 
-plot_ordination(ps.gamma, ps.gamma.ord, type="split", color="Order",
-                shape="cruise", title="biplot", label = "station") +
-  geom_point(size=3)
-
-
-plot_net(ps.gamma, distance = "(A+B-2*J)/(A+B)", type = "taxa",
-         maxdist = 0.9, color="Order", point_label="Genus")
-
-plot_net(ps.gamma.abund, distance = "(A+B-2*J)/(A+B)", type = "taxa",
-         maxdist = 0.8, color="Order", point_label="Genus")
-
-# ----- MAP ----
+```{r}
 
 library(marmap)
 
 xlim <- c(-30, -10)
 ylim <- c(70, 62)
+
+# get bathymetry data from NOAA
+depth <- getNOAA.bathy(lon1 = xlim[1], lon2 = xlim[2],
+                       lat1 = ylim[1], lat2 = ylim[2],
+                       resolution = 1)
+
+# turn the object into a data.frame
+df.depth <- fortify(depth)
+iceland <- map_data("world", region = "Iceland")
+
+
+library(marmap)
 
 # get bathymetry data from NOAA
 depth <- getNOAA.bathy(lon1 = xlim[1], lon2 = xlim[2],
@@ -312,47 +347,9 @@ ggplot() +
   coord_quickmap(xlim = xlim, ylim = ylim, expand = FALSE) +
   labs(x = NULL, y = NULL)
 
+# look the sequence
 as.character(refseq(ps)["ASV2"])
 
 
-
-library(ggrastr)
-ggplot() +
-  theme_bw() +
-  geom_contour(data = depth, aes(x, y, z = z),
-               breaks=c(-25, -50, -100, -200, -400),
-               colour="black", size=0.1) +
-  geom_path(data = iceland, aes(long, lat), size=0.1) +
-  rasterise(geom_point(data = mdf.thio[mdf.thio$variable == "ASV2" & mdf.thio$cruise == "B8-2010",], aes(x = lon,
-                                                                                                         y = lat,
-                                                                                                         size = value, color = variable),
-                       alpha = 0.5)) +
-  theme(aspect.ratio=1) +
-  # facet_grid(~cruise) + theme(aspect.ratio=1) +
-  coord_quickmap(xlim = xlim, ylim = ylim, expand = FALSE) +
-  labs(x = NULL, y = NULL)
-
-
-
-data(nw.atlantic)
-atl <- as.bathy(nw.atlantic)
-library(lattice)
-wireframe(unclass(atl), shade = TRUE, aspect = c(1/2, 0.1))
-
-data(nw.atlantic)
-atl <- as.bathy(nw.atlantic)
-
-
-depth2 <- getNOAA.bathy(lon1 = xlim[1], lon2 = xlim[2],
-                        lat1 = ylim[1], lat2 = ylim[2],
-                        resolution = 5)
-
-library(lattice)
-wireframe(unclass(depth2), shade = TRUE, aspect = c(1/2, 0.1))
-
-
-
-
 ```
-
 

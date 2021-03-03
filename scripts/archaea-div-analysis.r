@@ -307,7 +307,6 @@ ggplot() +
   # facet_grid(~cruise) + theme(aspect.ratio=1) +
   coord_quickmap(xlim = xlim, ylim = ylim, expand = FALSE) +
   labs(x = NULL, y = NULL)
-
 as.character(refseq(ps)["ASV2"])
 
 
