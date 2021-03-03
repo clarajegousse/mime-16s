@@ -1,25 +1,29 @@
-# archaea-diversity-analysis.r
+---
+title: "MIME - EMP 16S"
+author: "Clara Jégousse"
+date: "3/3/2021"
+output: html_document
+---
 
------ LIBRARIES -----
-  
+# Load libraries
+
+```{r, echo=FALSE}
+library(devtools)
 library(ggplot2)
 library(ggpubr)
-library(RColorBrewer)
-library(vegan)
-library(dplyr)
-library(scasles)
-library(grid)
 library(dada2)
-library(reshape2)
 library(phyloseq)
-library(marmap)
-library(devtools)
+```
 
-# ----- PRELIMINARY SETTINGS -----
+# Visual setting
 
-# import colours to remain consistent between all plots
+Import variables and functions for consistent plots.
+
+```{r, message=FALSE}
 source_url("https://raw.githubusercontent.com/clarajegousse/mime-16s/main/scripts/visual-settings.r")
+```
 
+```{r, echo=FALSE}
 # ----- LOAD PHYLOSEQ OBJ -----
 
 ps <- readRDS("/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
@@ -221,7 +225,7 @@ plot_ordination(ps.gamma, ps.gamma.ord, type="taxa", color="Order", shape= "year
 
 # set the colours
 nb.cols <- length(unique(sample_data(ps)$transect)) + 1
-transect.color <- colorRampPalette(intensePalette)(nb.cols)
+transect.color <- colorRampPalette(Palette1)(nb.cols)
 
 plot_ordination(ps.gamma, ps.gamma.ord, "samples", color="region",  label = "transect") +
   geom_point(size=7, alpha=0.2) + geom_path() + # scale_colour_hue(guide = FALSE) +
@@ -346,5 +350,9 @@ depth2 <- getNOAA.bathy(lon1 = xlim[1], lon2 = xlim[2],
 library(lattice)
 wireframe(unclass(depth2), shade = TRUE, aspect = c(1/2, 0.1))
 
+
+
+
+```
 
 

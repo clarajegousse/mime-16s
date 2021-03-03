@@ -112,7 +112,7 @@ ps3 = tax_glom(ps2, taxrank = taxGlomRank, NArm = TRUE)
 
 # here let's select only the surface samples
 
-ps4 <- subset_samples(ps2, depth =="0")
+ps4 <- subset_samples(ps3, depth =="0" % & year == 2015)
 ps4 <- ps3
 
 # ----- SUBSET SPECIFIC GROUP -----
@@ -125,12 +125,9 @@ total = median(sample_sums(ps5))
 standf = function(x, t=total) round(t * (x / sum(x, na.rm = TRUE)))
 ps6 = transform_sample_counts(ps5, standf)
 
-plot_bar(ps6, fill = "Order")
-
 sum(is.na(otu_table(ps6)))
 psmelt(ps5) %>%
   filter(is.na(Abundance))
-
 
 # Basic bar graph based on Order
 
@@ -141,7 +138,6 @@ mycolors <- colorRampPalette(Palette1)(nb.cols)
 plot_bar(ps6, x="Sample", fill = "Order") +
   scale_fill_manual(values=rev(mycolors)) + 
   clean_theme
-
 
 # ----- HEATMAP -----
 
@@ -188,7 +184,7 @@ plot_richness(ps.gamma, measures=c("Chao1", "Shannon"), x = "cruise", color="tra
 
 # ----- Ordination -----
 
-ps.gamma.ord <- ordinate(ps6, "NMDS", "bray")
+ps.gamma.ord <- ordinate(ps6, "NMDS", distance = "bray")
 
 plot_ordination(ps6, ps.gamma.ord, type="taxa", color="Order", shape= "year",
                 title="ASVs")
