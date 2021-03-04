@@ -146,3 +146,18 @@ plot_bar2 <-  function (physeq, x, y, fill = NULL, title = NULL, facet_grid = NU
         panel.grid.major.x = element_line(size = .1, colour = DarkGrey, linetype = 3))
   return(p)
 }
+
+plot_abundance = function(physeq,title = "",
+			     Facet = "Order", Color = "Phylum"){
+  # Arbitrary subset, based on Phylum, for plotting
+  p1f = subset_taxa(physeq, Phylum %in% c("Firmicutes"))
+  mphyseq = psmelt(p1f)
+  mphyseq <- subset(mphyseq, Abundance > 0)
+  ggplot(data = mphyseq, mapping = aes_string(x = "sex",y = "Abundance",
+                                 color = Color, fill = Color)) +
+    geom_violin(fill = NA) +
+    geom_point(size = 1, alpha = 0.3,
+                position = position_jitter(width = 0.3)) +
+    facet_wrap(facets = Facet) + scale_y_log10()+
+    theme(legend.position="none")
+}
