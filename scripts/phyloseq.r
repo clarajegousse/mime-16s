@@ -113,7 +113,7 @@ sample_data(ps)$primer <- "EMP"
 # make a categorial variable for north and south
 sample_data(ps)$region <- NA
 sample_data(ps)[sample_data(ps)$transect %in% c("LB", "FX", "SB", "IH", "SK", "RS", "HD"),]$region <- "South"
-sample_data(ps)[sample_data(ps)$transect %in% c("KG", "HB", "SI", "MS", "LN", "LA", "KR", "EY", "MI"),]$region <- "North"
+sample_data(ps)[sample_data(ps)$transect %in% c("KG", "HB", "SI", "MS", "LN", "LA", "KR", "EY", "MI", "HF"),]$region <- "North"
 sample_data(ps)[is.na(sample_data(ps)$region) == TRUE,]
 
 # variable as factor

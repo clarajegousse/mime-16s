@@ -150,10 +150,10 @@ plot_bar2 <-  function (physeq, x, y, fill = NULL, title = NULL, facet_grid = NU
 plot_abundance = function(physeq,title = "",
 			     Facet = "Order", Color = "Phylum"){
   # Arbitrary subset, based on Phylum, for plotting
-  p1f = subset_taxa(physeq, Phylum %in% c("Firmicutes"))
+  p1f = subset_taxa(physeq, Phylum %in% c("Proteobacteria"))
   mphyseq = psmelt(p1f)
   mphyseq <- subset(mphyseq, Abundance > 0)
-  ggplot(data = mphyseq, mapping = aes_string(x = "sex",y = "Abundance",
+  ggplot(data = mphyseq, mapping = aes_string(x = "region",y = "Abundance",
                                  color = Color, fill = Color)) +
     geom_violin(fill = NA) +
     geom_point(size = 1, alpha = 0.3,
