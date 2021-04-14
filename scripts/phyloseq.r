@@ -117,7 +117,7 @@ sample_data(ps)[sample_data(ps)$transect %in% c("KG", "HB", "SI", "MS", "LN", "L
 sample_data(ps)[is.na(sample_data(ps)$region) == TRUE,]
 
 # variable as factor
-sample_data(ps)$cruise <- factor(sample_data(ps)$cruise, levels =c("B8-2010", "B4-2011", "B5-2012", "B3-2013", "B4-2014", "B4-2015","B9-2016", "B7-2017", "B11-2017", "B3-2018", "B7-2018"))
+sample_data(ps)$cruise <- factor(sample_data(ps)$cruise, levels =c("B8-2010", "B4-2011", "B5-2012", "B3-2013", "B4-2014", "B4-2015","B9-2016", "B7-2017", "B11-2017", "B3-2018", "B7-2018", "B10-2018"))
 sample_data(ps)$run <- factor(sample_data(ps)$run)
 
 sample_data(ps)$iscar.nb <- substr(rownames(sample_data(ps)), 1, 9)
