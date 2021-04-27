@@ -13,6 +13,7 @@ library(dada2)
 library(reshape2)
 library(phyloseq)
 library(marmap)
+library(devtools)
 
 # ----- PRELIMINARY SETTINGS -----
 
@@ -112,7 +113,7 @@ ps3 = tax_glom(ps2, taxrank = taxGlomRank, NArm = TRUE)
 
 # here let's select only the surface samples
 
-ps4 <- subset_samples(ps3, depth =="0" % & year == 2015)
+ps4 <- subset_samples(ps3, depth =="0" & year == 2015)
 ps4 <- ps3
 
 # ----- SUBSET SPECIFIC GROUP -----
@@ -287,6 +288,7 @@ labs(x = NULL, y = NULL)
 as.character(refseq(ps)["ASV2"])
 
 
+# ------ 3D depth vizualisation
 
 library(ggrastr)
 ggplot() +
