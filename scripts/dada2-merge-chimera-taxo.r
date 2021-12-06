@@ -34,7 +34,7 @@ seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE
 db.path <- "/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz"
 
 # Assign taxonomy
-tax <- assignTaxonomy(seqtab.nochim, db, multithread=TRUE)
+tax <- assignTaxonomy(seqtab.nochim, db.path, multithread=TRUE)
 
 # Write to disk
 ifelse(!dir.exists(file.path(argv$output_path)), dir.create(file.path(argv$output_path), showWarnings = FALSE), FALSE)
