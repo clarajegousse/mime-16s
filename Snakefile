@@ -1,4 +1,5 @@
 # rm -f snakejob.*
+# conda activate snakemake-mime-16s
 # git stash; git pull; chmod +x scripts/*
 # snakemake --cluster qsub -j 12 --latency-wait 60 --rerun-incomplete --printshellcmds
 
