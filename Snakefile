@@ -20,10 +20,10 @@ REVTRUNCLEN = config["REVTRUNCLEN"]
 
 rule all:
     input:
-        expand("logs/trimmomatic/{run}/{sample}.log", run = RUN, sample = SAMPLES),
-        expand("logs/cutadapt/{run}/{sample}.log", run = RUN, sample = SAMPLES),
-        expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
-        expand("logs/dada2/{run}/dada2-inference.log", run = RUN),
+        #expand("logs/trimmomatic/{run}/{sample}.log", run = RUN, sample = SAMPLES),
+        #expand("logs/cutadapt/{run}/{sample}.log", run = RUN, sample = SAMPLES),
+        #expand("logs/dada2/{run}/dada2-filter.log", run = RUN),
+        #expand("logs/dada2/{run}/dada2-inference.log", run = RUN),
         expand("logs/dada2/{run}/dada2-merge-chimera-taxo.log", run = RUN)
 
 rule trimmomatic_pe:
