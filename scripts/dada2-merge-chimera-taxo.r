@@ -30,8 +30,11 @@ seqtab <- readRDS(seqtab.filename)
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE)
 # sum(seqtab.nochim)/sum(seqtab)
 
+# Choose database
+db.path <- "/users/work/cat3/db/dada2/silva_nr99_v138.1_wSpecies_train_set.fa.gz"
+
 # Assign taxonomy
-tax <- assignTaxonomy(seqtab.nochim, "/users/work/cat3/db/dada2/silva_nr99_v138_wSpecies_train_set.fa.gz", multithread=TRUE)
+tax <- assignTaxonomy(seqtab.nochim, db.path, multithread=TRUE)
 
 # Write to disk
 ifelse(!dir.exists(file.path(argv$output_path)), dir.create(file.path(argv$output_path), showWarnings = FALSE), FALSE)

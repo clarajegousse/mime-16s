@@ -38,7 +38,6 @@ filtpathR <- file.path(argv$output_path)
 # filtpathF <- "/users/home/cat3/projects/mime-16s/results/20200421_0102/dada2-filter"
 # filtpathR <- "/users/home/cat3/projects/mime-16s/results/20200421_0102/dada2-filter"
 
-
 fastqFs <- sort(list.files(pathF, pattern="R1.fastq.gz"))
 fastqRs <- sort(list.files(pathR, pattern="R2.fastq.gz"))
 
@@ -51,7 +50,6 @@ filterAndTrim(fwd = file.path(pathF, fastqFs),
   truncLen = c(argv$fwd_trunc_len, argv$rev_trunc_len),
   maxEE = argv$maxee, truncQ = argv$truncq,
   compress = TRUE, verbose = TRUE, multithread = TRUE)
-
 
 # filterAndTrim(fwd = file.path(pathF, fastqFs),
 #     filt = file.path(filtpathF, fastqFs),
