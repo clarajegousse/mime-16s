@@ -31,7 +31,9 @@ seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE
 # sum(seqtab.nochim)/sum(seqtab)
 
 # Choose database
-db.path <- "/users/work/cat3/db/dada2/silva_nr99_v138.1_wSpecies_train_set.fa.gz"
+db <- "GTDB_bac120_arc122_ssu_r202_fullTaxo.fa.gz"
+#db <- "silva_nr99_v138.1_wSpecies_train_set.fa.gz"
+db.path <- paste0("/users/work/cat3/db/dada2/", db)
 
 # Assign taxonomy
 tax <- assignTaxonomy(seqtab.nochim, db.path, multithread=TRUE)
