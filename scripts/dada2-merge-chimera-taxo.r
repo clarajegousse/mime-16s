@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # scripts/dada2-merge-chimera-taxo.r
 
-# ./scripts/dada2-merge-chimera-taxo.r -i results/20190508_0074/dada2-inference/ -o results/20190508_0074/dada2-merge-chimera-taxo/
+# ./scripts/dada2-merge-chimera-taxo.r --input_path results/20190508_0074/dada2-inference/ --output_path results/20190508_0074/dada2-merge-chimera-taxo/
 
 # ----- LIBRARIES -----
 
