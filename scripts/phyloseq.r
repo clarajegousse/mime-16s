@@ -25,7 +25,7 @@ rownames(metadata) <- metadata$smp.num
 
 miseq.runs.emp <- c("20190503_0073",
                 "20190508_0074",
-                "20190915_0082", 
+                "20190915_0082",
                 "20191002_0084",
                 "20191016_0085",
                 "20200228_0094",
@@ -38,13 +38,13 @@ miseq.runs.emp <- c("20190503_0073",
 i = 1
 for(run in miseq.runs.emp){
   print(run)
-  
+
   seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/seqtab_final.rds", sep = "")
   taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/tax_final.rds", sep = "")
 
   seqtab <- readRDS(seqtab.filename)
   tax_info <- readRDS(taxa.filename)
-  
+
   # extract info fron sample names
   samples.out <- rownames(seqtab)
   stn <- sapply(strsplit(samples.out, "-"), `[`, 1)
@@ -53,14 +53,14 @@ for(run in miseq.runs.emp){
   primer <- sapply(strsplit(samples.out, "-"), `[`, 3)
   samdf <- data.frame(stn=stn, smp.num=smp.num, primer=primer, run=run)
   rownames(samdf) <- samples.out
-  
+
   # build sample info dataframe
   samdf <- left_join(samdf, metadata, copy = FALSE, stringsAsFactors = FALSE)
   rownames(samdf) <- samples.out
-  
+
   # Issues with PCR replicates?
   samdf[is.na(samdf$cruise) == TRUE,]
-  
+
   print(i)
   if (i == 1){
     print("first")
@@ -82,8 +82,8 @@ for(run in miseq.runs.emp){
 sample_data(ps)$transect <- substr(sample_data(ps)$stn, 1, 2)
 
 # set dates
-sample_data(ps)$date <- as.Date(paste(sample_data(ps)$year, 
-                                      sample_data(ps)$month, 
+sample_data(ps)$date <- as.Date(paste(sample_data(ps)$year,
+                                      sample_data(ps)$month,
                                       sample_data(ps)$day, sep = "-"))
 
 # ----- LABEL CONTROLS ----
@@ -98,10 +98,10 @@ sample_data(ps)[sample_data(ps)$transect == "Co",]$transect <- "CTRL"
 sample_data(ps)[sample_data(ps)$transect == "CTRL",]$stn.num <- "CTRL"
 sample_data(ps)[sample_data(ps)$transect == "CTRL",]$stn.name <- "Control"
 sample_data(ps)[sample_data(ps)$transect == "CTRL",]$stn.num <- "CTRL"
-sample_data(ps)[sample_data(ps)$transect == "CTRL",]$smp.num <- 
+sample_data(ps)[sample_data(ps)$transect == "CTRL",]$smp.num <-
   substr(rownames(sample_data(ps)[sample_data(ps)$transect == "CTRL",]), 8, 14)
 
- 
+
 sample_data(ps)$transect <- as.factor(sample_data(ps)$transect)
 
 # Issues with PCR replicates?
@@ -127,7 +127,7 @@ sample_data(ps)$zone <- cut(sample_data(ps)$depth, breaks = c(-Inf, 0, 200, 1000
 
 # ----- SAVE EMP PS -----
 
-saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp.rds")
+saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-emp-gtdb.rds")
 
 # ----- ARCHAEA -----
 
@@ -141,13 +141,13 @@ miseq.runs.ark <- c("20200306_0095",
 i = 1
 for(run in miseq.runs.ark){
   print(run)
-  
+
   seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/seqtab_final.rds", sep = "")
   taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/tax_final.rds", sep = "")
-  
+
   seqtab <- readRDS(seqtab.filename)
   tax_info <- readRDS(taxa.filename)
-  
+
   # extract info fron sample names
   samples.out <- rownames(seqtab)
   stn <- sapply(strsplit(samples.out, "-"), `[`, 1)
@@ -156,14 +156,14 @@ for(run in miseq.runs.ark){
   primer <- sapply(strsplit(samples.out, "-"), `[`, 3)
   samdf <- data.frame(stn=stn, smp.num=smp.num, primer=primer, run=run)
   rownames(samdf) <- samples.out
-  
+
   # build sample info dataframe
   samdf <- left_join(samdf, metadata, copy = FALSE, stringsAsFactors = FALSE)
   rownames(samdf) <- samples.out
-  
+
   # Issues with PCR replicates?
   samdf[is.na(samdf$cruise) == TRUE,]
-  
+
   print(i)
   if (i == 1){
     print("first")
@@ -217,5 +217,4 @@ sample_data(ps)$zone <- cut(sample_data(ps)$depth, breaks = c(-Inf, 0, 200, 1000
 #                       transect != "Co" |
 #                       transect != "Ba")
 
-saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-ark.rds")
-
+saveRDS(ps, file = "/Users/Clara/Projects/mime-16s/global-ps-ark-gtdb.rds")
