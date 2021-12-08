@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # phyloseq.r
 # make global phyloseq object for all miseq runs
 
