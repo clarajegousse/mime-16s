@@ -209,7 +209,6 @@ sample_data(ps)$iscar.nb <- substr(rownames(sample_data(ps)), 1, 9)
 # pelagic zone
 sample_data(ps)$zone <- cut(sample_data(ps)$depth, breaks = c(-Inf, 0, 200, 1000, Inf), labels = c("surface", "photic", "aphotic", "bathypelgic"))
 
-
 # ------- CLEANUP DATASET ----
 
 # ps <- subset_samples(ps, transect != "Re" |
