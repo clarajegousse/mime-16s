@@ -1,7 +1,9 @@
 #!/usr/bin/env Rscript
 # scripts/dada2-merge-chimera-taxo.r
 
-# sbatch ./scripts/dada2-merge-chimera-taxo.r --input_path results/20201112_0114/dada2-inference/ --output_path results/20201112_0114/dada2-merge-chimera-taxo/
+# conda snakemake-mime-16s
+# chmod +x ./scripts/dada2-merge-chimera-taxo.r
+# sbatch ./scripts/dada2-merge-chimera-taxo.r --input_path results/20200306_0095/dada2-inference/ --output_path results/20200306_0095/dada2-merge-chimera-taxo/
 
 # ----- LIBRARIES -----
 
