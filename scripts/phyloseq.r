@@ -40,8 +40,14 @@ i = 1
 for(run in miseq.runs.emp){
   print(run)
 
-  seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/seqtab_final.rds", sep = "")
-  taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/tax_final.rds", sep = "")
+ 	#avec silva
+  	#seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/seqtab_final.rds", sep = "")
+  	#taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/tax_final.rds", sep = "")
+
+	# avec GTDB
+	seqtab.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/seqtab_final.rds", sep = "")
+    taxa.filename <- paste("~/Projects/mime-16s/results/", run, "/dada2-merge-chimera-taxo/tax_final.rds", sep = "")
+
 
   seqtab <- readRDS(seqtab.filename)
   tax_info <- readRDS(taxa.filename)
