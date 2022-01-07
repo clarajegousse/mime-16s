@@ -1,4 +1,3 @@
-
 # History files
 .Rhistory
 .Rapp.history
@@ -51,3 +50,6 @@ docs/
 
 # translation temp files
 po/*~
+
+# Figures and plots
+*.pdf
