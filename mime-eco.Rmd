@@ -1,0 +1,1317 @@
+---
+title: "mime-eco"
+author: "Clara Jégousse"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: '2'
+  word_document:
+    toc: yes
+    toc_depth: '2'
+  html_document:
+    toc: yes
+    toc_depth: 2
+    toc_float: yes
+    number_sections: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preliminary settings
+
+Load the libraries
+
+```{r libraries, message=FALSE, warning=FALSE}
+library(devtools)
+library(plyr) 
+library(dplyr) # for left_join
+library(ggplot2)
+library(ggpubr)
+library(reshape2) # for melt
+library(cowplot)
+library(stringr)
+library(phyloseq)
+library(gridExtra)
+library(vegan)
+```
+
+Set general parameters and import visual settings.
+
+```{r visual-settings, message=FALSE, warning=FALSE, echo = FALSE}
+
+'%!in%' <- function(x,y)!('%in%'(x,y))
+
+# import colours to remain consistent between all plots
+source_url("https://raw.githubusercontent.com/clarajegousse/mime-16s/main/scripts/visual-settings.r")
+
+#remove(Palette1)
+source_url("https://raw.githubusercontent.com/clarajegousse/colors/master/colours-frontiers.r")
+
+# set the directory to save img
+img.path = "/Users/Clara/Projects/mime/articles/article02/fig/"
+
+theme_set(
+  theme_pubclean() +
+    theme(legend.position = "right",
+          strip.text = element_text(face = "bold", color = "white"))
+)
+
+
+scale_colour_brewer_d <- function(...) {
+  scale_colour_brewer(palette = "Set1", ...)
+}
+
+scale_fill_brewer_d <- function(...) {
+  scale_fill_brewer(palette = "Set1", ...)
+}
+
+
+scale_colour_brewer_c <- function(...) {
+  scale_colour_distiller(palette = "Spectral", ...)
+}
+
+scale_fill_brewer_c <- function(...) {
+  scale_fill_distiller(palette = "Spectral", ...)
+}
+
+options(
+  ggplot2.continuous.colour = scale_colour_brewer_c,
+  ggplot2.continuous.fill = scale_fill_brewer_c,
+  
+  ggplot2.discrete.colour = scale_colour_brewer_d,
+  ggplot2.discrete.fill = scale_fill_brewer_d
+)
+
+```
+
+# Import data
+
+Import the metataxonomics dataset with taxonomic assignment based on Silva (Quast et al., 2012) stored as a phyloseq object (McMurdie et al., 2013) resulting from the DADA2 pipeline (Callahan et al., 2016).
+
+```{r import-mt-silva, echo = FALSE, warning = FALSE}
+githubURL <- "https://github.com/clarajegousse/mime-16s/raw/main/data/phyloseq-mt-silva.rds"
+download.file(githubURL, "phyloseq-mt-silva.rds", method = "auto") # change Method to libcurl for unix
+ps1 <- readRDS(file = "phyloseq-mt-silva.rds", refhook = NULL)
+ps1 # 13163 taxa and 32 samples
+```
+
+Import the second metataxonomics dataset with taxonomic assignment based on GTDB (Parks et al., 2018) stored as a phyloseq object (McMurdie et al., 2013) resulting from the DADA2 pipeline (Callahan et al., 2016).
+
+```{r import-mt-gtdb, echo = FALSE, warning = FALSE}
+githubURL <- "https://github.com/clarajegousse/mime-16s/raw/main/data/phyloseq-mt-gtdb.rds"
+download.file(githubURL, "phyloseq-mt-gtdb.rds", method = "auto")
+ps2 <- readRDS(file = "phyloseq-mt-gtdb.rds", refhook = NULL)
+ps2
+
+sequences <- Biostrings::DNAStringSet(taxa_names(ps2))
+names(sequences) <- taxa_names(ps2)
+ps2 <- merge_phyloseq(ps2, sequences)
+taxa_names(ps2) <- paste0("ASV",seq(ntaxa(ps2)))
+
+sample_names(ps2) <- sapply(strsplit(as.character(sample_names(ps2)),'-16S'), "[", 1)
+```
+
+Import the metagenomic dataset with taxonomic assignment based on GTDB (Parks et al., 2018) stored as a phyloseq object (McMurdie et al., 2013) resulting from Kraken2/Bracken (Wood et al., 2016, Wood et al., 2019, Lu et al. 2017).
+
+```{r import-mg-gtdb, echo = FALSE, warning = FALSE}
+githubURL <- "https://github.com/clarajegousse/mime-16s/raw/main/data/phyloseq-mg-gtdb.rds"
+download.file(githubURL, "phyloseq-mg-gtdb.rds", method = "auto")
+ps3 <- readRDS(file = "phyloseq-mg-gtdb.rds", refhook = NULL)
+ps3
+```
+
+Import the metagenomic dataset with taxonomic assignment based on custom-made NCBI Eukaryote stored as a phyloseq object (McMurdie et al., 2013) resulting from Kraken2/Bracken (Wood et al., 2016, Wood et al., 2019, Lu et al. 2017).
+
+```{r import-mg-euk, echo = FALSE, warning = FALSE}
+githubURL <- "https://github.com/clarajegousse/mime-16s/raw/main/data/phyloseq-mg-euk.rds"
+download.file(githubURL, "phyloseq-mg-euk.rds", method = "auto")
+ps4 <- readRDS(file = "phyloseq-mg-euk.rds", refhook = NULL)
+ps4
+```
+
+# Filtration and curation
+
+In the Silva metataxonomic profile, we insure that all taxa belong exclusively to the Kingdoms of Bacteria and Archaea. In this case, all taxa were either Bacteria (12733) or Archaea (430), however 355 were classified as Mitochodria (Family) and 993 as Chloroplast (Order).
+
+```{r filter-mt-silva, warning = FALSE}
+ps1 <- ps1 %>%
+  subset_taxa(Kingdom %in% c("Bacteria", "Archaea")) %>% 
+  subset_taxa(Family != "Mitochondria") %>%
+  subset_taxa(Order != "Chloroplast") %>%
+  prune_taxa(taxa_sums(.) > 0, .) 
+ps1
+```
+The exact filters are applied to the GTDB metataxonomic profile to insure that all taxa belong exclusively to the Kingdoms of Bacteria and Archaea.
+
+```{r filter-mt-gtdb, warning = FALSE}
+ps2 <- ps2 %>%
+  subset_taxa(Kingdom %in% c("Bacteria", "Archaea")) %>% 
+  subset_taxa(Family != "Mitochondria") %>%
+  subset_taxa(Order != "Chloroplast") %>%
+  prune_taxa(taxa_sums(.) > 0, .)
+ps2
+```
+
+```{r filter-mg-gtdb}
+# 5020 taxa and 14 samples
+ps3 <- ps3 %>%
+  subset_taxa(Kingdom %in% c("Bacteria", "Archaea")) %>% 
+  subset_taxa(Family != "Mitochondria") %>%
+  subset_taxa(Order != "Chloroplast") %>%
+  prune_taxa(taxa_sums(.) > 0, .)
+ps3 # 3952 taxa and 14 samples
+```
+In the metataxonomic dataset based on Silva, all observed archaea belong to the phylum Crenarchaeota, that were reclassified as Thermoproteaeota (Oren et al., 2015) and then as "Thermoproteota" by Whitman in 2018.
+
+```{r curation-bact-arch, error = FALSE, cache = FALSE}
+as.vector(sort(unique(tax_table(ps1)[tax_table(ps1)[,"Kingdom"] == "Archaea"][,"Phylum"])))
+as.vector(sort(unique(tax_table(ps2)[tax_table(ps2)[,"Kingdom"] == "Archaea"][,"Phylum"])))
+as.vector(sort(unique(tax_table(ps3)[tax_table(ps3)[,"Kingdom"] == "Archaea"][,"Phylum"])))
+
+# verifications
+#tax_table(ps1)[tax_table(ps1)[,"Phylum"] == "Crenarchaeota"][,"Phylum"] <- "Thermoproteota"
+#tax_table(ps2)[tax_table(ps2)[,"Phylum"] == "Crenarchaeota"][,"Phylum"] <- "Thermoproteota"
+#tax_table(ps3)[tax_table(ps3)[,"Phylum"] == "Crenarchaeota"][,"Phylum"] <- "Thermoproteota"
+```
+
+```{r nb-phyla-silva-vs-gtdb, warning = FALSE}
+phylum.mt.silva <- sort(unique(as.vector(t(tax_table(ps1)[, "Phylum"]))))
+phylum.mt.gtdb <- sort(unique(as.vector(t(tax_table(ps2)[, "Phylum"]))))
+
+length(phylum.mt.silva) # 21 phyla in Silva profile
+length(phylum.mt.gtdb) # 28 phyla in GTDB profile
+```
+
+In the Eukaryota dataset we also insure that all taxa are classified as Eukaryota and that the sum of each taxa in all samples is above 0. 
+
+```{r filter-mg-euk, warning = FALSE, include = TRUE, cache = FALSE}
+ps4 <- ps4 %>%
+  subset_taxa(Kingdom == "Eukaryota") %>% 
+  prune_taxa(taxa_sums(.) > 0, .)
+ps4 # 131 taxa and 14 samples
+```
+
+A total of 21 taxa are not classified at the phylum level, and only at the class level.
+
+```{r unclassifed-euk-phyla, warning = FALSE, include=TRUE, cache = FALSE}
+dim(tax_table(ps4)[is.na(tax_table(ps4)[,"Phylum"])])
+```
+We add manually the correct phylum information according to Algaebase.
+
+```{r nophylum, warning = FALSE, include = TRUE, cache = FALSE}
+as.vector(unique(tax_table(ps4)[is.na(tax_table(ps4)[,"Phylum"])][,"Class"]))
+```
+
+These five classes belong to the "Ochrophyta" Phylum according to <https://www.algaebase.org/browse/taxonomy/#99581>.
+
+```{r fix-ochrophyta, warning = FALSE, include=TRUE, cache = FALSE}
+ochrophyta_classes <- as.vector(unique(tax_table(ps4)[is.na(tax_table(ps4)[,"Phylum"])][,"Class"]))
+tax_table(ps4)[tax_table(ps4)[,"Class"] %in% ochrophyta_classes][,"Phylum"] <-  "Ochrophyta"
+```
+
+Three taxa are not classified as the Class level, and these three taxa are foramminifera and can be classified following <https://www.marinespecies.org/aphia.php?p=taxdetails&id=112112>
+
+```{r, warning = FALSE, include=TRUE, cache = FALSE}
+tax_table(ps4)[is.na(tax_table(ps4)[,"Class"])]
+
+tax_table(ps4)["2058621",] <- c("Eukaryota", "Foraminifera", "Globothalamea", 
+                                "Rotaliida", "Globobuliminidae", "Globobulimina", "sp.")
+
+tax_table(ps4)["46433",] <- c("Eukaryota", "Foraminifera", "Monothalamea", 
+                                "", "Reticulomyxidae", "Reticulomyxa", "filosa")
+
+# https://www.marinespecies.org/aphia.php?p=taxdetails&id=413538
+tax_table(ps4)["46078",] <- c("Eukaryota", "Foraminifera", "Monothalamea", 
+                                "Astrorhizida", "Saccamminidae", "Astrammina ", "rara")
+```
+
+A total of 7 taxa remain not classified at the phylum level, and only at the class level.
+```{r euk-tax-no-order}
+dim(tax_table(ps4)[is.na(tax_table(ps4)[,"Order"])])
+tax_table(ps4)[is.na(tax_table(ps4)[,"Order"])]
+```
+
+Let´s add the info about Bigelowiella natans <https://www.marinespecies.org/aphia.php?p=taxdetails&id=376277>
+```{r euk-tax-bigelowiella}
+tax_table(ps4)["227086",] <- c("Eukaryota", "Cercozoa", "Chlorarachnea", "Chlorachniida", 
+                               "Chlorarachniaceae","Bigelowiella","natans")
+```
+
+Let´s add the info about Picochlorum costavermella <https://www.marinespecies.org/aphia.php?p=taxdetails&id=13804027>
+```{r euk-tax-Picochlorum}
+tax_table(ps4)["2009235",] <- c("Eukaryota", "Chlorophyta", "Trebouxiophyceae", "Chlorellales", 
+                               "Chlorellales incertae sedis","Picochlorum","costavermella")
+
+tax_table(ps4)["1470871",] <- c("Eukaryota", "Chlorophyta", "Trebouxiophyceae", "Chlorellales", 
+                               "Chlorellales incertae sedis","Picochlorum","sp. SENEW3")
+```
+
+Reclassification of Aureococcus anophagefferens according to <https://www.algaebase.org/search/species/detail/?species_id=36719> and <https://www.marinespecies.org/aphia.php?p=taxdetails&id=375699>
+
+```{r}
+tax_table(ps4)["44056",] <- c("Eukaryota", "Ochrophyta", "Pelagophyceae", "Pelagomonadales",
+                              "Pelagomonadaceae", "Aureococcus", "anophagefferens")
+```
+
+Same with Triparma laevis <https://www.algaebase.org/search/species/detail/?species_id=48713>
+
+```{r}
+tax_table(ps4)["1534972",] <- c("Eukaryota", "Ochrophyta", "Bolidophyceae", "Parmales",
+                              "Triparmaceae", "Triparma", "laevis")
+```
+
+And reclassification of dinoflagellate as part of the Myzozoa phylum according to <https://www.marinespecies.org/aphia.php?p=taxdetails&id=19542>, also considered as part of Miozoa phylum (and Myzozoa subphylum) <https://www.algaebase.org/browse/taxonomy/#4346>.
+
+```{r}
+tax_table(ps4)[tax_table(ps4)[,"Class"] == "Dinophyceae"][,"Phylum"] <-  "Myzozoa"
+```
+
+And replace Haptista by Haptophyta which is the more common name.
+
+```{r}
+tax_table(ps4)[tax_table(ps4)[, "Phylum"] == "Haptista",] <- "Haptophyta"
+```
+
+# Compare Silva and GTDB taxonomy
+
+```{r}
+phylum.mt.silva <- sort(unique(as.vector(t(tax_table(ps1)[, "Phylum"]))))
+phylum.mt.gtdb <- sort(unique(as.vector(t(tax_table(ps2)[, "Phylum"]))))
+phylum.mg.gtdb <- sort(unique(as.vector(t(tax_table(ps3)[, "Phylum"]))))
+
+length(phylum.mt.silva) # 21 phyla in metataxonomic Silva profile
+length(phylum.mt.gtdb) # 28 phyla in metataxonomic GTDB profile
+length(phylum.mg.gtdb) # 32 phyla in metataxonomic GTDB profile
+
+phylum.mt.silva[phylum.mt.silva %!in% phylum.mt.gtdb] # 6 phyla in Silva are not in GTDB
+phylum.mt.gtdb[phylum.mt.gtdb %!in% phylum.mt.silva] # 13 phyla in GTDB are not in Silva
+
+phylum.mt.gtdb[phylum.mt.gtdb %!in% phylum.mg.gtdb] # 8
+phylum.mg.gtdb[phylum.mg.gtdb %!in% phylum.mt.gtdb] # 12
+```
+
+
+```{r silva-vs-gtdb2}
+
+rank <- "Phylum"
+melt(table(tax_table(ps1)[,"Phylum"]))
+
+```
+
+```{r silva-vs-gtdb}
+
+x <- list(
+  "MT Silva" = phylum.mt.silva, 
+  "MT GTDB" = phylum.mt.gtdb
+  #"MG GTDB" = phylum.mg.gtdb
+)
+
+ggvenn1 <- ggvenn::ggvenn(x)
+ggvenn1
+
+mg.gtdb.only <- as.data.frame(phylum.mg.gtdb[phylum.mg.gtdb %!in% phylum.mt.gtdb])
+colnames(mg.gtdb.only) <- NULL; rownames(mg.gtdb.only) <- NULL
+
+mt.gtdb.only <- as.data.frame(phylum.mt.gtdb[phylum.mt.gtdb %!in% phylum.mg.gtdb])
+colnames(mt.gtdb.only) <- NULL; rownames(mt.gtdb.only) <- NULL
+
+common <- as.data.frame(phylum.mt.gtdb[phylum.mt.gtdb %in% phylum.mg.gtdb])
+colnames(common) <- NULL; rownames(common) <- NULL
+
+```
+# Summary
+
+```{r summary-raw-df}
+# change  their name to Others in the raw dataset
+df1 <- psmelt(ps1)
+df1 <- df1[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+df1$Type <- "Raw"
+df1$Method <- "Metataxonomics"
+df1$Database <- "Silva"
+
+# change  their name to Others in the raw dataset
+df2 <- psmelt(ps2)
+df2 <- df2[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+df2$Type <- "Raw"
+df2$Method <- "Metataxonomics"
+df2$Database <- "GTDB"
+
+# change  their name to Others in the raw dataset
+df3 <- psmelt(ps3)
+df3 <- df3[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+df3$Type <- "Raw"
+df3$Method <- "Metagenomics"
+df3$Database <- "GTDB"
+
+# change  their name to Others in the raw dataset
+df4 <- psmelt(ps4)
+df4 <- df4[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+df4$Type <- "Raw"
+df4$Method <- "Metagenomics"
+df4$Database <- "NCBI Eukaryote"
+df4[is.na(df4$Phylum),]
+```
+
+# Normalisation
+
+```{r normalisation}
+nps1 <- microbiome::transform(ps1, transform = "compositional")
+ndf1 <- psmelt(nps1)
+ndf1 <- ndf1[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+ndf1$Type <- "Relative"
+ndf1$Database <- "Silva"
+ndf1$Method <- "Metataxonomics"
+
+nps2 <- microbiome::transform(ps2, transform = "compositional")
+ndf2 <- psmelt(nps2) # create dataframe from phyloseq object
+ndf2 <- ndf2[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+ndf2$Type <- "Relative"
+ndf2$Database <- "GTDB"
+ndf2$Method <- "Metataxonomics"
+
+nps3 <- microbiome::transform(ps3, transform = "compositional") # get abundance in %
+ndf3 <- psmelt(nps3) # create dataframe from phyloseq object
+ndf3 <- ndf3[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+ndf3$Type <- "Relative"
+ndf3$Database <- "GTDB"
+ndf3$Method <- "Metagenomics"
+
+nps4 <- microbiome::transform(ps4, transform = "compositional") # get abundance in %
+ndf4 <- psmelt(nps4) # create dataframe from phyloseq object
+ndf4 <- ndf4[c("OTU", "Sample", "Abundance", "stn", "year", "season", "region", "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species")]
+ndf4$Type <- "Relative"
+ndf4$Database <- "NCBI Eukaryote"
+ndf4$Method <- "Metagenomics"
+```
+
+
+# Summarise dataframes
+
+```{r summary-df}
+# everything
+df <- rbind(df1, ndf1, df2, ndf2, df3, ndf3, df4, ndf4)
+
+colnames(df) <-  c("OTU", "Sample", "Abundance", "Station", "Year", "Season", "Region", 
+                  "Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", 
+                   "Type", "Method", "Database") 
+
+df$Sample <- sapply(strsplit(as.character(df$Sample),'-16S'), "[", 1)
+
+df$Region <- factor(
+  df$Region, 
+  levels = c( "North", "South"))
+
+df$Season <- factor(
+  df$Season, 
+  levels = c( "Spring", "Summer"))
+
+df$Station <- factor(
+  df$Station, 
+  levels = c( "SI8", "SI3", "SB2", "SB5"))
+
+df$Method <- factor(
+  df$Method, 
+  levels = c("Metataxonomics", "Metagenomics"))
+
+df$Database <- factor(
+  df$Database, 
+  levels = c("Silva", "GTDB", "NCBI Eukaryote"))
+
+# only normalise
+ndf <- df[df$Type == "Relative",]
+
+phy2 <- ndf2 %>%
+    group_by(Phylum) %>%
+    dplyr::summarize(Mean = mean(Abundance, na.rm=TRUE)) %>%
+  filter(Mean >= 0.0005) %>%
+  select(Phylum) %>% pull(Phylum)
+
+phy3 <- ndf3 %>%
+    group_by(Phylum) %>%
+    dplyr::summarize(Mean = mean(Abundance, na.rm=TRUE)) %>%
+  filter(Mean >= 0.0005) %>%
+  select(Phylum) %>% pull(Phylum)
+
+phy4 <- ndf4 %>%
+    group_by(Phylum) %>%
+    dplyr::summarize(Mean = median(Abundance, na.rm=TRUE)) %>%
+  filter(Mean >= 0.0005) %>%
+  select(Phylum) %>% pull(Phylum)
+
+phylum_to_display <- unique(c(phy2, phy3, phy4))
+
+```
+
+# Visualise the Microbial community composition overview
+
+We ordered the phylum names bu kingdom for visualization.
+
+```{r phylum-colours, warning = FALSE}
+df$Phyla <- df$Phylum
+df[df$Phyla %!in% phylum_to_display,]$Phyla <- "Others"
+
+df$Phyla <- factor(
+  df$Phyla, 
+  # order phyla according to kingdom
+  levels = c(
+    #Archaea
+    "Asgardarchaeota", "Thermoproteota",
+    
+    # Bacteria
+    "Actinobacteriota", "Bacteroidota", "Cyanobacteria", "Proteobacteria", "Verrucomicrobiota",
+    
+    #Eukaryotes
+    "Bacillariophyta", "Cercozoa", "Chlorophyta", "Foraminifera", "Haptophyta", "Myzozoa", "Ochrophyta",
+    
+    "Others")
+  )
+```
+
+We draw the overview plot including the profiles based on all four datasets (metagenomics-silva, metagenomics-gtdb, metagenomic-gtdb, metagenomic-euk). This plot will be a supplementary figures or in the response to the reviewer. 
+
+```{r, fig.dim = c(6, 9)}
+
+# global plot
+ggplot(df[df$Type =="Relative",] %>%
+  group_by(Phyla), 
+       aes(x = Year, y = Abundance)) + 
+  geom_col(aes(fill = Phyla),
+           position = position_stack(reverse = TRUE)) + 
+  scale_fill_manual(values = colorRampPalette(c(Grapefruit, Orange, Sunflower, Grass, Mint, Aqua, Jeans, Lavender, LightGrey))(length(unique(df$Phyla)))) +
+  facet_grid(Method+Database+Region+Station~Year+Season, scales = 'free_x', space = 'free_x') +
+  labs(title = "Relative proportions of phyla") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  geom_hline(yintercept=0) +
+  theme(legend.position = "right",
+                           axis.title.x = element_blank(), 
+                           axis.text.x = element_blank(), 
+                           axis.ticks.x = element_blank())
+
+# save as Supplementary figure S1
+ggsave2(
+  "Figure-S1.png",
+  plot = ggplot2::last_plot(),
+  scale = 1,
+  width = 24,
+  height = 32,
+  units = "cm",
+  dpi = 300
+)
+```
+
+We focus on the three datasets (GTDB and Eukaryote)
+
+```{r,  fig.dim = c(6, 9)}
+# global plot
+ggplot(df[df$Type =="Relative" & df$Database != "Silva",], aes(x = Year, y = Abundance)) + 
+  geom_col(aes(fill = Phyla),
+           position = position_stack(reverse = TRUE)) + 
+  scale_fill_manual(values = colorRampPalette(c(Grapefruit, Orange, Sunflower, Grass, Mint, Aqua, Jeans, Lavender, LightGrey))(length(unique(df$Phyla)))) +
+  facet_grid(Method+Database+Region+Station~Year+Season, 
+             scales = 'free_x', space = 'free_x') +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  geom_hline(yintercept=0) +
+  labs(title = "Relative proportions of phyla") +
+  theme(legend.position = "right",
+                           axis.title.x = element_blank(), 
+                           axis.text.x = element_blank(), 
+                           axis.ticks.x = element_blank())
+
+# Save the second figure (Figure 1 is the map of Iceland)
+ggsave2(
+  "Figure-2.png",
+  plot = ggplot2::last_plot(),
+  scale = 2.5,
+  width = 9,
+  height = 12,
+  units = "cm",
+  dpi = 300
+)
+```
+
+# Compare relative proportions of phyla between methods
+
+```{r compare-mt-mg, warning = FALSE}
+# bind the two dataset of relative abundances for MT and MG
+df <- rbind(ndf2, ndf3)
+
+chi.res.tab <- data.frame()
+for (y in c("2016", "2017", "2018")) {
+  for (s in c("Spring", "Summer")) {
+    for (l in c("SI8", "SI3", "SB2", "SB5")) {
+
+      mg <- df[df$Method == "Metagenomics" &
+      df$year == y & 
+      df$season == s &
+      df$stn == l,]
+      
+       mt <- df[df$Method == "Metataxonomics" &
+          df$year == y & 
+            df$season == s & 
+            df$stn == l,] 
+       
+       
+      if(nrow(mg) > 0 & nrow(mt) > 0){
+      
+        prop.mg <- aggregate(mg$Abundance, by=list(Category=mg$Phylum), FUN=sum)
+        prop.mt <- aggregate(mt$Abundance, by=list(Category=mt$Phylum), FUN=sum)
+        
+        prop <- full_join(prop.mt, prop.mg, by="Category")
+        colnames(prop) <- c("Category", "MT", "MG") 
+        prop[is.na(prop)] <- 0 
+        prop <- na.omit(prop[prop$MT != 0 & prop$MG != 0,])
+        
+        # xtable::xtable(prop, digits = 3)
+        
+        chi.res <- chisq.test(prop$MT, prop$MG)
+        
+        chi.res.tab <- rbind(chi.res.tab, cbind(y,s,l, chi.res$statistic, chi.res$p.value))
+      }
+    }
+  }
+}
+chi.res.tab
+colnames(chi.res.tab) <- c("Year", "Season", "Station", "X-squared", "p-value")
+chi.res.tab[,5] <- as.numeric(chi.res.tab[,5])
+xtable::xtable(chi.res.tab, digits = 4)
+
+```
+
+# Alpha diversity
+
+## Calculate alpha diversity indices
+
+```{r alpha-div}
+min_lib <- min(sample_sums(ps2))
+sample_names(ps2) <- sample_data(ps2)$smp.num
+
+# Initialize matrices to store richness and evenness estimates
+nsamp = nsamples(ps2)
+trials = 100
+
+# Chao1
+chao1 <- matrix(nrow = nsamp, ncol = trials)
+row.names(chao1) <- sample_names(ps2)
+
+# Shannon
+shannon <- matrix(nrow = nsamp, ncol = trials)
+row.names(shannon) <- sample_names(ps2)
+
+ntaxa <- matrix(nrow = nsamp, ncol = trials)
+row.names(ntaxa) <- sample_names(ps2)
+
+# It is always important to set a seed when you subsample so your result is replicable 
+set.seed(3)
+
+for (i in 1:100) {
+  # Subsample
+  r <- rarefy_even_depth(ps2, sample.size = min_lib, verbose = FALSE, replace = TRUE)
+  
+  # chao1
+  c <- as.numeric(as.matrix(estimate_richness(r, measures = "Chao1")$Chao1))
+  chao1[ ,i] <- c
+
+  # Calculate shannon
+  shan <- as.numeric(as.matrix(estimate_richness(r, measures = "Shannon")))
+  shannon[ ,i] <- shan
+  
+  ntaxa[ ,i] <- ntaxa(r)
+  #print(ntaxa(r))
+}
+
+ntax <-  round(mean(ntaxa), digit = 0)
+
+
+```
+
+## Summarise alpha diversity measures
+
+```{r alpha-div-summary}
+# Create a new dataframe to hold the means and standard deviations of richness estimates
+smp.num <- row.names(chao1)
+mean <- apply(chao1, 1, mean)
+sd <- apply(chao1, 1, sd)
+measure <- rep("Chao1", nsamp)
+chao1_stats <- data.frame(smp.num, mean, sd, measure)
+
+smp.num <- row.names(shannon)
+mean <- apply(shannon, 1, mean)
+sd <- apply(shannon, 1, sd)
+measure <- rep("Shannon", nsamp)
+shan_stats <- data.frame(smp.num, mean, sd, measure)
+
+alpha <- rbind(shan_stats, chao1_stats)
+
+s <- data.frame(sample_data(ps2))
+alphadiv <- merge(alpha, s, by = "smp.num") 
+
+chao1 <-  alphadiv[alphadiv$season == "Spring" & alphadiv$measure == "Chao1",]
+chao1$currents <- NA
+chao1[chao1$stn == "SI8",]$currents <- "East Greenland current"
+chao1[chao1$stn == "SI3",]$currents <- "Coastal current"
+chao1[chao1$stn == "SB2",]$currents <- "Coastal current"
+chao1[chao1$stn == "SB5",]$currents <- "North Atlantic current"
+
+chao1$waters <- NA
+chao1[chao1$stn %in% c("SI3", "SB2"),]$waters <- "Coastal"
+chao1[chao1$stn %in% c("SI8", "SB5"),]$waters <- "Oceanic"
+
+
+shannon <- alphadiv[alphadiv$season == "Spring" & alphadiv$measure == "Shannon",]
+shannon$currents <- NA
+shannon[shannon$stn == "SI8",]$currents <- "East Greenland current"
+shannon[shannon$stn == "SI3",]$currents <- "Coastal current"
+shannon[shannon$stn == "SB2",]$currents <- "Coastal current"
+shannon[shannon$stn == "SB5",]$currents <- "North Atlantic current"
+
+shannon$waters <- NA
+shannon[shannon$stn %in% c("SI3", "SB2"),]$waters <- "Coastal"
+shannon[shannon$stn %in% c("SI8", "SB5"),]$waters <- "Oceanic"
+
+```
+
+## Rarefaction curves
+
+```{r rarefaction-curves}
+
+psdata <- ps2
+psdata
+sample_sums(psdata)
+
+set.seed(42)
+
+calculate_rarefaction_curves <- function(psdata, measures, depths) {
+  require('plyr') # ldply
+  require('reshape2') # melt
+  
+  estimate_rarified_richness <- function(psdata, measures, depth) {
+    if(max(sample_sums(psdata)) < depth) return()
+    psdata <- prune_samples(sample_sums(psdata) >= depth, psdata)
+    
+    rarified_psdata <- rarefy_even_depth(psdata, depth, verbose = FALSE)
+    
+    alpha_diversity <- estimate_richness(rarified_psdata, measures = measures)
+    
+    # as.matrix forces the use of melt.array, which includes the Sample names (rownames)
+    molten_alpha_diversity <- melt(as.matrix(alpha_diversity), varnames = c('smp.num', 'Measure'), value.name = 'Alpha_diversity')
+    
+    molten_alpha_diversity
+  }
+  
+  names(depths) <- depths # this enables automatic addition of the Depth to the output by ldply
+  rarefaction_curve_data <- ldply(depths, estimate_rarified_richness, psdata = psdata, measures = measures, .id = 'Depth', .progress = ifelse(interactive(), 'text', 'none'))
+  
+  # convert Depth from factor to numeric
+  rarefaction_curve_data$Depth <- as.numeric(levels(rarefaction_curve_data$Depth))[rarefaction_curve_data$Depth]
+  
+  rarefaction_curve_data
+}
+
+rarefaction_curve_data <- calculate_rarefaction_curves(psdata, c('Chao1', 'Shannon'), rep(c(1, 10, 100, 1000, 1:100 * 10000), each = 10))
+summary(rarefaction_curve_data)
+
+rarefaction_curve_data_summary <- ddply(rarefaction_curve_data, c('Depth', 'smp.num', 'Measure'), summarise, Alpha_diversity_mean = mean(Alpha_diversity), Alpha_diversity_sd = sd(Alpha_diversity))
+
+rarefaction_curve_data_summary$smp.num <- gsub("\\.", "-", rarefaction_curve_data_summary$smp.num)
+
+rarefaction_curve_data_summary_verbose <- merge(rarefaction_curve_data_summary, data.frame(sample_data(psdata)), by.x = 'smp.num', by.y = 'row.names')
+
+rarefaction_curve_data_summary_verbose
+
+ggplot(
+  data = rarefaction_curve_data_summary_verbose[rarefaction_curve_data_summary_verbose$Measure != "se.chao1",],
+  mapping = aes(
+    x = Depth,
+    y = Alpha_diversity_mean,
+    ymin = Alpha_diversity_mean - Alpha_diversity_sd,
+    ymax = Alpha_diversity_mean + Alpha_diversity_sd,
+    colour = stn.name,
+    group = smp.num)) + 
+  geom_line(size = 1) + 
+  scale_colour_manual(values = c(Grass, Grapefruit, Grass, Aqua), 
+                      name = "Station") +
+  facet_wrap(facets = region ~ Measure, scales = 'free_y') + 
+  theme(aspect.ratio = 1)
+
+# save as Supplementary figure S2
+ggsave2(
+  "Figure-S2.png",
+  plot = ggplot2::last_plot(),
+  scale = 0.75,
+  width = 24,
+  height = 18,
+  units = "cm",
+  dpi = 300
+)
+
+```
+
+
+
+## Visualise alpha diversity metrics over time
+
+```{r alpha-div-viz, warning = FALSE}
+p.chao1 <- ggplot(chao1, aes(x = date, y = mean, shape = waters, color = currents)) +
+  geom_point(size = 4) + 
+  geom_line(size = 0.8) +
+  stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")), 
+           label.x.npc = c("left", "left", "left", "left"),label.y.npc = c("bottom", "bottom", "top", "top")) +
+  facet_wrap(~ region, ncol = 1, scales = "free") +
+  scale_color_manual(values = c(Grass, Aqua, Grapefruit), name = "Currents") +
+  scale_shape_manual(values = c(19, 17), name = "Depth of the station", label = c("Shallow station", "Deep station")) +
+  labs(title = "Chao1") + ylab("") +
+  lims(y = c(25, 200)) 
+
+p.shannon <- ggplot(shannon, aes(x = date, y = mean, shape = waters, color = currents)) +
+  geom_point(size = 4) + 
+  geom_line(size = 0.8) +
+  stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")), 
+           label.x.npc = c("left", "left", "left", "left"),label.y.npc = c("bottom", "top", "top", "top")) +
+  facet_wrap(~ region, ncol = 1, scales = "free") +
+  scale_color_manual(values = c(Grass, Aqua, Grapefruit), name = "Currents") +
+  scale_shape_manual(values = c(19, 17), name = "Depth of the station", label = c("Shallow station", "Deep station")) +
+  labs(title = "Shannon") + ylab("") 
+
+legend <- get_legend(p.chao1)
+
+plot_grid(p.chao1 +theme(legend.position = "none"), 
+          p.shannon + theme(legend.position = "none"), 
+          legend, labels = c("A", "B"), ncol = 3)
+
+# save as figure 3
+ggsave2(
+  "Figure-3.png",
+  plot = ggplot2::last_plot(),
+  scale = 1,
+  width = 24,
+  height = 15,
+  units = "cm",
+  dpi = 300
+)
+
+```
+
+## Statistical summary of alpha diversity metrics
+
+```{r alpha-div-stat}
+chao1.df <- rbind(
+data.frame(
+  Group = c("North", "South"),
+  Average = c(formatC(mean(chao1[chao1$region == "North",]$mean), digits= 2, format = "f"),
+              formatC( mean(chao1[chao1$region == "South",]$mean), digits= 2, format = "f")),
+  SD = c(formatC(sd(chao1[chao1$region == "North",]$mean), digits= 2, format = "f"),
+         formatC(sd(chao1[chao1$region == "South",]$mean), digits= 2, format = "f")),
+  Minimum = c(formatC(min(chao1[chao1$region == "North",]$mean), digits= 2, format = "f"),
+              formatC(min(chao1[chao1$region == "South",]$mean), digits= 2, format = "f")),
+  Maximum = c(formatC(max(chao1[chao1$region == "North",]$mean), digits= 2, format = "f"),
+              formatC(max(chao1[chao1$region == "South",]$mean), digits= 2, format = "f"))
+  ),
+data.frame(
+  Group= c("Coastal", "Oceanic"),
+  Average = c(formatC(mean(chao1[chao1$waters == "Coastal",]$mean), digits= 2, format = "f"),
+              formatC( mean(chao1[chao1$waters == "Oceanic",]$mean), digits= 2, format = "f")),
+  SD = c(formatC(sd(chao1[chao1$waters == "Coastal",]$mean), digits= 2, format = "f"),
+         formatC(sd(chao1[chao1$waters == "Oceanic",]$mean), digits= 2, format = "f")),
+  Minimum = c(formatC(min(chao1[chao1$waters == "Coastal",]$mean), digits= 2, format = "f"),
+              formatC(min(chao1[chao1$waters == "Oceanic",]$mean), digits= 2, format = "f")),
+  Maximum = c(formatC(max(chao1[chao1$waters == "Coastal",]$mean), digits= 2, format = "f"),
+              formatC(max(chao1[chao1$waters == "Oceanic",]$mean), digits= 2, format = "f"))
+))
+
+shannon.df <- rbind(
+data.frame(
+  Group = c("North", "South"),
+  Average = c(formatC(mean(shannon[shannon$region == "North",]$mean), digits= 2, format = "f"),
+              formatC( mean(shannon[shannon$region == "South",]$mean), digits= 2, format = "f")),
+  SD = c(formatC(sd(shannon[shannon$region == "North",]$mean), digits= 2, format = "f"),
+         formatC(sd(shannon[shannon$region == "South",]$mean), digits= 2, format = "f")),
+  Minimum = c(formatC(min(shannon[shannon$region == "North",]$mean), digits= 2, format = "f"),
+              formatC(min(shannon[shannon$region == "South",]$mean), digits= 2, format = "f")),
+  Maximum = c(formatC(max(shannon[shannon$region == "North",]$mean), digits= 2, format = "f"),
+              formatC(max(shannon[shannon$region == "South",]$mean), digits= 2, format = "f"))
+  ),
+data.frame(
+  Group= c("Coastal", "Oceanic"),
+  Average = c(formatC(mean(shannon[shannon$waters == "Coastal",]$mean), digits= 2, format = "f"),
+              formatC( mean(shannon[shannon$waters == "Oceanic",]$mean), digits= 2, format = "f")),
+  SD = c(formatC(sd(shannon[shannon$waters == "Coastal",]$mean), digits= 2, format = "f"),
+         formatC(sd(shannon[shannon$waters == "Oceanic",]$mean), digits= 2, format = "f")),
+  Minimum = c(formatC(min(shannon[shannon$waters == "Coastal",]$mean), digits= 2, format = "f"),
+              formatC(min(shannon[shannon$waters == "Oceanic",]$mean), digits= 2, format = "f")),
+  Maximum = c(formatC(max(shannon[shannon$waters == "Coastal",]$mean), digits= 2, format = "f"),
+              formatC(max(shannon[shannon$waters == "Oceanic",]$mean), digits= 2, format = "f"))
+))
+
+xtable::xtable(chao1.df, digits = 3, caption = "Statistical summary of alpha diversity with Chao1 indices.")
+
+xtable::xtable(shannon.df, caption = "Statistical summary of alpha diversity with Shannon indices.")
+```
+
+# Ordinations
+
+Import complete set of environmental data
+
+```{r import-env-plus}
+githubURL <- "https://github.com/clarajegousse/mime-16s/raw/main/data/env_plus.rds"
+download.file(githubURL, "env_plus.rds", method = "auto") # change Method to libcurl for unix
+env.plus<- readRDS(file = "env_plus.rds", refhook = NULL)
+row.names(env.plus) <- env.plus$smp.num
+```
+
+## Unconstrained ordinations
+
+```{r ordinations, warning = FALSE}
+
+source_url("https://raw.githubusercontent.com/DenefLab/MicrobeMiseq/7e6bc9a860d9208060b2760bb87ba87387870ea4/R/miseqR.R")
+# Scale reads to even depth
+ps_scale <- ps2 %>%
+  scale_reads(n = median(sample_sums(ps2)), round = "round") 
+sample_data(ps_scale) <- env.plus
+
+# here are the sample data (environmental data) used to build the phyloseq object
+# sample_data(ps_scale)
+
+# Fix month levels in sample_data
+sample_data(ps_scale)$season <- factor(
+  sample_data(ps_scale)$season,
+  levels = c("Winter", "Spring", "Summer"))
+
+sample_data(ps_scale)$Currents <- NA
+sample_data(ps_scale)[sample_data(ps_scale)$stn == "SI8",]$Currents <- "East Greenland current"
+sample_data(ps_scale)[sample_data(ps_scale)$stn == "SI3",]$Currents <- "Coastal current"
+sample_data(ps_scale)[sample_data(ps_scale)$stn == "SB2",]$Currents <- "Coastal current"
+sample_data(ps_scale)[sample_data(ps_scale)$stn == "SB5",]$Currents <- "North Atlantic current"
+
+sample_data(ps_scale)$Waters <- NA
+sample_data(ps_scale)[sample_data(ps_scale)$stn %in% c("SI3", "SB2"),]$Waters <- "Coastal"
+sample_data(ps_scale)[sample_data(ps_scale)$stn %in% c("SI8", "SB5"),]$Waters <- "Oceanic"
+
+sample_data(ps_scale)$stn <- factor(
+  sample_data(ps_scale)$stn,
+  levels = c("SI008", "SI003", "SB002", "SB005"),
+  labels = c("North Oceanic (SI8)", "North Coastal (SI3)", 
+             "South Coastal (SB2)", "South Oceanic (SB5)"))
+
+# Ordinate
+ps_pcoa <- ordinate(
+  physeq = ps_scale,
+  method = "PCoA",
+  distance = "bray")
+
+ord <- plot_ordination(physeq = ps_scale,
+  ordination = ps_pcoa,
+  shape = "Waters",
+  color = "Currents",
+  title = "MDS/PCoA (Bray-Curtis)") +
+  scale_color_manual(values = c(Grass, Aqua, Bittersweet)) +
+  geom_point(alpha = 0.75, size = 6) +
+  #geom_point(colour = LightGrey, size = 1.5, alpha = 0.9) +
+  guides(color = guide_legend(ncol=1),
+         shape = guide_legend(ncol=1)) +
+  stat_ellipse(type = "norm", linetype = 2) +
+  stat_ellipse(type = "t") +
+  lims(x = c(-.9, 0.9), y = c(-.6, 0.6))
+
+# Permanova
+set.seed(1)
+
+# Calculate bray curtis distance matrix
+ps_bray <- phyloseq::distance(ps_scale, method = "bray")
+
+# make a data frame from the sample_data 
+sampledf <- data.frame(sample_data(ps_scale))
+
+# Adonis test
+adonis2(ps_bray ~ region, data = sampledf) 
+adonis2(ps_bray ~ Currents, data = sampledf) 
+adonis2(ps_bray ~ date, data = sampledf)
+#adonis2(ps_bray ~ stn, data = sampledf)
+adonis2(ps_bray ~ Waters, data = sampledf)
+
+
+```
+
+## Constrained ordinations
+
+```{r constrained-ord, warning = FALSE}
+# Remove data points with missing metadata 
+ps_not_na <- ps_scale %>%
+  subset_samples(
+    !is.na(temp.avg) & 
+      !is.na(salt.avg) &
+      !is.na(po4.avg) & 
+      !is.na(sio2.avg) & 
+      !is.na(no3.avg) &
+      !is.na(chl.a) &
+      !is.na(reit.diff) &
+      !is.na(phaeo) &
+      !is.na(rfsu) &
+      season == "Spring"
+  )
+
+bray_not_na <- phyloseq::distance(physeq = ps_not_na, method = "bray")
+
+# CAP ordinate
+cap_ord <- ordinate(
+  physeq = ps_not_na,
+  method = "CAP",
+  distance = bray_not_na,
+  formula = ~ temp.avg + sio2.avg + no3.avg + chl.a + phaeo
+)
+
+anova(cap_ord)
+
+# Now add the environmental variables as arrows 
+arrowmat <- vegan::scores(cap_ord, display = "bp")
+
+# Add labels, make a data.frame
+arrowdf <- data.frame(labels = rownames(arrowmat), arrowmat)
+
+# Define the arrow aesthetic mapping
+arrow_map <- aes(xend = CAP1, 
+                 yend = CAP2, 
+                 x = 0, 
+                 y = 0, 
+                 shape = NULL, 
+                 color = NULL, 
+                 label = labels)
+
+label_map <- aes(x = 1.3 * CAP1, 
+                 y = 1.3 * CAP2, 
+                 shape = NULL, 
+                 color = NULL, 
+                 label = labels)
+
+arrowhead = arrow(length = unit(0.02, "npc"))
+
+# CAP plot
+cap_plot <- plot_ordination(
+  physeq = ps_not_na,
+  ordination = cap_ord,
+  color = "Currents",
+  title = "CAP (Bray-Custis)",
+  axes = c(1,2)) +
+  aes(shape = Waters) +
+  geom_point(aes(colour = Currents), alpha = 0.75, size = 7) +
+  scale_color_manual(values = c(Grass, Aqua, Bittersweet)) +
+  geom_point(colour = LightGrey, size = 1.5, alpha = 0.75)
+
+# Make a new graphic
+cap <- cap_plot +
+  geom_segment(
+    mapping = arrow_map, 
+    size = .5, 
+    data = arrowdf, 
+    color = "gray", 
+    arrow = arrowhead
+  ) +
+  geom_text(
+    mapping = label_map, 
+    size = 4,  
+    data = arrowdf, 
+    show.legend = FALSE
+  ) +
+  guides(color = guide_legend(ncol=1),
+         shape = guide_legend(ncol=1))
+
+```
+
+Now let's make the figure
+
+```{r ord-viz, warning = FALSE}
+
+legend <- get_legend(
+  # create some space to the left of the legend
+  ord + theme(legend.box.margin = margin(0, 0, 0, 12),
+               legend.direction = "vertical",
+               legend.box = 'vertical',
+               legend.box.just = "left")
+)
+
+prow <- plot_grid(
+  ord + theme(legend.position="none", aspect.ratio = 1),
+  cap + theme(legend.position="none", aspect.ratio = 1) + 
+    lims(x = c(-2,2), y = c(-2,2)),
+  align = 'h',
+  labels = c("A", "B"),
+  hjust = -1,
+  nrow = 1, 
+  rel_widths = c(1, 1)
+)
+prow
+
+plot_grid(prow, legend, align = 'hv',
+          ncol = 2, rel_widths = c(.9, .25))
+
+# save as figure 3
+ggsave2(
+  "Figure-4.png",
+  plot = ggplot2::last_plot(),
+  scale = 1,
+  width = 24,
+  height = 12,
+  units = "cm",
+  dpi = 300
+)
+
+
+```
+
+
+# Core taxa
+
+```{r core-taxa, warning = FALSE}
+library(phylosmith)
+
+set.seed(TRUE)
+
+core.gtdb <- taxa_core(tax_glom(ps2, taxrank = "Species",  NArm=FALSE), 
+                       treatment = "region", subset = NULL, 
+                     frequency = 0.5, abundance_threshold = 0.01)
+
+tax_table(core.gtdb)
+dim(tax_table(core.gtdb))
+
+prop <- taxa_proportions(core.gtdb, 'Species', treatment = c("region"))
+
+prop.df <- as.data.frame(prop)
+prop.df <- left_join(prop.df, as.data.frame(tax_table(ps2)), by = "Species")
+
+prop.df<- prop.df[c("region", "Phylum", "Class", "Order", "Family", "Genus", "Species", "Proportion")]
+
+core_taxa <- as.data.frame(na.omit(unique(prop.df[,6:7])))
+
+write.csv(as.vector(unique(na.omit(prop.df[,7]))))
+
+variable_correlation_heatmap(core.gtdb, 
+                             variables = c('temp.avg'), # 'sio2.avg', 'no3.avg', "phaeo", "chl.a"
+                             treatment = c('region'),
+                             classification = 'Genus', method = 'spearman', cores = 1,
+                             colors = c(Jeans, Aqua, Grass, Sunflower),
+                             limits = c(-1, 1),
+                             significance_color = 'white')
+
+```
+
+
+
+# Differential phyla
+
+```{r compare-means-phylum-lvl, warning = FALSE, fig.dim = c(6, 9)}
+
+# https://doi.org/10.1186/s12859-019-2744-2
+# confirm that wilcoxon is suitable
+
+compare_means(Abundance ~ region , data = ndf1, group.by = "Phylum", method = "wilcox.test") %>%
+  mutate(p.fdr = p.adjust(p, method="fdr"),
+         p.sig = ifelse(p < .05, "*", ""),
+         p.fdr.sig = ifelse(p.fdr < .05, "*", "")) %>% 
+  filter(p.signif != "ns") %>% 
+  select(Phylum)
+# Cyanobacteria
+
+compare_means(Abundance ~ region , data = ndf2, group.by = "Phylum", method = "wilcox.test") %>%
+  mutate(p.fdr = p.adjust(p, method="fdr"),
+         p.sig = ifelse(p < .05, "*", ""),
+         p.fdr.sig = ifelse(p.fdr < .05, "*", "")) %>% 
+  filter(p.signif != "ns") %>% 
+  select(Phylum) # Cyanobacteria	Thermoplasmatota
+
+compare_means(Abundance ~ region , data = ndf3, group.by = "Phylum", method = "wilcox.test") %>%
+  mutate(p.fdr = p.adjust(p, method="fdr"),
+         p.sig = ifelse(p < .05, "*", ""),
+         p.fdr.sig = ifelse(p.fdr < .05, "*", "")) %>% 
+  filter(p.signif != "ns") %>% 
+  select(Phylum)
+
+compare_means(Abundance ~ region , data = ndf4, group.by = "Phylum", method = "wilcox.test") %>%
+  mutate(p.fdr = p.adjust(p, method="fdr"),
+         p.sig = ifelse(p < .05, "*", ""),
+         p.fdr.sig = ifelse(p.fdr < .05, "*", "")) %>% 
+  filter(p.signif != "ns") %>% 
+  select(Phylum) # Chlorophyta
+
+
+#ndf <- df[df$Type == "Relative" & ndf$Database != "Silva",]
+ndf <- rbind(ndf2, ndf3, ndf4)
+
+ndf$Method <- factor(
+  ndf$Method, 
+  levels = c("Metataxonomics", "Metagenomics"))
+
+ndf$Database <- factor(
+  ndf$Database, 
+  levels = c("GTDB", "NCBI Eukaryote"))
+
+ggboxplot(ndf, x = "region", y = "Abundance",
+               fill = "region", palette = c(Jeans, Grapefruit),
+               add = "jitter", add.params = list(shape = 21),
+               facet.by = "Phylum+Method", 
+               short.panel.labs = TRUE) +
+  lims(y=c(0,0.5)) + labs(x = "") +
+stat_compare_means(label = "p.signif", label.x = 1.25, label.y = 0.4, size = 5) + 
+theme_pubclean() + theme(legend.position = "none")
+
+ggboxplot(ndf[ndf$Phylum == "Chlorophyta",], x = "region", y = "Abundance",
+               fill = "region", palette = c(Jeans, Grapefruit),
+               add = "jitter", add.params = list(shape = 21)) +
+  lims(y=c(0,0.1)) + labs(x = "") + scale_y_log10() +
+  stat_compare_means(label = "p.format", label.x = 1.25, label.y = 0.4, size = 5)
+
+ndf[ndf$Phylum == "Chlorophyta" & ndf$Genus == "Bathycoccus",] %>%
+     group_by(region,Species) %>%
+     summarise_at(vars(Abundance), funs(mean(., na.rm=TRUE)))
+
+ndf[ndf$Phylum == "Chlorophyta" & ndf$Genus == "Micromonas",] %>%
+     group_by(region,Species) %>%
+     summarise_at(vars(Abundance), funs(mean(., na.rm=TRUE), sd(., na.rm=TRUE)))
+
+```
+
+# Differential taxa 
+
+We compare the average proportions of taxa at the genus level between the north and south of Iceland.
+
+```{r comp-mean-prop-genera-mt, warning = FALSE, error = FALSE}
+genus_comparison_mt <- compare_means(Abundance ~ region, data = ndf2, group.by = "Genus", method = "wilcox.test")
+head(genus_comparison_mt)
+
+genus_diff_mt_gtdb <- c(genus_comparison_mt %>% 
+  filter(p.signif != "ns") %>% 
+  filter(p < 0.01) %>%
+  select(Genus))
+
+# Adjusting for the FDR by hand
+genus_comparison_mt_gtdb <- genus_comparison_mt %>%
+  mutate(p.fdr = p.adjust(p, method="fdr"),
+         p.sig = ifelse(p < .05, "*", ""),
+         p.fdr.sig = ifelse(p.fdr < .05, "*", ""))
+
+genus_comparison_mt_gtdb_adj <- genus_comparison_mt_gtdb %>% 
+  filter(p.fdr.sig == "*") %>% 
+  select(Genus)
+head(genus_comparison_mt_gtdb_adj )
+
+diff_taxa <- as.data.frame(unique(na.omit(ndf2[ndf2$Genus %in% genus_comparison_mt_gtdb_adj$Genus, c("Genus", "Species")])))
+
+```
+
+```{r comp-mean-prop-genera-mg, warning = FALSE}
+genus_comparison_mg <- compare_means(Abundance ~ region, data = ndf[ndf$Method == "Metagenomics" & ndf$Database == "GTDB",], group.by = "Genus", method = "wilcox.test") 
+
+genus_diff_mg_gtdb <- c(genus_comparison_mg %>% 
+  filter(p.signif != "ns") %>% 
+  filter(p < 0.01) %>%
+  select(Genus))
+
+# Adjusting for the FDR by hand
+genus_comparison_mg_gtdb <- genus_comparison_mg %>%
+  mutate(p.fdr = p.adjust(p, method="fdr"),
+         p.sig = ifelse(p < .05, "*", ""),
+         p.fdr.sig = ifelse(p.fdr < .05, "*", ""))
+
+genus_comparison_mg_gtdb_adj <- genus_comparison_mg_gtdb %>% 
+  filter(p.fdr.sig == "*") %>% 
+  select(Genus) %>%
+  filter(Genus %in% genus_comparison_mt_gtdb_adj$Genus)
+
+genus_comparison_mg_gtdb_adj
+```
+
+We look at the difference of relative abundance of the eukaryotic taxa at the genus level between the north and south shelves of Iceland. Only two genera - Bathycoccus and Reticulomyxa - show significant difference in relative abundance between the samples collected north vs. south of Iceland. 
+
+Bathycoccus usually represents about 10% of Mamiellophyceae, but up to 40% of Mamiellophyceae around Iceland (Tragin et al., 2019).
+
+Reticulomyxa on the other hand, is known as a freshwater species. It has been expected to find similar so-called "naked foraminifera" in the marine environment (Pawlowski et al., 1999).
+
+
+```{r comp-mean-prop-genera-euk, warning = FALSE}
+genus_comparison_euk <- compare_means(Abundance ~ region, data = ndf4, group.by = "Genus", method = "wilcox.test") 
+
+genus_diff_euk_gtdb <- c(genus_comparison_euk %>% 
+  filter(p.signif != "ns") %>% 
+  filter(p < 0.01) %>%
+  select(Genus)) # [1] "Bathycoccus"  "Reticulomyxa"
+
+# Adjusting for the FDR by hand
+genus_comparison_euk_gtdb <- genus_comparison_euk %>%
+  mutate(p.fdr = p.adjust(p, method="fdr"),
+         p.sig = ifelse(p < .05, "*", ""),
+         p.fdr.sig = ifelse(p.fdr < .05, "*", ""))
+
+genus_comparison_euk_gtdb_adj <- genus_comparison_euk_gtdb %>% 
+  filter(p.fdr.sig == "*") %>% 
+  select(Genus)
+
+genus_comparison_euk_gtdb_adj
+```
+
+# Special Taxa
+
+```{r, warning=FALSE}
+core_taxa$Special <- NA
+core_taxa$Special <- "Core taxa"
+
+diff_taxa <- rbind(diff_taxa, 
+                   c("Aquiluna", "Aquiluna sp000257665(RS_GCF_000257665_1)"))
+diff_taxa$Special <- NA
+diff_taxa$Special <- "Differential taxa"
+
+focus_taxa <- rbind(core_taxa, diff_taxa)
+focus_taxa
+
+
+taxa_prop <- as.data.frame(taxa_proportions(nps2, 'Genus', treatment = 'region'))
+taxa_prop$cat <- NA
+taxa_prop[taxa_prop$Genus %in% diff_taxa$Genus,]$cat <- "Differential taxa"
+taxa_prop[taxa_prop$Genus %in% core_taxa$Genus,]$cat <- "Core taxa"
+
+
+ggdotchart(taxa_prop[taxa_prop$Genus %in% focus_taxa$Genus,], 
+           x = "Genus", y = "Proportion",
+           color = "cat",                                # Color by groups
+           #palette = c("#00AFBB", "#E7B800", "#FC4E07"), # Custom color palette
+           sorting = "ascending",                        # Sort value in descending order
+           add = "segments",                             # Add segments from y = 0 to dots
+           ggtheme = theme_pubclean()                        # ggplot2 theme
+           ) + facet_wrap(~region, ncol = 1) +
+  lims(y = c(0, 0.07))
+
+```
+
+# Metabolism
+
+```{r, warning=FALSE, fig.dim=c(6,9)}
+# metabo.file <- "https://raw.githubusercontent.com/clarajegousse/mime-16s/main/metabolism/METABAT__194_kegg-metabolism_modules_modules.tsv"
+
+metabo.file = "all-kegg-metabolism-modules.txt"
+
+metabo <- read.delim(metabo.file, sep = "\t", dec = ".", header = TRUE, check.names = TRUE)
+colnames(metabo) <- stringr::str_replace_all(colnames(metabo), "_", ".")
+
+# select energy metabolism
+unique(metabo$module.category)
+
+nrj <- metabo[metabo$module.category == "Energy metabolism" & metabo$module.subcategory != "ATP synthesis",] 
+
+nrj$module.label <- NA
+nrj$module.label <- sapply(str_split(nrj$module.name, ","), `[`, 1) 
+nrj$module.label <- nrj$module.name 
+
+# unique(nrj[c("module.label", "kegg.module")])
+
+nrj$module.label <- paste(nrj$kegg.module, nrj$module.label)
+nrj$module.label <- forcats::fct_reorder(nrj$module.label, nrj$module.subcategory, min)
+
+p1 <- ggplot(nrj[nrj$module.completeness > 0.8,], 
+             aes(module.label, genome.name, fill = module.subcategory)) + # fill = module.subcategory
+  geom_tile() +
+  labs(alpha = "KEGG module completeness", x = "KEGG Module category", fill = "KEGG subcategory") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+p1
+```
+
